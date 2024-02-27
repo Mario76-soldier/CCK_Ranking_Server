@@ -1,0 +1,46 @@
+version: "3"
+volumes:
+  cckDB:
+    external: true
+
+services:
+  database:
+    container_name: mysql_db
+    image: mysql/mysql-server:8.0
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: cck
+      MYSQL_ROOT_HOST: '%'
+      MYSQL_ROOT_PASSWORD: 3304
+      TZ: 'Asia/Seoul'
+    ports:
+      - "4000:3306"
+    volumes:
+      - cckDB:/var/lib/mysql
+    command:
+      - "mysqld"
+      - "--character-set-server=utf8mb4"
+      - "--collation-server=utf8mb4_unicode_ci"
+    networks:
+      - test
+
+
+
+  application:
+    build:
+      context: .
+      dockerfile: compRanking.dockerfile
+    ports:
+      - "80:80"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql_db:4000/cck
+      SPRING_DATASOURCE_USERNAME: CCK_ADMIN
+      SPRING_DATASOURCE_PASSWORD: 3304
+    depends_on:
+      - database
+    restart: always
+    networks:
+      - test
+
+networks:
+  test:
