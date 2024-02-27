@@ -145,7 +145,7 @@
 		<div class="page-inner">
 			<div class="row">
 				<div class="input-field col s9">
-					<input id="search" name="search" type="text" class="validate" placeholder="search" onkeyup="enterSearch()">
+					<input id="search" name="search" type="text" class="validate" placeholder="search" onkeyup="enterSearch()" autofocus />
 					<input type="hidden" id="compIdx" name="compIdx" th:value="${compIdx}">
 					<input type="hidden" id="roundIdx" name="roundIdx" th:value="${roundIdx}">
 				</div>
@@ -180,7 +180,7 @@
 										<form th:action="@{/recordcomp(compIdx=${compIdx}, roundIdx=${roundIdx}, idx=${part.idx})}" method="post" th:object="${recorder}">
 											<input type="hidden" id="csrfToken" name="_csrf" th:value="${csrfToken}">
 										<tbody>
-										<td>[[${partStat.count}]]</td>
+										<td>[[${part.ranking}]]</td>
 										<td>[[${part.userName}]]</td>
 										<td>[[${part.email}]]</td>
 										<td th:if="${part.avgM>0}">[[${part.avgM}]]:[[${part.avgS}]]</td>

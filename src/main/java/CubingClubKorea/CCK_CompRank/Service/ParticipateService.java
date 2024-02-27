@@ -1,6 +1,7 @@
 package CubingClubKorea.CCK_CompRank.Service;
 
 
+import CubingClubKorea.CCK_CompRank.Repository.AccountRepository;
 import CubingClubKorea.CCK_CompRank.Repository.ParticipateRepository;
 import CubingClubKorea.CCK_CompRank.Entity.Participate;
 import jakarta.transaction.Transactional;
@@ -19,8 +20,12 @@ public class ParticipateService {
     @Autowired
     private final ParticipateRepository participateRepository;
 
-    public List<Participate> getParticipate(int round){
+    public List<Integer> getRank(int round){
         return participateRepository.findByRoundOrderByAvgMAscAvgSAsc(round);
+    }
+
+    public List<Participate> getParticipate(int round){
+        return participateRepository.findByRound(round);
     }
 
     public List<Participate> getSearchedParticipate(int round, String search){
@@ -261,6 +266,10 @@ public class ParticipateService {
         participateRepository.deleteByIdx(idx);
     }
 
+    public void deleteByRoundIdx(int idx){
+        participateRepository.deleteByRound(idx);
+    }
+
     public int addParticipate(Participate participate){
         return participateRepository.save(participate).getIdx();
     }
@@ -269,5 +278,13 @@ public class ParticipateService {
         for(int i=0; i<advance; i++){
             participateRepository.save(participate.get(i));
         }
+    }
+
+    public void updateChecker(String checker, int idx){
+        participateRepository.updateChecker2(checker, idx);
+    }
+
+    public void updateRanking(int ranking, int idx){
+        participateRepository.updateRanking(ranking, idx);
     }
 }

@@ -746,6 +746,15 @@ padding: 0 15px 0px 15px;
 		top: 130px;
 		box-shadow: none;
 	}
+    .fixedCol{
+        overflow:hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        max-width:90px;
+    }
+    .noShowMobile{
+        display:none;
+    }
  }
   @media(max-width:520px) {
 	  ul#dropdown1 {

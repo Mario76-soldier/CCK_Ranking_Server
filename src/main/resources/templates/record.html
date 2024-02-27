@@ -1,6 +1,5 @@
-﻿<!DOCTYPE html>>
+﻿<!DOCTYPE html>
 <html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
-
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -134,7 +133,7 @@
                                     <thead>
                                     <tr>
                                         <th>순위</th>
-                                        <th>이름</th>
+                                        <th class="fixedCol">이름</th>
                                         <th>평균</th>
                                         <th>최고</th>
                                         <th>아이디</th>
@@ -143,7 +142,8 @@
                                         <th>3</th>
                                         <th>4</th>
                                         <th>5</th>
-
+                                        <th sec:authorize="hasAuthority('admin')">1차 확인</th>
+                                        <th sec:authorize="hasAuthority('admin')">2차 확인</th>
                                     </tr>
                                     </thead>
                                     <div th:each="part, partStat:${partList}">
@@ -160,8 +160,8 @@
                                     <div th:if="${round.advance==3} and ${partStat.count==3}">
                                         <tr class="warning">
                                     </div>
-                                        <td>[[${partStat.count}]]</td>
-                                        <td>[[${part.userName}]]</td>
+                                        <td>[[${part.ranking}]]</td>
+                                        <td class="fixedCol">[[${part.userName}]]</td>
                                         <td th:if="${part.avgM>0}">[[${part.avgM}]]:[[${part.avgS}]]</td>
                                         <td th:if="${part.avgS==-1}">DNF</td>
                                         <td th:if="${part.avgS==-2}">DNS</td>
@@ -198,7 +198,20 @@
                                         <td th:if="${part.s5==-2}">DNS</td>
                                         <td th:if="${part.m5==0} and ${part.s5==0}"></td>
                                         <td th:if="${part.m5==0} and ${part.s5>0}">[[${part.s5}]]</td>
-
+                                        <td sec:authorize="hasAuthority('admin')">[[${part.checker1}]]</td>
+                                    <td sec:authorize="hasAuthority('admin')">
+                                        <div th:if="${not #strings.isEmpty(part.checker2)}">
+                                        [[${part.checker2}]]
+                                        </div>
+                                        <div th:unless="${not #strings.isEmpty(part.checker2)}">
+                                        <form th:action="@{/updatechecker(compIdx=${compIdx}, roundIdx=${roundIdx},idx=${part.idx})}" method="post">
+                                            <input type="hidden" id="csrfToken1" name="_csrf" th:value="${csrfToken}">
+                                            <div class="button">
+                                                <button type="submit" class="waves-effect waves-light btn">2차 확인</button>
+                                            </div>
+                                        </form>
+                                        </div>
+                                    </td>
                                     </tr>
                                     </tbody>
                                     </div>
