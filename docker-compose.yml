@@ -10,8 +10,9 @@ services:
     restart: unless-stopped
     environment:
       MYSQL_DATABASE: cck
-      MYSQL_ROOT_HOST: '%'
-      MYSQL_ROOT_PASSWORD: 3304
+      MYSQL_ROOT_PASSWORD: ${ROOT_PASSWORD}
+      MYSQL_USER: ${USER}
+      MYSQL_PASSWORD: ${PASSWORD}
       TZ: 'Asia/Seoul'
     ports:
       - "4000:3306"
@@ -24,8 +25,6 @@ services:
     networks:
       - test
 
-
-
   application:
     build:
       context: .
@@ -33,9 +32,9 @@ services:
     ports:
       - "80:80"
     environment:
-      SPRING_DATASOURCE_URL: jdbc:mysql://mysql_db:4000/cck
-      SPRING_DATASOURCE_USERNAME: CCK_ADMIN
-      SPRING_DATASOURCE_PASSWORD: 3304
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql_db:3306/cck
+      SPRING_DATASOURCE_USERNAME: ${USER}
+      SPRING_DATASOURCE_PASSWORD: ${PASSWORD}
     depends_on:
       - database
     restart: always
