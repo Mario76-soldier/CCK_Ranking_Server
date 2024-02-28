@@ -1,5 +1,6 @@
 package CubingClubKorea.CCK_CompRank.Structure;
 
+import CubingClubKorea.CCK_CompRank.Entity.CubeEvent;
 import lombok.Getter;
 import lombok.Setter;
 

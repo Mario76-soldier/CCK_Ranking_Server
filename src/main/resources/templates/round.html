@@ -124,11 +124,11 @@
 						<div th:each="past:${pastList}">
 							<div class="card horizontal cardIcon waves-effect waves-dark" th:onclick="|location.href='@{/record(compIdx=${comp.idx}, roundIdx=${past.idx})}'|">
 								<div class="card-image blue"><!--완료는 파란색-->
-									<img th:src="@{'/img/'+${past.eventName}+'.svg'}"/>
+									<img th:src="@{'/img/'+${past.cubeEvent.eventName}+'.svg'}"/>
 								</div>
 								<div class="card-stacked blue">
 									<div class="card-content">
-										<h3>[[${past.eventName}]] [[${past.round}]]</h3>
+										<h3>[[${past.cubeEvent.eventName}]] [[${past.round}]]</h3>
 									</div>
 									<div class="card-action">
 										<strong>[[${#dates.format(past.eventStart, 'HH:mm')}]] - [[${#dates.format(past.eventEnd, 'HH:mm')}]]</strong>
@@ -151,11 +151,11 @@
 						<div th:each="now:${nowList}">
 							<div class="card horizontal cardIcon waves-effect waves-dark" th:onclick="|location.href='@{/record(compIdx=${comp.idx}, roundIdx=${now.idx})}'|">
 								<div class="card-image green"><!--진행은 초록색-->
-									<img th:src="@{'/img/'+${now.eventName}+'.svg'}"/>
+									<img th:src="@{'/img/'+${now.cubeEvent.eventName}+'.svg'}"/>
 								</div>
 								<div class="card-stacked green">
 									<div class="card-content">
-										<h3>[[${now.eventName}]] [[${now.round}]]</h3>
+										<h3>[[${now.cubeEvent.eventName}]] [[${now.round}]]</h3>
 									</div>
 									<div class="card-action">
 										<strong>[[${#dates.format(now.eventStart, 'HH:mm')}]] - [[${#dates.format(now.eventEnd, 'HH:mm')}]]</strong>
@@ -178,11 +178,11 @@
 						<div th:each="future:${futureList}">
 							<div class="card horizontal cardIcon waves-effect waves-dark" th:onclick="|location.href='@{/record(compIdx=${comp.idx}, roundIdx=${future.idx})}'|">
 								<div class="card-image orange"><!--예정은 노란색-->
-									<img th:src="@{'/img/'+${future.eventName}+'.svg'}"/>
+									<img th:src="@{'/img/'+${future.cubeEvent.eventName}+'.svg'}"/>
 								</div>
 								<div class="card-stacked orange">
 									<div class="card-content">
-										<h3>[[${future.eventName}]] [[${future.round}]]</h3>
+										<h3>[[${future.cubeEvent.eventName}]] [[${future.round}]]</h3>
 									</div>
 									<div class="card-action">
 										<strong>[[${#dates.format(future.eventStart, 'HH:mm')}]] - [[${#dates.format(future.eventEnd, 'HH:mm')}]]</strong>

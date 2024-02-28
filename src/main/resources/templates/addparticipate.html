@@ -116,7 +116,7 @@
 				[[${comp.compName}]]
 			</h1>
 			<h3 class="page-header">
-				[[${round.eventName}]] [[${round.round}]]
+				[[${round.cubeEvent.eventName}]] [[${round.round}]]
 			</h3>
 
 		</div>
@@ -138,7 +138,7 @@
 										<form th:action="@{/addparticipate(compIdx=${compIdx}, roundIdx=${roundIdx})}" method="post" th:object="${participate}">
 											<input type="hidden" id="csrfToken" name="_csrf" th:value="${csrfToken}">
 										<tbody>
-										<input type="hidden" name="eventName" id="eventName" th:value="${round.getEventName()}" class="validate">
+										<input type="hidden" name="eventName" id="eventName" th:value="${round.getCubeEvent().getEventName()}" class="validate">
 										<input type="hidden" name="round" id="round" th:value="${roundIdx}" class="validate">
 										<td>
 											<input type="text" name="userName" id="userName" class="validate">

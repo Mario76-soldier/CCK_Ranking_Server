@@ -137,7 +137,7 @@
 				[[${comp.compName}]]
 			</h1>
 			<h3 class="page-header">
-				[[${round.eventName}]] [[${round.round}]]
+				[[${round.cubeEvent.eventName}]] [[${round.round}]]
 			</h3>
 
 		</div>
@@ -171,8 +171,10 @@
 										<th>1</th>
 										<th>2</th>
 										<th>3</th>
-										<th>4</th>
-										<th>5</th>
+										<th:block th:if="${round.cubeEvent.avgCalc=='ao5'}">
+											<th>4</th>
+											<th>5</th>
+										</th:block>
 
 									</tr>
 									</thead>
@@ -200,11 +202,15 @@
 												<input type="number" id="second" name="second" th:value="${part.m2}*10000+${#numbers.formatInteger(part.s2*100,1)}">
 											</td><td>
 												<input type="number" id="third" name="third" th:value="${part.m3}*10000+${#numbers.formatInteger(part.s3*100,1)}">
-											</td><td>
+											</td>
+											<th:block th:if="${round.cubeEvent.avgCalc=='ao5'}">
+												<td>
 												<input type="number" id="fourth" name="fourth" th:value="${part.m4}*10000+${#numbers.formatInteger(part.s4*100,1)}">
-											</td><td>
+											</td>
+												<td>
 												<input type="number" id="fifth" name="fifth" th:value="${part.m5}*10000+${#numbers.formatInteger(part.s5*100,1)}">
 											</td>
+											</th:block>
 											<td>
 												<div class="button">
 													<button type="submit" class="waves-effect waves-light btn">입력</button>

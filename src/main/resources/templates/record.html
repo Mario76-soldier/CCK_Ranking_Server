@@ -117,7 +117,7 @@
                 [[${comp.compName}]]
             </h1>
             <h3 class="page-header">
-                [[${round.eventName}]] [[${round.round}]]
+                [[${round.cubeEvent.eventName}]] [[${round.round}]]
             </h3>
         </div>
 
@@ -140,8 +140,10 @@
                                         <th>1</th>
                                         <th>2</th>
                                         <th>3</th>
+                                        <th:block th:if="${round.cubeEvent.avgCalc=='ao5'}">
                                         <th>4</th>
                                         <th>5</th>
+                                        </th:block>
                                         <th sec:authorize="hasAuthority('admin')">1차 확인</th>
                                         <th sec:authorize="hasAuthority('admin')">2차 확인</th>
                                     </tr>
@@ -188,6 +190,7 @@
                                         <td th:if="${part.s3==-2}">DNS</td>
                                         <td th:if="${part.m3==0} and ${part.s3==0}"></td>
                                         <td th:if="${part.m3==0} and ${part.s3>0}">[[${part.s3}]]</td>
+                                    <th:block th:if="${round.cubeEvent.avgCalc=='ao5'}">
                                         <td th:if="${part.m4>0}">[[${part.m4}]]:[[${part.s4}]]</td>
                                         <td th:if="${part.s4==-1}">DNF</td>
                                         <td th:if="${part.s4==-2}">DNS</td>
@@ -198,6 +201,7 @@
                                         <td th:if="${part.s5==-2}">DNS</td>
                                         <td th:if="${part.m5==0} and ${part.s5==0}"></td>
                                         <td th:if="${part.m5==0} and ${part.s5>0}">[[${part.s5}]]</td>
+                                    </th:block>
                                         <td sec:authorize="hasAuthority('admin')">[[${part.checker1}]]</td>
                                     <td sec:authorize="hasAuthority('admin')">
                                         <div th:if="${not #strings.isEmpty(part.checker2)}">
