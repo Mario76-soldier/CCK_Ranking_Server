@@ -114,32 +114,32 @@
 			<div class="header">
 				<h1 class="page-header">
 					다가오는 대회
-                </h1>
+				</h1>
 			</div>
 			<div class="page-inner">
 				<div class="dashboard-cards">
 					<div class="row">
 						<div class="col-md-8 col-sm-8">
 							<div th:each="future:${futureList}">
-							<div class="card" th:onclick="|location.href='@{/round(compIdx=${future.idx})}'|">
-								<div class="card-content">
+								<div class="card" th:onclick="|location.href='@{/round(compIdx=${future.idx})}'|">
+									<div class="card-content">
 										<span class="card-title">[[${future.compName}]]</span>
 										<p th:text="${#dates.format(future.compDate, 'yyyy-MM-dd')}"></p>
 									</div>
 								</div>
 								<div sec:authorize="hasAuthority('admin')">
-								<form th:action="@{/deletecomp(idx=${future.getIdx()})}" method="post">
-									<button type="submit" class="waves-effect waves-light btn">삭제하기</button>
-								</form>
+									<form th:action="@{/deletecomp(idx=${future.getIdx()})}" method="post" id="f">
+										<button onclick="deleteConfirmF()" class="waves-effect waves-light btn">삭제하기</button>
+									</form>
 								</div>
 							</div>
 						</div>
 					</div>
 				</div>
 				<div sec:authorize="hasAuthority('admin')">
-                <div class="">
-                    <a class="waves-effect waves-light btn-large" th:href="makecomp">대회 만들기</a>
-                </div>
+					<div class="">
+						<a class="waves-effect waves-light btn-large" th:href="makecomp">대회 만들기</a>
+					</div>
 				</div>
 				<a id="now"></a>
 			</div>
@@ -154,16 +154,16 @@
 					<div class="row">
 						<div class="col-md-8 col-sm-8">
 							<div th:each="today:${todayList}">
-							<div class="card teal" th:onclick="|location.href='@{/round(compIdx=${today.idx})}'|">
-								<div class="card-content white-text">
+								<div class="card teal" th:onclick="|location.href='@{/round(compIdx=${today.idx})}'|">
+									<div class="card-content white-text">
 										<span class="card-title">[[${today.compName}]]</span>
-									<p th:text="${#dates.format(today.compDate, 'yyyy-MM-dd')}"></p>
+										<p th:text="${#dates.format(today.compDate, 'yyyy-MM-dd')}"></p>
 									</div>
 								</div>
 								<div sec:authorize="hasAuthority('admin')">
-								<form th:action="@{/deletecomp(idx=${today.getIdx()})}" method="post">
-									<button type="submit" class="waves-effect waves-light btn">삭제하기</button>
-								</form>
+									<form th:action="@{/deletecomp(idx=${today.getIdx()})}" method="post" id="t">
+										<button onclick="deleteConfirmT()" type="button" class="waves-effect waves-light btn">삭제하기</button>
+									</form>
 								</div>
 							</div>
 						</div>
@@ -183,17 +183,17 @@
 					<div class="row">
 						<div class="col-md-8 col-sm-8">
 							<div th:each="past:${pastList}">
-							<div class="card blue-grey darken-1" th:onclick="|location.href='@{/round(compIdx=${past.idx})}'|">
-								<div class="card-content white-text">
+								<div class="card blue-grey darken-1" th:onclick="|location.href='@{/round(compIdx=${past.idx})}'|">
+									<div class="card-content white-text">
 
 										<span class="card-title">[[${past.getCompName()}]]</span>
-									<p th:text="${#dates.format(past.compDate, 'yyyy-MM-dd')}"></p>
+										<p th:text="${#dates.format(past.compDate, 'yyyy-MM-dd')}"></p>
 									</div>
 								</div>
 								<div sec:authorize="hasAuthority('admin')">
-								<form th:action="@{/deletecomp(idx=${past.getIdx()})}" method="post">
-									<button type="submit" class="waves-effect waves-light btn">삭제하기</button>
-								</form>
+									<form th:action="@{/deletecomp(idx=${past.getIdx()})}" method="post" id="p">
+										<button type="button" onclick="deleteConfirmP()" class="waves-effect waves-light btn">삭제하기</button>
+									</form>
 								</div>
 							</div>
 						</div>
@@ -228,6 +228,32 @@
 
 	<!-- Custom Js -->
 	<script src="/js/custom-scripts.js"></script>
+
+	<script>function deleteConfirmP(){
+		if(confirm("정말 삭제하시겠습니까?")){
+			document.getElementById("p").submit();
+		}
+		else{
+			return false;
+		}
+	}
+	function deleteConfirmT(){
+		if(confirm("정말 삭제하시겠습니까?")){
+			document.getElementById("t").submit();
+		}
+		else{
+			return false;
+		}
+	}
+	function deleteConfirmF(){
+		if(confirm("정말 삭제하시겠습니까?")){
+			document.getElementById("f").submit();
+		}
+		else{
+			return false;
+		}
+	}
+	</script>
 
 
 </body>
