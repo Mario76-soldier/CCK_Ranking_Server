@@ -128,8 +128,8 @@
 									</div>
 								</div>
 								<div sec:authorize="hasAuthority('admin')">
-									<form th:action="@{/deletecomp(idx=${future.getIdx()})}" method="post" id="f">
-										<button onclick="deleteConfirmF()" class="waves-effect waves-light btn">삭제하기</button>
+									<form th:action="@{/deletecomp(idx=${future.getIdx()})}" method="post" th:id="${future.idx}">
+										<button th:onclick="deleteConfirm([[${future.idx}]])" class="waves-effect waves-light btn">삭제하기</button>
 									</form>
 								</div>
 							</div>
@@ -161,8 +161,8 @@
 									</div>
 								</div>
 								<div sec:authorize="hasAuthority('admin')">
-									<form th:action="@{/deletecomp(idx=${today.getIdx()})}" method="post" id="t">
-										<button onclick="deleteConfirmT()" type="button" class="waves-effect waves-light btn">삭제하기</button>
+									<form th:action="@{/deletecomp(idx=${today.getIdx()})}" method="post" th:id="${today.idx}">
+										<button th:onclick="deleteConfirm([[${today.idx}]])" type="button" class="waves-effect waves-light btn">삭제하기</button>
 									</form>
 								</div>
 							</div>
@@ -191,8 +191,8 @@
 									</div>
 								</div>
 								<div sec:authorize="hasAuthority('admin')">
-									<form th:action="@{/deletecomp(idx=${past.getIdx()})}" method="post" id="p">
-										<button type="button" onclick="deleteConfirmP()" class="waves-effect waves-light btn">삭제하기</button>
+									<form th:action="@{/deletecomp(idx=${past.getIdx()})}" method="post" th:id="${past.idx}">
+										<button type="button" th:onclick="deleteConfirm([[${past.idx}]])" class="waves-effect waves-light btn">삭제하기</button>
 									</form>
 								</div>
 							</div>
@@ -229,25 +229,9 @@
 	<!-- Custom Js -->
 	<script src="/js/custom-scripts.js"></script>
 
-	<script>function deleteConfirmP(){
+	<script>function deleteConfirm(id){
 		if(confirm("정말 삭제하시겠습니까?")){
-			document.getElementById("p").submit();
-		}
-		else{
-			return false;
-		}
-	}
-	function deleteConfirmT(){
-		if(confirm("정말 삭제하시겠습니까?")){
-			document.getElementById("t").submit();
-		}
-		else{
-			return false;
-		}
-	}
-	function deleteConfirmF(){
-		if(confirm("정말 삭제하시겠습니까?")){
-			document.getElementById("f").submit();
+			document.getElementById(id).submit();
 		}
 		else{
 			return false;

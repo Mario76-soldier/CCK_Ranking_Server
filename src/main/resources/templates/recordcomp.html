@@ -205,21 +205,21 @@
 											</td>
 											<th:block th:if="${round.cubeEvent.avgCalc=='ao5'}">
 												<td>
-												<input type="number" id="fourth" name="fourth" th:value="${part.m4}*10000+${#numbers.formatInteger(part.s4*100,1)}">
-											</td>
+													<input type="number" id="fourth" name="fourth" th:value="${part.m4}*10000+${#numbers.formatInteger(part.s4*100,1)}">
+												</td>
 												<td>
-												<input type="number" id="fifth" name="fifth" th:value="${part.m5}*10000+${#numbers.formatInteger(part.s5*100,1)}">
-											</td>
+													<input type="number" id="fifth" name="fifth" th:value="${part.m5}*10000+${#numbers.formatInteger(part.s5*100,1)}">
+												</td>
 											</th:block>
 											<td>
 												<div class="button">
 													<button type="submit" class="waves-effect waves-light btn">입력</button>
 												</div>
 										</form>
-										<form th:action="@{/deleterecord(compIdx=${compIdx}, roundIdx=${roundIdx}, idx=${part.idx})}" method="post" id="dt">
+										<form th:action="@{/deleterecord(compIdx=${compIdx}, roundIdx=${roundIdx}, idx=${part.idx})}" method="post" th:id="${part.idx}">
 											<input type="hidden" id="csrfToken1" name="_csrf" th:value="${csrfToken}">
 											<div class="button">
-												<button type="button" onclick="deleteConfirm()" class="waves-effect waves-light btn">삭제</button>
+												<button type="button" th:onclick="deleteConfirm([[${part.idx}]])" class="waves-effect waves-light btn">삭제</button>
 											</div>
 										</form>
 										</td>
@@ -271,9 +271,9 @@
 	<!-- Custom Js -->
 	<script src="/js/custom-scripts.js"></script>
 
-	<script>function deleteConfirm(){
+	<script>function deleteConfirm(id){
 		if(confirm("정말 삭제하시겠습니까?")){
-			document.getElementById("dt").submit();
+			document.getElementById(id).submit();
 		}
 		else{
 			return false;
