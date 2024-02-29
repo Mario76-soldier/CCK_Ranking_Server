@@ -41,11 +41,10 @@ public class MainController {
 
     private final EventService eventService;
 
-    private Date now=new Date();
-
     SimpleDateFormat formatter=new SimpleDateFormat("yyyy-MM-dd'T'HH:mm");
     @GetMapping("/")
     public String MainPage(Model model){
+        Date now=new Date();
         List<CompList> compListPast=complistService.getListPast(now);
         List<CompList> compListToday=complistService.getListToday(now);
         List<CompList> compListFuture=complistService.getListFuture(now);
@@ -57,6 +56,7 @@ public class MainController {
 
     @GetMapping("/index")
     public String Index(Model model) {
+        Date now=new Date();
         List<CompList> compListPast=complistService.getListPast(now);
         List<CompList> compListToday=complistService.getListToday(now);
         List<CompList> compListFuture=complistService.getListFuture(now);
@@ -68,6 +68,7 @@ public class MainController {
 
     @GetMapping("/round")
     public String Round(@RequestParam(name="compIdx") int compIdx , Model model){
+        Date now=new Date();
         CompList comp=complistService.getOne(compIdx);
         List<Round> roundPast=roundService.getRoundPast(now, compIdx);
         List<Round> roundNow=roundService.getRoundNow(now, compIdx);
