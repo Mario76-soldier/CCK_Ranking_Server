@@ -1,9 +1,10 @@
 ﻿<!DOCTYPE html>
 <html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
+    <meta name="_csrf" th:content="${_csrf.token}"/>
+    <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Ranking</title>
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link rel="stylesheet" href="/css/materialize.min.css" media="screen,projection" />
     <!-- Bootstrap Styles-->
@@ -17,30 +18,48 @@
     <!-- Google Fonts-->
     <link href='http://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css' />
     <link rel="stylesheet" href="/js/Lightweight-Chart/cssCharts.css">
-    <meta name="_csrf" th:content="${_csrf.token}"/>
-    <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
+    <title>CCK CompRanking</title>
+    <script type="text/javascript">
+        function searchRedirect(){
+            var search=document.getElementById('search').value;
+            var compIdx=document.getElementById('compIdx').value;
+            var roundIdx=document.getElementById('roundIdx').value;
+            var url="/record?compIdx="+compIdx+"&roundIdx="+roundIdx+"&search="+search;
+            location.href=url;
+        }
+
+        function enterSearch(){
+            if(window.event.keyCode==13) {
+                var search = document.getElementById('search').value;
+                var compIdx = document.getElementById('compIdx').value;
+                var roundIdx = document.getElementById('roundIdx').value;
+                var url = "/record?compIdx=" + compIdx + "&roundIdx=" + roundIdx + "&search=" + search;
+                location.href = url;
+            }
+        }
+    </script>
 </head>
 
 <body>
 <div id="wrapper">
     <nav class="navbar navbar-default top-navbar" role="navigation">
         <div class="navbar-header">
-            <button type="button" class="navbar-toggle waves-effect waves-dark" data-toggle="collapse"
-                    data-target=".sidebar-collapse">
+            <button class="navbar-toggle waves-effect waves-dark" data-target=".sidebar-collapse" data-toggle="collapse"
+                    type="button">
                 <span class="sr-only">Toggle navigation</span>
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
             </button>
             <a class="navbar-brand waves-effect waves-dark" th:href="index">
-                <img src="/img/img.png" alt="logo" width="45px" height="45px"/><strong>CompRanking</strong></a>
+                <img alt="logo" height="45px" src="/img/img.png" width="45px"/><strong>CompRanking</strong></a>
 
-            <div id="sideNav" href=""><i class="material-icons dp48">toc</i></div>
+            <div href="" id="sideNav"><i class="material-icons dp48">toc</i></div>
         </div>
 
         <ul class="nav navbar-top-links navbar-right">
             <li>
-                <a class="dropdown-button waves-effect waves-dark" href="#!" data-activates="dropdown1">
+                <a class="dropdown-button waves-effect waves-dark" data-activates="dropdown1" href="#!">
                     <div sec:authorize="isAnonymous()">
                         <i class="fa fa-user fa-fw"></i> <b>login</b>
                         <i class="material-icons right">arrow_drop_down</i>
@@ -54,7 +73,7 @@
         </ul>
     </nav>
     <!-- Dropdown Structure -->
-    <ul id="dropdown1" class="dropdown-content">
+    <ul class="dropdown-content" id="dropdown1">
         <div sec:authorize="isAnonymous()">
             <li><a href="/login"><i class="fa fa-user fa-fw"></i>로그인</a>
             </li>
@@ -63,7 +82,7 @@
         <div sec:authorize="isAuthenticated()">
             <li><a href="/register"><i class="fa fa-user fa-fw"></i> My Profile</a>
             </li>
-            <form id="logout" action="/logout" method="post" onclick="this.submit()">
+            <form action="/logout" id="logout" method="post" onclick="this.submit()">
                 <li><i class="fa fa-sign-out fa-fw"></i> Logout
             </form>
             </li>
@@ -91,10 +110,11 @@
                     </ul>
                 </li>
                 <li>
-                    <a th:href="register" class="waves-effect waves-dark"><i class="fa fa-bar-chart-o"></i>개인 기록 보러가기</a>
+                    <a class="waves-effect waves-dark" th:href="register"><i class="fa fa-bar-chart-o"></i>개인 기록
+                        보러가기</a>
                 </li>
                 <li>
-                    <a th:href="register" class="waves-effect waves-dark"><i class="fa fa-edit"></i> 대회 신청 </a>
+                    <a class="waves-effect waves-dark" th:href="register"><i class="fa fa-edit"></i> 대회 신청 </a>
                 </li>
             </ul>
             <div class="footer">
@@ -111,6 +131,7 @@
     </nav>
     <!-- /. NAV SIDE  -->
 
+    <a id="future"></a>
     <div id="page-wrapper">
         <div class="header">
             <h1 class="page-header">
@@ -122,7 +143,15 @@
         </div>
 
         <div class="page-inner">
-
+            <div class="row">
+                <div class="input-field col s9">
+                    <input autofocus class="validate" id="search" name="search" onkeyup="enterSearch()"
+                           placeholder="search" type="text"/>
+                    <input id="compIdx" name="compIdx" th:value="${compIdx}" type="hidden">
+                    <input id="roundIdx" name="roundIdx" th:value="${roundIdx}" type="hidden">
+                </div>
+                <a class="waves-effect waves-light btn" onclick="searchRedirect()">검색하기</a>
+            </div>
             <div class="row">
                 <div class="col-md-12">
                     <!-- Advanced Tables -->
@@ -141,27 +170,27 @@
                                         <th class="noShowMobile">2</th>
                                         <th class="noShowMobile">3</th>
                                         <th:block th:if="${round.cubeEvent.avgCalc=='ao5'}">
-                                        <th class="noShowMobile">4</th>
-                                        <th class="noShowMobile">5</th>
+                                            <th class="noShowMobile">4</th>
+                                            <th class="noShowMobile">5</th>
                                         </th:block>
                                         <th class="noShowMobile" sec:authorize="hasAuthority('admin')">1차 확인</th>
                                         <th class="noShowMobile" sec:authorize="hasAuthority('admin')">2차 확인</th>
                                     </tr>
                                     </thead>
                                     <div th:each="part, partStat:${partList}">
-                                    <tbody th:onclick="openModal([[${part.idx}]])">
-                                    <div th:if="${partStat.count<=round.advance} ">
-                                        <tr class="success">
-                                    </div>
-                                    <div th:if="${round.advance==3} and ${partStat.count==1}">
-                                        <tr class="info">
-                                    </div>
-                                    <div th:if="${round.advance==3} and ${partStat.count==2}">
-                                        <tr class="success">
-                                    </div>
-                                    <div th:if="${round.advance==3} and ${partStat.count==3}">
-                                        <tr class="warning">
-                                    </div>
+                                        <tbody th:onclick="openModal([[${part.idx}]])">
+                                        <div th:if="${partStat.count<=round.advance} ">
+                                            <tr class="success">
+                                        </div>
+                                        <div th:if="${round.advance==3} and ${partStat.count==1}">
+                                            <tr class="info">
+                                        </div>
+                                        <div th:if="${round.advance==3} and ${partStat.count==2}">
+                                            <tr class="success">
+                                        </div>
+                                        <div th:if="${round.advance==3} and ${partStat.count==3}">
+                                            <tr class="warning">
+                                        </div>
                                         <td>[[${part.ranking}]]</td>
                                         <td class="fixedCol">[[${part.userName}]]</td>
                                         <td th:if="${part.avgM>0}">[[${part.avgM}]]:[[${part.avgS}]]</td>
@@ -179,97 +208,134 @@
                                         <td class="noShowMobile" th:if="${part.s1==-1}">DNF</td>
                                         <td class="noShowMobile" th:if="${part.s1==-2}">DNS</td>
                                         <td class="noShowMobile" th:if="${part.m1==0} and ${part.s1==0}"></td>
-                                        <td class="noShowMobile" th:if="${part.m1==0} and ${part.s1>0}">[[${part.s1}]]</td>
+                                        <td class="noShowMobile" th:if="${part.m1==0} and ${part.s1>0}">[[${part.s1}]]
+                                        </td>
                                         <td class="noShowMobile" th:if="${part.m2>0}">[[${part.m2}]]:[[${part.s2}]]</td>
                                         <td class="noShowMobile" th:if="${part.s2==-1}">DNF</td>
                                         <td class="noShowMobile" th:if="${part.s2==-2}">DNS</td>
                                         <td class="noShowMobile" th:if="${part.m2==0} and ${part.s2==0}"></td>
-                                        <td class="noShowMobile" th:if="${part.m2==0} and ${part.s2>0}">[[${part.s2}]]</td>
+                                        <td class="noShowMobile" th:if="${part.m2==0} and ${part.s2>0}">[[${part.s2}]]
+                                        </td>
                                         <td class="noShowMobile" th:if="${part.m3>0}">[[${part.m3}]]:[[${part.s3}]]</td>
                                         <td class="noShowMobile" th:if="${part.s3==-1}">DNF</td>
                                         <td class="noShowMobile" th:if="${part.s3==-2}">DNS</td>
                                         <td class="noShowMobile" th:if="${part.m3==0} and ${part.s3==0}"></td>
-                                        <td class="noShowMobile" th:if="${part.m3==0} and ${part.s3>0}">[[${part.s3}]]</td>
-                                    <th:block th:if="${round.cubeEvent.avgCalc=='ao5'}">
-                                        <td class="noShowMobile" th:if="${part.m4>0}">[[${part.m4}]]:[[${part.s4}]]</td>
-                                        <td class="noShowMobile" th:if="${part.s4==-1}">DNF</td>
-                                        <td class="noShowMobile" th:if="${part.s4==-2}">DNS</td>
-                                        <td class="noShowMobile" th:if="${part.m4==0} and ${part.s4==0}"></td>
-                                        <td class="noShowMobile" th:if="${part.m4==0} and ${part.s4>0}">[[${part.s4}]]</td>
-                                        <td class="noShowMobile" th:if="${part.m5>0}">[[${part.m5}]]:[[${part.s5}]]</td>
-                                        <td class="noShowMobile" th:if="${part.s5==-1}">DNF</td>
-                                        <td class="noShowMobile" th:if="${part.s5==-2}">DNS</td>
-                                        <td class="noShowMobile" th:if="${part.m5==0} and ${part.s5==0}"></td>
-                                        <td class="noShowMobile" th:if="${part.m5==0} and ${part.s5>0}">[[${part.s5}]]</td>
-                                    </th:block>
-                                    <div class="modalContainer" th:id="${part.idx}" style="display: none">
-                                        <div class="modalContent">
-                                            <h3 style="margin-bottom:30px; font-weight: 600;">[[${part.userName}]] #[[${part.ranking}]]</h3>
-                                            <h4 style="font-weight: 550;">이메일</h4>
-                                            <h5>[[${part.email}]]</h5>
-                                            <h4 style="font-weight: 550;">솔빙내역</h4>
-                                            <h5 style="display: inline" th:if="${part.m1>0}">[[${part.m1}]]:[[${part.s1}]]</h5>
-                                            <h5 style="display: inline" th:if="${part.s1==-1}">DNF</h5>
-                                            <h5 style="display: inline" th:if="${part.s1==-2}">DNS</h5>
-                                            <h5 style="display: inline" th:if="${part.m1==0} and ${part.s1==0}">n/a</h5>
-                                            <h5 style="display: inline" th:if="${part.m1==0} and ${part.s1>0}">[[${part.s1}]]</h5>
-                                            <h5 style="display: inline">|</h5>
-                                            <h5 style="display: inline" th:if="${part.m2>0}">[[${part.m2}]]:[[${part.s2}]]</h5>
-                                            <h5 style="display: inline" th:if="${part.s2==-1}">DNF</h5>
-                                            <h5 style="display: inline" th:if="${part.s2==-2}">DNS</h5>
-                                            <h5 style="display: inline" th:if="${part.m2==0} and ${part.s2==0}">n/a</h5>
-                                            <h5 style="display: inline" th:if="${part.m2==0} and ${part.s2>0}">[[${part.s2}]]</h5>
-                                            <h5 style="display: inline">|</h5>
-                                            <h5 style="display: inline" th:if="${part.m3>0}">[[${part.m3}]]:[[${part.s3}]]</h5>
-                                            <h5 style="display: inline" th:if="${part.s3==-1}">DNF</h5>
-                                            <h5 style="display: inline" th:if="${part.s3==-2}">DNS</h5>
-                                            <h5 style="display: inline" th:if="${part.m3==0} and ${part.s3==0}">n/a</h5>
-                                            <h5 style="display: inline" th:if="${part.m3==0} and ${part.s3>0}">[[${part.s3}]]</h5>
-                                            <th:block th:if="${round.cubeEvent.avgCalc=='ao5'}">
+                                        <td class="noShowMobile" th:if="${part.m3==0} and ${part.s3>0}">[[${part.s3}]]
+                                        </td>
+                                        <th:block th:if="${round.cubeEvent.avgCalc=='ao5'}">
+                                            <td class="noShowMobile" th:if="${part.m4>0}">
+                                                [[${part.m4}]]:[[${part.s4}]]
+                                            </td>
+                                            <td class="noShowMobile" th:if="${part.s4==-1}">DNF</td>
+                                            <td class="noShowMobile" th:if="${part.s4==-2}">DNS</td>
+                                            <td class="noShowMobile" th:if="${part.m4==0} and ${part.s4==0}"></td>
+                                            <td class="noShowMobile" th:if="${part.m4==0} and ${part.s4>0}">
+                                                [[${part.s4}]]
+                                            </td>
+                                            <td class="noShowMobile" th:if="${part.m5>0}">
+                                                [[${part.m5}]]:[[${part.s5}]]
+                                            </td>
+                                            <td class="noShowMobile" th:if="${part.s5==-1}">DNF</td>
+                                            <td class="noShowMobile" th:if="${part.s5==-2}">DNS</td>
+                                            <td class="noShowMobile" th:if="${part.m5==0} and ${part.s5==0}"></td>
+                                            <td class="noShowMobile" th:if="${part.m5==0} and ${part.s5>0}">
+                                                [[${part.s5}]]
+                                            </td>
+                                        </th:block>
+                                        <div class="modalContainer" style="display: none" th:id="${part.idx}">
+                                            <div class="modalContent">
+                                                <h3 style="margin-bottom:30px; font-weight: 600; font-family: One_Mobile_Bold;">
+                                                    [[${part.userName}]] #[[${part.ranking}]]</h3>
+                                                <h4 style="font-family: One_Mobile_Bold;">이메일</h4>
+                                                <h5>[[${part.email}]]</h5>
+                                                <h4 style="font-weight: 550; font-family: One_Mobile_Bold;">솔빙내역</h4>
+                                                <h5 style="display: inline" th:if="${part.m1>0}">
+                                                    [[${part.m1}]]:[[${part.s1}]]</h5>
+                                                <h5 style="display: inline" th:if="${part.s1==-1}">DNF</h5>
+                                                <h5 style="display: inline" th:if="${part.s1==-2}">DNS</h5>
+                                                <h5 style="display: inline" th:if="${part.m1==0} and ${part.s1==0}">
+                                                    n/a</h5>
+                                                <h5 style="display: inline" th:if="${part.m1==0} and ${part.s1>0}">
+                                                    [[${part.s1}]]</h5>
                                                 <h5 style="display: inline">|</h5>
-                                                <h5 style="display: inline" th:if="${part.m4>0}">[[${part.m4}]]:[[${part.s4}]]</h5>
-                                                <h5 style="display: inline" th:if="${part.s4==-1}">DNF</h5>
-                                                <h5 style="display: inline" th:if="${part.s4==-2}">DNS</h5>
-                                                <h5 style="display: inline" th:if="${part.m4==0} and ${part.s4==0}">n/a</h5>
-                                                <h5 style="display: inline" th:if="${part.m4==0} and ${part.s4>0}">[[${part.s4}]]</h5>
+                                                <h5 style="display: inline" th:if="${part.m2>0}">
+                                                    [[${part.m2}]]:[[${part.s2}]]</h5>
+                                                <h5 style="display: inline" th:if="${part.s2==-1}">DNF</h5>
+                                                <h5 style="display: inline" th:if="${part.s2==-2}">DNS</h5>
+                                                <h5 style="display: inline" th:if="${part.m2==0} and ${part.s2==0}">
+                                                    n/a</h5>
+                                                <h5 style="display: inline" th:if="${part.m2==0} and ${part.s2>0}">
+                                                    [[${part.s2}]]</h5>
                                                 <h5 style="display: inline">|</h5>
-                                                <h5 style="display: inline" th:if="${part.m5>0}">[[${part.m5}]]:[[${part.s5}]]</h5>
-                                                <h5 style="display: inline" th:if="${part.s5==-1}">DNF</h5>
-                                                <h5 style="display: inline" th:if="${part.s5==-2}">DNS</h5>
-                                                <h5 style="display: inline" th:if="${part.m5==0} and ${part.s5==0}">n/a</h5>
-                                                <h5 style="display: inline" th:if="${part.m5==0} and ${part.s5>0}">[[${part.s5}]]</h5>
-                                            </th:block>
-                                            <h4 style="font-weight: 550;">평균</h4>
-                                            <h5 th:if="${part.avgM>0}">[[${part.avgM}]]:[[${part.avgS}]]</h5>
-                                            <h5 th:if="${part.avgS==-1}">DNF</h5>
-                                            <h5 th:if="${part.avgS==-2}">DNS</h5>
-                                            <h5 th:if="${part.avgM==0} and ${part.avgS==0}">n/a</h5>
-                                            <h5 th:if="${part.avgM==0} and ${part.avgS>0}">[[${part.avgS}]]</h5>
-                                            <h4 style="font-weight: 550;">최고</h4>
-                                            <h5 th:if="${part.singleM>0}">[[${part.singleM}]]:[[${part.singleS}]]</h5>
-                                            <h5 th:if="${part.singleS==-1}">DNF</h5>
-                                            <h5 th:if="${part.singleS==-2}">DNS</h5>
-                                            <h5 th:if="${part.singleM==0} and ${part.singleS==0}">n/a</h5>
-                                            <h5 th:if="${part.singleM==0} and ${part.singleS>0}">[[${part.singleS}]]</h5>
-                                            <button type="button" class="waves-effect waves-light btn" style="position: absolute; right: 30px; bottom: 30px;" th:onclick="closeModal([[${part.idx}]])">닫기</button>
-                                        </div>
-                                    </div>
-                                        <td sec:authorize="hasAuthority('admin')">[[${part.checker1}]]</td>
-                                    <td sec:authorize="hasAuthority('admin')">
-                                        <div th:if="${not #strings.isEmpty(part.checker2)}">
-                                        [[${part.checker2}]]
-                                        </div>
-                                        <div th:unless="${not #strings.isEmpty(part.checker2)}">
-                                        <form th:action="@{/updatechecker(compIdx=${compIdx}, roundIdx=${roundIdx},idx=${part.idx})}" method="post">
-                                            <input type="hidden" id="csrfToken1" name="_csrf" th:value="${csrfToken}">
-                                            <div class="button">
-                                                <button type="submit" class="waves-effect waves-light btn">2차 확인</button>
+                                                <h5 style="display: inline" th:if="${part.m3>0}">
+                                                    [[${part.m3}]]:[[${part.s3}]]</h5>
+                                                <h5 style="display: inline" th:if="${part.s3==-1}">DNF</h5>
+                                                <h5 style="display: inline" th:if="${part.s3==-2}">DNS</h5>
+                                                <h5 style="display: inline" th:if="${part.m3==0} and ${part.s3==0}">
+                                                    n/a</h5>
+                                                <h5 style="display: inline" th:if="${part.m3==0} and ${part.s3>0}">
+                                                    [[${part.s3}]]</h5>
+                                                <th:block th:if="${round.cubeEvent.avgCalc=='ao5'}">
+                                                    <h5 style="display: inline">|</h5>
+                                                    <h5 style="display: inline" th:if="${part.m4>0}">
+                                                        [[${part.m4}]]:[[${part.s4}]]</h5>
+                                                    <h5 style="display: inline" th:if="${part.s4==-1}">DNF</h5>
+                                                    <h5 style="display: inline" th:if="${part.s4==-2}">DNS</h5>
+                                                    <h5 style="display: inline" th:if="${part.m4==0} and ${part.s4==0}">
+                                                        n/a</h5>
+                                                    <h5 style="display: inline" th:if="${part.m4==0} and ${part.s4>0}">
+                                                        [[${part.s4}]]</h5>
+                                                    <h5 style="display: inline">|</h5>
+                                                    <h5 style="display: inline" th:if="${part.m5>0}">
+                                                        [[${part.m5}]]:[[${part.s5}]]</h5>
+                                                    <h5 style="display: inline" th:if="${part.s5==-1}">DNF</h5>
+                                                    <h5 style="display: inline" th:if="${part.s5==-2}">DNS</h5>
+                                                    <h5 style="display: inline" th:if="${part.m5==0} and ${part.s5==0}">
+                                                        n/a</h5>
+                                                    <h5 style="display: inline" th:if="${part.m5==0} and ${part.s5>0}">
+                                                        [[${part.s5}]]</h5>
+                                                </th:block>
+                                                <h4 style="font-family: One_Mobile_Bold;">평균</h4>
+                                                <h5 th:if="${part.avgM>0}">[[${part.avgM}]]:[[${part.avgS}]]</h5>
+                                                <h5 th:if="${part.avgS==-1}">DNF</h5>
+                                                <h5 th:if="${part.avgS==-2}">DNS</h5>
+                                                <h5 th:if="${part.avgM==0} and ${part.avgS==0}">n/a</h5>
+                                                <h5 th:if="${part.avgM==0} and ${part.avgS>0}">[[${part.avgS}]]</h5>
+                                                <h4 style="font-family: One_Mobile_Bold;">최고</h4>
+                                                <h5 th:if="${part.singleM>0}">
+                                                    [[${part.singleM}]]:[[${part.singleS}]]</h5>
+                                                <h5 th:if="${part.singleS==-1}">DNF</h5>
+                                                <h5 th:if="${part.singleS==-2}">DNS</h5>
+                                                <h5 th:if="${part.singleM==0} and ${part.singleS==0}">n/a</h5>
+                                                <h5 th:if="${part.singleM==0} and ${part.singleS>0}">
+                                                    [[${part.singleS}]]</h5>
+                                                <button class="waves-effect waves-light btn blue-grey"
+                                                        style="position: absolute; right: 25px; bottom: 30px;"
+                                                        th:onclick="closeModal([[${part.idx}]])"
+                                                        type="button">닫기
+                                                </button>
                                             </div>
-                                        </form>
                                         </div>
-                                    </td>
-                                    </tr>
-                                    </tbody>
+                                        <td sec:authorize="hasAuthority('admin')">[[${part.checker1}]]</td>
+                                        <td sec:authorize="hasAuthority('admin')">
+                                            <div th:if="${not #strings.isEmpty(part.checker2)}">
+                                                [[${part.checker2}]]
+                                            </div>
+                                            <div th:unless="${not #strings.isEmpty(part.checker2)}">
+                                                <form method="post"
+                                                      th:action="@{/updatechecker(compIdx=${compIdx}, roundIdx=${roundIdx},idx=${part.idx})}">
+                                                    <input id="csrfToken1" name="_csrf" th:value="${csrfToken}"
+                                                           type="hidden">
+                                                    <div class="button">
+                                                        <button class="waves-effect waves-light btn" type="submit">2차
+                                                            확인
+                                                        </button>
+                                                    </div>
+                                                </form>
+                                            </div>
+                                        </td>
+                                        </tr>
+                                        </tbody>
                                     </div>
                                 </table>
                             </div>
@@ -280,8 +346,9 @@
                 </div>
             </div>
         </div>
-            <!-- /. PAGE INNER  -->
-        </div>
+    </div>
+    <!-- /. PAGE INNER  -->
+</div>
         <!-- JS Scripts-->
         <!-- jQuery Js -->
         <script src="/js/jquery-1.10.2.js"></script>
@@ -314,8 +381,6 @@
             document.getElementById(id).style.display='none';
         }
     </script>
-
-</div>
 </body>
 
 </html>

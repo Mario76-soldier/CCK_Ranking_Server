@@ -1,10 +1,8 @@
-<!DOCTYPE html>>
+<!DOCTYPE html>
 <html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
-
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Ranking</title>
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link rel="stylesheet" href="/css/materialize.min.css" media="screen,projection" />
     <!-- Bootstrap Styles-->
@@ -20,6 +18,7 @@
     <link rel="stylesheet" href="/js/Lightweight-Chart/cssCharts.css">
     <meta name="_csrf" th:content="${_csrf.token}"/>
     <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
+    <title>CCK CompRanking</title>
 </head>
 
 <body>
@@ -115,6 +114,9 @@
 
     <div id="page-wrapper">
         <div class="header">
+            <h1 class="page-header">
+            </h1>
+        </div>
             <div class="page-inner">
                 <div class="row">
                     <div class="col-md-12">
@@ -156,9 +158,9 @@
                     </div>
                 </div>
             </div>
-            <!-- /. PAGE INNER  -->
         </div>
-    </div>
+    <!-- /. PAGE INNER  -->
+</div>
     <!-- JS Scripts-->
     <!-- jQuery Js -->
     <script src="/js/jquery-1.10.2.js"></script>
@@ -213,8 +215,5 @@
             });
         });
     </script>
-
-</div>
 </body>
-
 </html>

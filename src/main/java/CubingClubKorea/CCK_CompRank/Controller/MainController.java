@@ -146,10 +146,16 @@ public class MainController {
         return "myrank";
     }
     @GetMapping("/record")
-    public String Record(@RequestParam(name="compIdx") int compIdx, @RequestParam(name="roundIdx") int roundIdx, Model model){
+    public String Record(@RequestParam(name="compIdx") int compIdx, @RequestParam(name="roundIdx") int roundIdx, @RequestParam(required = false, name = "search")String search, Model model){
         CompList comp=complistService.getOne(compIdx);
         Round round=roundService.getOne(roundIdx);
-        List<Participate> participates=participateService.getParticipate(roundIdx);
+        List<Participate> participates;
+        if(search==null) {
+            participates = participateService.getParticipate(roundIdx);
+        }
+        else{
+            participates=participateService.getSearchedParticipate(roundIdx, search);
+        }
         model.addAttribute("comp",comp);
         model.addAttribute("round",round);
         model.addAttribute("compIdx",compIdx);

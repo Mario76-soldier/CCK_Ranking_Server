@@ -1,6 +1,7 @@
-﻿<!DOCTYPE html>>
+﻿<!DOCTYPE html>
 <html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
+	<meta name="naver-site-verification" content="8d9495cc428df19db22484afcf19bd794547b1bd" />
 	<meta name="_csrf" th:content="${_csrf.token}"/>
 	<meta name="_csrf_header" th:content="${_csrf.headerName}"/>
 	<meta charset="utf-8" />
@@ -18,193 +19,202 @@
 	<!-- Google Fonts-->
 	<link href='http://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css' />
 	<link rel="stylesheet" href="/js/Lightweight-Chart/cssCharts.css">
-	<link rel="shortcut icon" href="/img/img.png" type="image/x-icon" sizes="16x16"/>
 	<title>CCK CompRanking</title>
 </head>
 <body>
-	<div id="wrapper">
-		<nav class="navbar navbar-default top-navbar" role="navigation">
-			<div class="navbar-header">
-				<button type="button" class="navbar-toggle waves-effect waves-dark" data-toggle="collapse"
-					data-target=".sidebar-collapse">
-					<span class="sr-only">Toggle navigation</span>
-					<span class="icon-bar"></span>
-					<span class="icon-bar"></span>
-					<span class="icon-bar"></span>
-				</button>
-				<a class="navbar-brand waves-effect waves-dark" th:href="index">
-					<img src="/img/img.png" alt="logo" width="45px" height="45px"/><strong>CompRanking</strong></a>
+<div id="wrapper">
+	<nav class="navbar navbar-default top-navbar" role="navigation">
+		<div class="navbar-header">
+			<button class="navbar-toggle waves-effect waves-dark" data-target=".sidebar-collapse" data-toggle="collapse"
+					type="button">
+				<span class="sr-only">Toggle navigation</span>
+				<span class="icon-bar"></span>
+				<span class="icon-bar"></span>
+				<span class="icon-bar"></span>
+			</button>
+			<a class="navbar-brand waves-effect waves-dark" th:href="index">
+				<img alt="logo" height="45px" src="/img/img.png" width="45px"/><strong>CompRanking</strong></a>
 
-				<div id="sideNav" href=""><i class="material-icons dp48">toc</i></div>
-			</div>
+			<div href="" id="sideNav"><i class="material-icons dp48">toc</i></div>
+		</div>
 
-			<ul class="nav navbar-top-links navbar-right">
-				<li>
-					<a class="dropdown-button waves-effect waves-dark" href="#!" data-activates="dropdown1">
-						<div sec:authorize="isAnonymous()">
-							<i class="fa fa-user fa-fw"></i> <b>login</b>
-							<i class="material-icons right">arrow_drop_down</i>
-						</div>
-						<div sec:authorize="isAuthenticated()">
+		<ul class="nav navbar-top-links navbar-right">
+			<li>
+				<a class="dropdown-button waves-effect waves-dark" data-activates="dropdown1" href="#!">
+					<div sec:authorize="isAnonymous()">
+						<i class="fa fa-user fa-fw"></i> <b>login</b>
+						<i class="material-icons right">arrow_drop_down</i>
+					</div>
+					<div sec:authorize="isAuthenticated()">
 						<i class="fa fa-user fa-fw"></i> <b sec:authentication="principal"></b>
 						<i class="material-icons right">arrow_drop_down</i>
-						</div>
-					</a>
-				</li>
-			</ul>
-		</nav>
-		<!-- Dropdown Structure -->
-		<ul id="dropdown1" class="dropdown-content">
-			<div sec:authorize="isAnonymous()">
-				<li><a href="/login"><i class="fa fa-user fa-fw"></i>로그인</a>
-				</li>
-			</div>
+					</div>
+				</a>
+			</li>
+		</ul>
+	</nav>
+	<!-- Dropdown Structure -->
+	<ul class="dropdown-content" id="dropdown1">
+		<div sec:authorize="isAnonymous()">
+			<li><a href="/login"><i class="fa fa-user fa-fw"></i>로그인</a>
+			</li>
+		</div>
 
-			<div sec:authorize="isAuthenticated()">
+		<div sec:authorize="isAuthenticated()">
 			<li><a href="/register"><i class="fa fa-user fa-fw"></i> My Profile</a>
 			</li>
-			<form id="logout" action="/logout" method="post" onclick="this.submit()">
+			<form action="/logout" id="logout" method="post" onclick="this.submit()">
 				<li><i class="fa fa-sign-out fa-fw"></i> Logout
 			</form>
 			</li>
-			</div>
-		</ul>
-		<!--/. NAV TOP  -->
-		<nav class="navbar-default navbar-side" role="navigation">
-			<div class="sidebar-collapse">
-				<ul class="nav" id="main-menu">
-					<li>
-						<a class="active-menu waves-effect waves-dark" th:href="index"><i class="fa fa-dashboard"></i>대회 목록<span class="fa arrow"></span></a>
-						<ul class="nav nav-second-level">
-							<li>
-								<a th:href="@{/#future}">다가오는 대회</a>
-							</li>
-							<li>
-								<a th:href="@{/#now}">진행중인 대회</a>
-							</li>
-							<li>
-								<a th:href="@{/#past}">종료된 대회</a>
-							</li>
-						</ul>
-					</li>
-					<li>
-						<a th:href="register" class="waves-effect waves-dark"><i class="fa fa-bar-chart-o"></i>개인 기록 보러가기</a>
-					</li>
-					<li>
-						<a th:href="register" class="waves-effect waves-dark"><i class="fa fa-edit"></i> 대회 신청 </a>
-					</li>
-
-				</ul>
-				<div class="footer">
-					<p class="page-footer">
-						상호명: Cubing Club Korea<br>
-						대표자: 정헌재<br>
-						이메일: notifications@cubingclub.com<br>
-						전화: 010-7925-9060<br>
-						사업자등록번호: 358-54-00896<br>
-						COPYRIGHT (c) Cubing Club Korea ALL RIGHTS RESERVED.
-					</p>
-				</div>
-			</div>
-		</nav>
-		<!-- /. NAV SIDE  -->
-
-		<a id="future"></a>
-		<div id="page-wrapper">
-			<div class="header">
-				<h1 class="page-header">
-					다가오는 대회
-				</h1>
-			</div>
-			<div class="page-inner">
-				<div class="dashboard-cards">
-					<div class="row">
-						<div class="col-md-8 col-sm-8">
-							<div th:each="future:${futureList}">
-								<div class="card" th:onclick="|location.href='@{/round(compIdx=${future.idx})}'|">
-									<div class="card-content">
-										<span class="card-title">[[${future.compName}]]</span>
-										<p th:text="${#dates.format(future.compDate, 'yyyy-MM-dd')}"></p>
-									</div>
-								</div>
-								<div sec:authorize="hasAuthority('admin')">
-									<form th:action="@{/deletecomp(idx=${future.getIdx()})}" method="post" th:id="${future.idx}">
-										<button th:onclick="deleteConfirm([[${future.idx}]])" class="waves-effect waves-light btn">삭제하기</button>
-									</form>
-								</div>
-							</div>
-						</div>
-					</div>
-				</div>
-				<div sec:authorize="hasAuthority('admin')">
-					<div class="">
-						<a class="waves-effect waves-light btn-large" th:href="makecomp">대회 만들기</a>
-					</div>
-				</div>
-				<a id="now"></a>
-			</div>
-			<div class="header">
-				<h1 class="page-header">
-					진행중인 대회
-				</h1>
-			</div>
-			<div class="page-inner">
-
-				<div class="dashboard-cards">
-					<div class="row">
-						<div class="col-md-8 col-sm-8">
-							<div th:each="today:${todayList}">
-								<div class="card teal" th:onclick="|location.href='@{/round(compIdx=${today.idx})}'|">
-									<div class="card-content white-text">
-										<span class="card-title">[[${today.compName}]]</span>
-										<p th:text="${#dates.format(today.compDate, 'yyyy-MM-dd')}"></p>
-									</div>
-								</div>
-								<div sec:authorize="hasAuthority('admin')">
-									<form th:action="@{/deletecomp(idx=${today.getIdx()})}" method="post" th:id="${today.idx}">
-										<button th:onclick="deleteConfirm([[${today.idx}]])" type="button" class="waves-effect waves-light btn">삭제하기</button>
-									</form>
-								</div>
-							</div>
-						</div>
-					</div>
-				</div>
-				<a id="past"></a>
-			</div>
-
-			<div class="header">
-				<h1 class="page-header">
-					종료된 대회
-				</h1>
-			</div>
-			<div class="page-inner">
-
-				<div class="dashboard-cards">
-					<div class="row">
-						<div class="col-md-8 col-sm-8">
-							<div th:each="past:${pastList}">
-								<div class="card blue-grey darken-1" th:onclick="|location.href='@{/round(compIdx=${past.idx})}'|">
-									<div class="card-content white-text">
-
-										<span class="card-title">[[${past.getCompName()}]]</span>
-										<p th:text="${#dates.format(past.compDate, 'yyyy-MM-dd')}"></p>
-									</div>
-								</div>
-								<div sec:authorize="hasAuthority('admin')">
-									<form th:action="@{/deletecomp(idx=${past.getIdx()})}" method="post" th:id="${past.idx}">
-										<button type="button" th:onclick="deleteConfirm([[${past.idx}]])" class="waves-effect waves-light btn">삭제하기</button>
-									</form>
-								</div>
-							</div>
-						</div>
-					</div>
-				</div>
-			</div>
-
 		</div>
-		<!-- /. PAGE INNER  -->
+	</ul>
+	<!--/. NAV TOP  -->
+	<nav class="navbar-default navbar-side" role="navigation">
+		<div class="sidebar-collapse">
+			<ul class="nav" id="main-menu">
+				<li>
+					<a class="active-menu waves-effect waves-dark" th:href="index"><i class="fa fa-dashboard"></i>대회
+						목록<span class="fa arrow"></span></a>
+					<ul class="nav nav-second-level">
+						<li>
+							<a th:href="@{/#future}">다가오는 대회</a>
+						</li>
+						<li>
+							<a th:href="@{/#now}">진행중인 대회</a>
+						</li>
+						<li>
+							<a th:href="@{/#past}">종료된 대회</a>
+						</li>
+					</ul>
+				</li>
+				<li>
+					<a class="waves-effect waves-dark" th:href="register"><i class="fa fa-bar-chart-o"></i>개인 기록
+						보러가기</a>
+				</li>
+				<li>
+					<a class="waves-effect waves-dark" th:href="register"><i class="fa fa-edit"></i> 대회 신청 </a>
+				</li>
+
+			</ul>
+			<div class="footer">
+				<p class="page-footer">
+					상호명: Cubing Club Korea<br>
+					대표자: 정헌재<br>
+					이메일: notifications@cubingclub.com<br>
+					전화: 010-7925-9060<br>
+					사업자등록번호: 358-54-00896<br>
+					COPYRIGHT (c) Cubing Club Korea ALL RIGHTS RESERVED.
+				</p>
+			</div>
+		</div>
+	</nav>
+	<!-- /. NAV SIDE  -->
+	<div id="page-wrapper">
+		<div class="header">
+			<h1 class="page-header">
+				다가오는 대회
+			</h1>
+		</div>
+		<div class="page-inner">
+			<div class="dashboard-cards">
+				<div class="row">
+					<div class="col-md-8 col-sm-8">
+						<div th:each="future:${futureList}">
+							<div class="card" th:onclick="|location.href='@{/round(compIdx=${future.idx})}'|">
+								<div class="card-content">
+									<span class="card-title">[[${future.compName}]]</span>
+									<p th:text="${#dates.format(future.compDate, 'yyyy-MM-dd')}"></p>
+								</div>
+							</div>
+							<div sec:authorize="hasAuthority('admin')" style="font-family: One_Mobile_Light">
+								<form method="post" th:action="@{/deletecomp(idx=${future.getIdx()})}"
+									  th:id="${future.idx}">
+									<button class="waves-effect waves-light btn blue-grey"
+											th:onclick="deleteConfirm([[${future.idx}]])">삭제하기
+									</button>
+								</form>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div sec:authorize="hasAuthority('admin')">
+				<div class="">
+					<a class="waves-effect waves-light btn-large blue-grey" th:href="makecomp">대회 만들기</a>
+				</div>
+			</div>
+			<a id="now"></a>
+		</div>
+		<div class="header">
+			<h1 class="page-header">
+				진행중인 대회
+			</h1>
+		</div>
+		<div class="page-inner">
+
+			<div class="dashboard-cards">
+				<div class="row">
+					<div class="col-md-8 col-sm-8">
+						<div th:each="today:${todayList}">
+							<div class="card teal" th:onclick="|location.href='@{/round(compIdx=${today.idx})}'|">
+								<div class="card-content white-text">
+									<span class="card-title">[[${today.compName}]]</span>
+									<p th:text="${#dates.format(today.compDate, 'yyyy-MM-dd')}"></p>
+								</div>
+							</div>
+							<div sec:authorize="hasAuthority('admin')" style="font-family: One_Mobile_Light">
+								<form method="post" th:action="@{/deletecomp(idx=${today.getIdx()})}"
+									  th:id="${today.idx}">
+									<button class="waves-effect waves-light btn blue-grey" th:onclick="deleteConfirm([[${today.idx}]])"
+											type="button">삭제하기
+									</button>
+								</form>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<a id="past"></a>
+		</div>
+
+		<div class="header">
+			<h1 class="page-header">
+				종료된 대회
+			</h1>
+		</div>
+		<div class="page-inner">
+
+			<div class="dashboard-cards">
+				<div class="row">
+					<div class="col-md-8 col-sm-8">
+						<div th:each="past:${pastList}">
+							<div class="card blue-grey darken-1"
+								 th:onclick="|location.href='@{/round(compIdx=${past.idx})}'|">
+								<div class="card-content white-text">
+
+									<span class="card-title">[[${past.getCompName()}]]</span>
+									<p th:text="${#dates.format(past.compDate, 'yyyy-MM-dd')}"></p>
+								</div>
+							</div>
+							<div sec:authorize="hasAuthority('admin')" style="font-family: One_Mobile_Light">
+								<form method="post" th:action="@{/deletecomp(idx=${past.getIdx()})}"
+									  th:id="${past.idx}">
+									<button class="waves-effect waves-light btn blue-grey" th:onclick="deleteConfirm([[${past.idx}]])"
+											type="button">삭제하기
+									</button>
+								</form>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
 
 	</div>
+	<!-- /. PAGE INNER  -->
+
+</div>
 	<!-- JS Scripts-->
 	<!-- jQuery Js -->
 	<script src="/js/jquery-1.10.2.js"></script>

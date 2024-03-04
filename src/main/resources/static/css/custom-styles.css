@@ -8,9 +8,46 @@ http://creativecommons.org/licenses/by/3.0/
 /*----------------------------------------------
     COMMON  STYLES    
 ------------------------------------------------*/
+@font-face {
+    font-family: "One_Mobile_Bold";
+    src: url("../fonts/ONE_Mobile_Bold.ttf") format("truetype"),
+    url("../fonts/ONE_Mobile_Bold.otf") format("opentype");
+}
+@font-face {
+    font-family: "One_Mobile_Regular";
+    src: url("../fonts/ONE_Mobile_Regular.ttf") format("truetype"),
+    url("../fonts/ONE_Mobile_Regular.otf") format("opentype");
+}
+@font-face {
+    font-family: "One_Mobile_Light";
+    src: url("../fonts/ONE_Mobile_Light.ttf") format("truetype"),
+    url("../fonts/ONE_Mobile_Light.otf") format("opentype");
+}
+
+p{
+    font-family: One_Mobile_Regular;
+}
+
 body {
-    font-family: 'Open Sans', sans-serif;
+    font-family: "One_Mobile_Bold";
     background: #1F2837;
+}
+
+.btn, .btn-large{
+    font-family: One_Mobile_Light !important;
+    background-color: #607d8b !important;
+}
+
+#main-menu{
+    font-family: One_Mobile_Regular !important;
+}
+
+.card-action{
+    font-family: One_Mobile_Light !important;
+}
+
+table{
+    font-family: One_Mobile_Regular !important;
 }
 
 .modalContainer {
@@ -31,6 +68,8 @@ body {
     width: 300px;
     height: 450px;
     padding: 15px;
+    border-radius: 8px;
+    font-family: One_Mobile_Regular;
 }
 
 .modalContainer.hidden {
@@ -39,7 +78,6 @@ body {
 
  #wrapper {
     width: 100%;
-     margin-top: -20px;
 }
 
 #page-wrapper {
@@ -411,7 +449,7 @@ max-width:170px;
 .top-navbar{
 margin: 0px;
 }
-.top-navbar .navbar-brand {color: #000000;width: 260px;text-align: left;height: 70px;font-size: 24px;font-weight: 700;/* text-transform: uppercase; */line-height: 30px;background: #e4e4e4; display: flex; align-items: center;}
+.top-navbar .navbar-brand {color: #000000;width: 260px;text-align: left;height: 70px;font-size: 26px;font-weight: 2000;/* text-transform: uppercase; */line-height: 30px;background: #e4e4e4; display: flex; align-items: center;}
 .navbar-brand b{
 color: #4BD28C;
 }
@@ -422,7 +460,7 @@ margin: 0px;
 padding: 0px;
 }
 .top-navbar .nav > li > a {position: relative;display: block;padding: 17px;color: #484848;margin: 0px;}
-.top-navbar .nav > li > a:hover, .top-navbar .nav > li > a:focus {text-decoration: none;color: #f44336 !important;background: transparent;}
+.top-navbar .nav > li > a:hover, .top-navbar .nav > li > a:focus {text-decoration: none;color: #afafaf !important;background: transparent;}
 .top-navbar .dropdown-menu{
 min-width: 230px;
 border-radius: 0 0 4px 4px;
@@ -451,7 +489,7 @@ padding-top: 4px;
     background-color: #233342 !important;
     color: #fff !important;
 }
-.active-menu i{color: #f44336 !important;}
+.active-menu i{color: #ffffff !important;}
 .arrow {
     float: right;
     margin-top: 8px;
@@ -539,7 +577,7 @@ margin: 8px 0;
     float: left;
     left: 0;
     z-index: 3;
-    color: #f44336;
+    color: #000000;
     cursor:pointer;
     border-radius: 0;
     width: 14px;
