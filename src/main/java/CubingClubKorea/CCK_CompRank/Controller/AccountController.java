@@ -39,7 +39,6 @@ public class AccountController {
     public String addJoin(@ModelAttribute AccountDTO accountDTO, BindingResult bindingResult, Model model){
         if(accountService.checkEmailDuplicate(accountDTO.getEmail())) {
             bindingResult.addError(new FieldError("joinRequest", "loginId", "로그인 아이디가 중복됩니다."));
-            System.out.println("중복");
         }
         if(bindingResult.hasErrors()) {
             return "join";

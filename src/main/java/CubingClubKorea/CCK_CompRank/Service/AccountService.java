@@ -59,4 +59,10 @@ public class AccountService {
     public String getUserName(String email){
         return accountRepository.findByEmail(email).get().getName();
     }
+
+    public Account getAccount(String email){
+        Optional<Account> acc=accountRepository.findByEmail(email);
+        if(acc.isEmpty()) return null;
+        return acc.get();
+    }
 }
