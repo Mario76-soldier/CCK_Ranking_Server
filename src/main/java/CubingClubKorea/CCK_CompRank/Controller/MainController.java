@@ -1,17 +1,12 @@
 package CubingClubKorea.CCK_CompRank.Controller;
 
 
-import CubingClubKorea.CCK_CompRank.DTO.CompListDTO;
-import CubingClubKorea.CCK_CompRank.DTO.CubeEventDTO;
-import CubingClubKorea.CCK_CompRank.DTO.ParticipateDTO;
-import CubingClubKorea.CCK_CompRank.DTO.RoundDTO;
-import CubingClubKorea.CCK_CompRank.Entity.CubeEvent;
+import CubingClubKorea.CCK_CompRank.DTO.*;
+import CubingClubKorea.CCK_CompRank.Entity.*;
 import CubingClubKorea.CCK_CompRank.Repository.EventRepository;
 import CubingClubKorea.CCK_CompRank.Service.*;
-import CubingClubKorea.CCK_CompRank.Entity.CompList;
-import CubingClubKorea.CCK_CompRank.Entity.Participate;
-import CubingClubKorea.CCK_CompRank.Entity.Round;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -22,8 +17,11 @@ import org.springframework.web.bind.annotation.*;
 import CubingClubKorea.CCK_CompRank.Structure.MultRound;
 import CubingClubKorea.CCK_CompRank.Structure.Recorder;
 
+import java.io.PrintWriter;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.*;
 
 @Controller
@@ -54,16 +52,66 @@ public class MainController {
         return "index";
     }
 
-    @GetMapping("/index")
-    public String Index(Model model) {
-        Date now=new Date();
-        List<CompList> compListPast=complistService.getListPast(now);
-        List<CompList> compListToday=complistService.getListToday(now);
-        List<CompList> compListFuture=complistService.getListFuture(now);
-        model.addAttribute("pastList",compListPast);
-        model.addAttribute("todayList",compListToday);
-        model.addAttribute("futureList",compListFuture);
-        return "index";
+    @GetMapping("/register")
+    public String Register(HttpServletResponse response, Authentication authentication, Model model) throws Exception {
+        if(authentication==null){
+            response.setContentType("text/html; charset=euc-kr");
+            PrintWriter out = response.getWriter();
+            out.println("<script>alert('로그인이 필요합니다.'); </script>");
+            out.flush();
+            return "login";
+        }
+        else {
+            Date now = new Date();
+            List<CompList> compListJoin = complistService.getListFuture(now);
+            model.addAttribute("joinList", compListJoin);
+            return "register";
+        }
+    }
+
+    @GetMapping("/regist")
+    public String Regist(HttpServletResponse response, Authentication authentication, Model model, @RequestParam(name="compIdx") int compIdx) throws Exception {
+        if(authentication==null){
+            response.setContentType("text/html; charset=euc-kr");
+            PrintWriter out = response.getWriter();
+            out.println("<script>alert('로그인이 필요합니다.'); </script>");
+            out.flush();
+            return "login";
+        }
+        else {
+            LocalDateTime start=complistService.getOne(compIdx).getStartDate();
+            LocalDateTime end=complistService.getOne(compIdx).getEndDate();
+            LocalDateTime now=LocalDateTime.now();
+            if(now.isAfter(start) && now.isBefore(end)) {
+                List<Round> roundList=roundService.getCompRound(compIdx);
+                Account account=accountService.getAccount(authentication.getName());
+                AddPartDTO participate=new AddPartDTO();
+                model.addAttribute("roundList", roundList);
+                model.addAttribute("account", account);
+                model.addAttribute("participate",participate);
+                return "regist";
+            }
+            else{
+                response.setContentType("text/html; charset=euc-kr");
+                PrintWriter out = response.getWriter();
+                out.println("<script>alert('대회 신청 기간이 아닙니다.'); </script>");
+                out.flush();
+                return "register";
+            }
+        }
+    }
+
+    @PostMapping("/regist")
+    public String AddRegist(Model model, @ModelAttribute("participate")AddPartDTO participate) throws ParseException {
+        for(int i=0; i<participate.getRound().size(); i++) {
+            ParticipateDTO part=new ParticipateDTO();
+            part.setEmail(participate.getEmail());
+            part.setUserName(participate.getUserName());
+            part.setRound(participate.getRound().get(i));
+            part.setEventName(roundService.getOne(participate.getRound().get(i)).getCubeEvent().getEventName());
+            participateService.addParticipate(part.toEntity());
+        }
+        return "redirect:/";
     }
 
     @GetMapping("/round")
@@ -119,7 +167,6 @@ public class MainController {
     @PreAuthorize("hasAuthority('admin')")
     @PostMapping("/makeround")
     public String NewRound(@ModelAttribute MultRound round, @RequestParam(name="compIdx")int compIdx) throws ParseException {
-        System.out.println(round.getCompIdx().get(0));
         for(int i=0; i<round.getEventStart().length; i++){
             RoundDTO roundDTO=new RoundDTO();
             roundDTO.setCompIdx(compIdx);
@@ -261,10 +308,6 @@ public class MainController {
             participateService.addParticipate(advance);
         }
         return "redirect:/round?compIdx="+compIdx;
-    }
-    @GetMapping("/register")
-    public String Register(Model model){
-        return "register";
     }
     @GetMapping("/confirm")
     public String Confirm(Model model){

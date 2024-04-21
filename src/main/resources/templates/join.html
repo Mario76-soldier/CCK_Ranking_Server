@@ -21,17 +21,34 @@
     <title>CCK CompRanking</title>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
     <script type="text/javascript">
-        function sendNumber(){
-            $.ajax({
-                url: "/mailsend",
-                type: "post",
-                dataType: "json",
-                data: {"email": $("#email").val()},
-                success: function (data) {
-                    alert("인증번호가 발송되었습니다. 3분 내로 입력해주세요.");
-                    document.getElementById("confirmation").style.display='';
+        function sendNumber() {
+            var boole;
+                $.ajax({
+                    url: "/dupcheck",
+                    type: "post",
+                    dataType: "text",
+                    async: false,
+                    data: {"email": $("#email").val()},
+                    success: function (data) {
+                        boole=data;
+                    }
+                });
+                if(boole=="ok") {
+                    $.ajax({
+                        url: "/mailsend",
+                        type: "post",
+                        dataType: "json",
+                        async: false,
+                        data: {"email": $("#email").val()},
+                        success: function (data) {
+                            alert("인증번호가 발송되었습니다. 3분 내로 입력해주세요.");
+                            document.getElementById("confirmation").style.display = '';
+                        }
+                    });
                 }
-            });
+                else{
+                    alert("동일한 이메일이 존재합니다.");
+                }
         }
 
         function confirmNumber() {
@@ -63,12 +80,18 @@
 
         function submitter(){
             var bool=$("#ConfirmBool").val();
-            if(bool=="true"){
-                document.getElementById("join").submit();
-                alert("회원가입이 완료되었습니다!")
+            var pw=$("#password").val();
+            var pwcf=$("#passwordCorrection").val();
+            if(pw==pwcf) {
+                if (bool == "true") {
+                    document.getElementById("join").submit();
+                    alert("회원가입이 완료되었습니다!");
+                } else {
+                    alert("이메일 인증을 완료해주세요.");
+                }
             }
             else{
-                alert("이메일 인증을 완료해주세요.")
+                alert("비밀번호가 일치하지 않습니다.");
             }
         }
     </script>
@@ -85,7 +108,7 @@
                 <div class="icon-bar"></div>
                 <div class="icon-bar"></div>
             </button>
-            <a class="navbar-brand waves-effect waves-dark" th:href="index">
+            <a class="navbar-brand waves-effect waves-dark" th:href="@{/}">
                 <img src="/img/img.png" alt="logo" width="45px" height="45px"/><strong>CompRanking</strong></a>
 
             <div id="sideNav" href=""><i class="material-icons dp48">toc</i></div>
@@ -129,17 +152,17 @@
 
 
                 <li>
-                    <a class="active-menu waves-effect waves-dark" th:href="index"><i class="fa fa-dashboard"></i>대회
+                    <a class="active-menu waves-effect waves-dark" th:href="@{/}"><i class="fa fa-dashboard"></i>대회
                         목록<div class="fa arrow"></div></a>
                     <ul class="nav nav-second-level">
                         <li>
-                            <a th:href="index">다가오는 대회</a>
+                            <a th:href="@{/}">다가오는 대회</a>
                         </li>
                         <li>
-                            <a th:href="index">진행중인 대회</a>
+                            <a th:href="@{/}">진행중인 대회</a>
                         </li>
                         <li>
-                            <a th:href="index">종료된 대회</a>
+                            <a th:href="@{/}">종료된 대회</a>
                         </li>
                     </ul>
                 </li>

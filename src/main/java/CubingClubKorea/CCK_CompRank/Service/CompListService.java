@@ -8,6 +8,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 
@@ -37,6 +39,10 @@ public class CompListService {
 
     public List<CompList> getListFuture(Date date){
         return (List<CompList>) complistRepository.findByCompDateAfter(date);
+    }
+
+    public List<CompList> getListJoin(LocalDateTime date){
+        return (List<CompList>) complistRepository.findByStartDateBeforeAndEndDateAfter(date, date);
     }
 
     public void deleteByIdx(int Idx){

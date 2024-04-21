@@ -38,7 +38,7 @@ public class SecurityConfig{
                 .csrf(csrf -> csrf
                         .csrfTokenRequestHandler(requestHandler)
                         .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
-                        .ignoringRequestMatchers("/", "/login/**", "/logout/**", "/round", "/record", "/join/**", "/mailsend/**", "/mailauthcheck/**")
+                        .ignoringRequestMatchers("/", "/login/**", "/logout/**", "/round", "/record", "/join/**", "/mailsend/**", "/mailauthcheck/**", "/dupcheck/**")
                 )
                 .authorizeHttpRequests(request -> request
                         .requestMatchers("/makecomp","/makeround","/addparticipate","/recordcomp","/advance","/deletecomp","/deleterecord","/updateadvance").hasAuthority(UserRole.admin.name())
