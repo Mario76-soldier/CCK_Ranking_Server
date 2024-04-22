@@ -28,16 +28,10 @@ public class SecurityConfig{
     private static final int QUARTER = 900;
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        CsrfTokenRequestAttributeHandler requestHandler = new CsrfTokenRequestAttributeHandler();
-        requestHandler.setCsrfRequestAttributeName("_csrf");
         return http
-                .csrf(csrf -> csrf
-                        .csrfTokenRequestHandler(requestHandler)
-                        .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
-                        .ignoringRequestMatchers("/", "/login/**", "/logout/**", "/round", "/record", "/join/**", "/mailsend/**", "/mailauthcheck/**", "/dupcheck/**")
-                )
+                .csrf().disable()
                 .authorizeHttpRequests(request -> request
-                        .requestMatchers("/makecomp","/makeround","/addparticipate","/recordcomp","/advance","/deletecomp","/deleterecord","/updateadvance").hasAuthority(UserRole.admin.name())
+                        //.requestMatchers("/makecomp","/makeround","/addparticipate","/recordcomp","/advance","/deletecomp","/deleterecord","/updateadvance").hasAuthority(UserRole.admin.name())
                         .requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll()
                         .anyRequest().permitAll()
                 )

@@ -28,7 +28,7 @@ public class Round {
     @JoinColumn(name="EventName")
     private CubeEvent cubeEvent;
 
-    @Column(name="Round")
+    @Column(name="Round", length=30)
     private String round;
 
     @Column(name="EventStart")

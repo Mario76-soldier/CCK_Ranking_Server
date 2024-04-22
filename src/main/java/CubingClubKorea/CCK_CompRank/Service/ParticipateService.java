@@ -301,16 +301,9 @@ public class ParticipateService {
         participateRepository.deleteByRound(idx);
     }
 
-    public Integer addParticipate(Participate participate){
-        return participateRepository.save(participate).getIdx();
+    public Integer addParticipate(ParticipateDTO participate){
+        return participateRepository.save(participate.toEntity()).getIdx();
     }
-
-    public void goAdvance(List<ParticipateDTO> participate, Integer advance){
-        for(int i=0; i<advance; i++){
-            participateRepository.save(participate.get(i).toEntity());
-        }
-    }
-
     public void updateChecker(String checker, Integer idx){
         participateRepository.updateChecker2(checker, idx);
     }

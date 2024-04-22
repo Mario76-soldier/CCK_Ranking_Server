@@ -17,13 +17,13 @@ public class Participate {
     @Column(name="Idx")
     private Integer idx;
 
-    @Column(name="UserName")
+    @Column(name="UserName", length=40)
     private String userName;
 
-    @Column(name="EventName")
+    @Column(name="EventName", length=15)
     private String eventName;
 
-    @Column(name="Email")
+    @Column(name="Email", length=30)
     private String email;
 
     @Column(name="Round")
@@ -74,10 +74,10 @@ public class Participate {
     @Column(name="ranking")
     private Integer ranking;
 
-    @Column(name="Checker1")
+    @Column(name="Checker1", length=20)
     private String checker1;
 
-    @Column(name = "Checker2")
+    @Column(name = "Checker2", length=20)
     private String checker2;
 
     @Builder

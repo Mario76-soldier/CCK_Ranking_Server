@@ -2,6 +2,7 @@ package CubingClubKorea.CCK_CompRank.Entity;
 
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -18,7 +19,7 @@ public class CompList {
     @Column(name="Idx")
     private Integer idx;
 
-    @Column(name = "CompName")
+    @Column(name = "CompName", length=50)
     private String compName;
 
     @Column(name = "CompDateStart")

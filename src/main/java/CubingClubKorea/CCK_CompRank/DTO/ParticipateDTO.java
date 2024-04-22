@@ -32,8 +32,6 @@ public class ParticipateDTO {
     private Integer ranking;
     private String checker1;
     private String checker2;
-
-
     public ParticipateDTO(Participate entity){
         this.idx=entity.getIdx();
         this.userName=entity.getUserName();
@@ -58,7 +56,12 @@ public class ParticipateDTO {
         this.checker1=entity.getChecker1();
         this.checker2=entity.getChecker2();
     }
-
+    public ParticipateDTO(String userName, String eventName, String email, Integer advanceRoundIdx) {
+        this.userName=userName;
+        this.eventName=eventName;
+        this.email=email;
+        this.round=advanceRoundIdx;
+    }
     public Participate toEntity(){
         return Participate.builder()
                 .UserName(userName)

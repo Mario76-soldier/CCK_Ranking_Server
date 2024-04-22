@@ -65,15 +65,13 @@ public class RoundService {
         }
         return listDTO;
     }
-
-    public void deleteRound(Integer idx){
-        roundRepository.deleteByCompIdx(idx);
+    public void deleteRound(Integer compIdx){
+        roundRepository.deleteByCompIdx(compIdx);
     }
-
-    public void deleteByRoundIdx(Integer idx){
-        roundRepository.deleteByIdx(idx);
+    public void deleteByRoundIdx(Integer roundIdx){
+        roundRepository.deleteByIdx(roundIdx);
     }
-    public void updateAdvance(Integer idx, Integer advance){
-        roundRepository.updateAdvance(idx, advance);
+    public void updateAdvance(Integer nextCompIdx, Integer advance){
+        roundRepository.updateAdvance(nextCompIdx, advance);
     }
 }
