@@ -12,11 +12,10 @@ import java.util.List;
 public interface CompListRepository extends JpaRepository<CompList, Integer> {
     CompList findByIdx(Integer idx);
     List<CompList> findAll();
-    List<CompList> findByCompDateBefore(Date date);
-    List<CompList> findByCompDate(Date date);
-    List<CompList> findByCompDateAfter(Date date);
+    List<CompList> findByCompDateEndBefore(LocalDateTime date);
+    List<CompList> findByCompDateEndAfterAndCompDateStartBefore(LocalDateTime date1, LocalDateTime date2);
+    List<CompList> findByCompDateStartAfter(LocalDateTime date);
 
-    List<CompList> findByStartDateBeforeAndEndDateAfter(LocalDateTime date, LocalDateTime date2);
-
+    List<CompList> findByJoinDateEndAfterAndJoinDateStartBefore(LocalDateTime date1, LocalDateTime date2);
     void deleteByIdx(int idx);
 }

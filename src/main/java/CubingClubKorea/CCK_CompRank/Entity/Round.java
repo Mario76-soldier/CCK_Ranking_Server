@@ -6,7 +6,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 @Entity
 @Getter
@@ -16,15 +16,15 @@ public class Round {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name="Idx")
-    private int idx;
+    private Integer idx;
 
     @Column(name="CompIdx")
-    private int compIdx;
+    private Integer compIdx;
 
     @Column(name="Seq")
-    private int seq;
+    private Integer seq;
 
-    @ManyToOne(fetch=FetchType.LAZY)
+    @ManyToOne(fetch=FetchType.EAGER)
     @JoinColumn(name="EventName")
     private CubeEvent cubeEvent;
 
@@ -32,16 +32,16 @@ public class Round {
     private String round;
 
     @Column(name="EventStart")
-    private Date eventStart;
+    private LocalDateTime eventStart;
 
     @Column(name="EventEnd")
-    private Date eventEnd;
+    private LocalDateTime eventEnd;
 
     @Column(name="Advance")
-    private int advance;
+    private Integer advance;
 
     @Builder
-    public Round(int Idx, int CompIdx, int Seq, CubeEvent cubeEvent, String Round, Date EventStart, Date EventEnd, int Advance){
+    public Round(Integer Idx, Integer CompIdx, Integer Seq, CubeEvent cubeEvent, String Round, LocalDateTime EventStart, LocalDateTime EventEnd, Integer Advance){
         this.idx=Idx;
         this.compIdx=CompIdx;
         this.seq=Seq;

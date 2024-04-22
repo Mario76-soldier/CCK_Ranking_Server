@@ -6,52 +6,43 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.DynamicInsert;
-import org.springframework.format.annotation.DateTimeFormat;
-
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.Date;
 
 @Entity
 @Getter
 @NoArgsConstructor
-@DynamicInsert
 @Table(name="CompList")
 public class CompList {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name="Idx")
-    private int idx;
+    private Integer idx;
 
     @Column(name = "CompName")
     private String compName;
 
-    @Column(name = "CompDate")
-    @Temporal(TemporalType.DATE)
-    @DateTimeFormat(pattern="yyyy-MM-dd")
-    private Date compDate;
+    @Column(name = "CompDateStart")
+    private LocalDateTime compDateStart;
 
-    @Column(name = "CountRound")
-    private int countRound;
+    @Column(name = "CompDateEnd")
+    private LocalDateTime compDateEnd;
 
-    @Column(name = "startDate")
-    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-    private LocalDateTime startDate;
+    @Column(name = "joinDateStart")
+    private LocalDateTime joinDateStart;
 
-    @Column(name = "endDate")
-    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-    private LocalDateTime endDate;
+    @Column(name = "JoinDateEnd")
+    private LocalDateTime joinDateEnd;
 
     @Column(name = "maxParticipate")
     private Integer maxParticipate;
 
     @Builder
-    public CompList(String CompName, Date CompDate, int CountRound, LocalDateTime StartDate, LocalDateTime EndDate, Integer MaxParticipate){
+    public CompList(String CompName, LocalDateTime CompDateStart, LocalDateTime CompDateEnd,LocalDateTime JoinDateStart, LocalDateTime JoinDateEnd, Integer MaxParticipate){
         this.compName=CompName;
-        this.compDate=CompDate;
-        this.countRound=CountRound;
-        this.startDate=StartDate;
-        this.endDate=EndDate;
+        this.compDateStart=CompDateStart;
+        this.compDateEnd=CompDateEnd;
+        this.joinDateStart=JoinDateStart;
+        this.joinDateEnd=JoinDateEnd;
         this.maxParticipate=MaxParticipate;
     }
 

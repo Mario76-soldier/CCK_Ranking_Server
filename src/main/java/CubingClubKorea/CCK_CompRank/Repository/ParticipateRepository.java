@@ -11,7 +11,7 @@ import java.util.List;
 public interface ParticipateRepository extends JpaRepository<Participate, Integer> {
 
     @Query("select u.idx from Participate u where u.round=:round and u.checker1 is not null order by (case when u.avgM=0 and u.avgS=0 then 1 else 0 end) asc, (case when u.avgS=-2 then 1 else 0 end) asc, (case when u.avgS=-1 then 1 else 0 end) asc, (case when u.singleS=-2 then 1 else 0 end) asc,(case when u.singleS=-1 then 1 else 0 end) asc, u.avgM asc, u.avgS asc, u.singleM asc, u.singleS asc")
-    List<Integer> findByRoundOrderByAvgMAscAvgSAsc(@Param(value="round")int round);
+    List<Integer> findByRoundOrder(@Param(value="round")int round);
 
     @Query("select u from Participate u where u.round=:round order by (case when u.ranking is null then 1 else 0 end) asc, u.ranking asc")
     List<Participate> findByRound(@Param(value="round")int round);

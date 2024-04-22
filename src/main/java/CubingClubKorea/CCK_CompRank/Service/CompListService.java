@@ -1,5 +1,6 @@
 package CubingClubKorea.CCK_CompRank.Service;
 
+import CubingClubKorea.CCK_CompRank.DTO.CompListDTO;
 import CubingClubKorea.CCK_CompRank.Repository.CompListRepository;
 import CubingClubKorea.CCK_CompRank.Repository.RoundRepository;
 import CubingClubKorea.CCK_CompRank.Entity.CompList;
@@ -10,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -20,29 +22,48 @@ public class CompListService {
     @Autowired
     private final CompListRepository complistRepository;
     private final RoundRepository roundRepository;
-    public int create(CompList comp){
-
-        return complistRepository.save(comp).getIdx();
+    public Integer create(CompListDTO comp){
+        return complistRepository.save(comp.toEntity()).getIdx();
     }
 
-    public CompList getOne(int idx){
-        return complistRepository.findByIdx(idx);
+    public CompListDTO getOne(Integer idx){
+        return new CompListDTO(complistRepository.findByIdx(idx));
     }
 
-    public List<CompList> getListToday(Date date){
-        return (List<CompList>) complistRepository.findByCompDate(date);
+    public List<CompListDTO> getListToday(LocalDateTime date){
+        List<CompList> list=complistRepository.findByCompDateEndAfterAndCompDateStartBefore(date, date);
+        List<CompListDTO> listDTO=new ArrayList<>();
+        for (CompList now:list) {
+            listDTO.add(new CompListDTO(now));
+        }
+        return listDTO;
     }
 
-    public List<CompList> getListPast(Date date){
-        return (List<CompList>) complistRepository.findByCompDateBefore(date);
+    public List<CompListDTO> getListPast(LocalDateTime date){
+        List<CompList> list=complistRepository.findByCompDateEndBefore(date);
+        List<CompListDTO> listDTO=new ArrayList<>();
+        for (CompList past:list) {
+            listDTO.add(new CompListDTO(past));
+        }
+        return listDTO;
     }
 
-    public List<CompList> getListFuture(Date date){
-        return (List<CompList>) complistRepository.findByCompDateAfter(date);
+    public List<CompListDTO> getListFuture(LocalDateTime date){
+        List<CompList> list=complistRepository.findByCompDateStartAfter(date);
+        List<CompListDTO> listDTO=new ArrayList<>();
+        for (CompList future:list) {
+            listDTO.add(new CompListDTO(future));
+        }
+        return listDTO;
     }
 
-    public List<CompList> getListJoin(LocalDateTime date){
-        return (List<CompList>) complistRepository.findByStartDateBeforeAndEndDateAfter(date, date);
+    public List<CompListDTO> getListJoin(LocalDateTime date){
+        List<CompList> list=complistRepository.findByJoinDateEndAfterAndJoinDateStartBefore(date, date);
+        List<CompListDTO> listDTO=new ArrayList<>();
+        for (CompList join:list) {
+            listDTO.add(new CompListDTO(join));
+        }
+        return listDTO;
     }
 
     public void deleteByIdx(int Idx){

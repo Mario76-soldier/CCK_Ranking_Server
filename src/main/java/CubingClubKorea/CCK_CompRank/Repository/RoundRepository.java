@@ -6,22 +6,25 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.List;
 
 public interface RoundRepository extends JpaRepository<Round, Integer> {
     Round findByIdx(Integer idx);
-    List<Round> findByEventStartBeforeAndEventEndBeforeAndCompIdx(Date date, Date date2, int compIdx);
-    List<Round> findByEventStartBeforeAndEventEndAfterAndCompIdx(Date date,Date date2, int compIdx);
-    List<Round> findByEventStartAfterAndEventEndAfterAndCompIdx(Date date, Date date2, int compIdx);
+    @Query("select r from Round r join fetch r.cubeEvent where r.compIdx=:compIdx and r.eventEnd<:date")
+    List<Round> findPast(@Param(value="date")LocalDateTime date, @Param(value="compIdx")Integer compIdx);
+    @Query("select r from Round r join fetch r.cubeEvent where r.compIdx=:compIdx and r.eventEnd>:date and r.eventStart<:date")
+    List<Round> findNow(@Param(value="date")LocalDateTime date, @Param(value="compIdx")Integer compIdx);
+    @Query("select r from Round r join fetch r.cubeEvent where r.compIdx=:compIdx and r.eventStart>:date")
+    List<Round> findFuture(@Param(value="date")LocalDateTime date, @Param(value="compIdx")Integer compIdx);
 
-    List<Round> findByCompIdx(int compIdx);
+    List<Round> findByCompIdx(Integer compIdx);
 
     @Modifying
     @Query("update Round u set u.advance=:advance where u.idx=:idx")
-    void updateAdvance(@Param(value="idx")int idx, @Param(value = "advance")int advance);
+    void updateAdvance(@Param(value="idx")Integer idx, @Param(value = "advance")Integer advance);
 
-    void deleteByCompIdx(int compIdx);
-    void deleteByIdx(int Idx);
+    void deleteByCompIdx(Integer compIdx);
+    void deleteByIdx(Integer Idx);
 
 }

@@ -6,43 +6,34 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 @Getter
 @Setter
 @NoArgsConstructor
 public class RoundDTO {
-    private int Idx;
-
-    private int CompIdx;
-
-    private int Seq;
-
+    private Integer idx;
+    private Integer compIdx;
+    private Integer seq;
     private CubeEvent cubeEvent;
-
     private String round;
-
-    private Date eventStart;
-
-    private Date eventEnd;
-
-    private int advance;
-
+    private LocalDateTime eventStart;
+    private LocalDateTime eventEnd;
+    private Integer advance;
     public RoundDTO(Round entity){
-        this.Idx=entity.getIdx();
-        this.CompIdx=entity.getCompIdx();
-        this.Seq=entity.getSeq();
+        this.idx=entity.getIdx();
+        this.compIdx=entity.getCompIdx();
+        this.seq=entity.getSeq();
         this.cubeEvent=entity.getCubeEvent();
         this.round=entity.getRound();
         this.eventStart=entity.getEventStart();
         this.eventEnd=entity.getEventEnd();
         this.advance=entity.getAdvance();
     }
-
     public Round toEntity(){
         return Round.builder()
-                .CompIdx(CompIdx)
-                .Seq(Seq)
+                .CompIdx(compIdx)
+                .Seq(seq)
                 .cubeEvent(cubeEvent)
                 .Round(round)
                 .EventStart(eventStart)

@@ -1,6 +1,9 @@
 package CubingClubKorea.CCK_CompRank.Service;
 
 
+import CubingClubKorea.CCK_CompRank.DTO.ParticipateDTO;
+import CubingClubKorea.CCK_CompRank.DTO.RoundDTO;
+import CubingClubKorea.CCK_CompRank.Entity.Round;
 import CubingClubKorea.CCK_CompRank.Repository.AccountRepository;
 import CubingClubKorea.CCK_CompRank.Repository.ParticipateRepository;
 import CubingClubKorea.CCK_CompRank.Entity.Participate;
@@ -10,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import CubingClubKorea.CCK_CompRank.Structure.Recorder;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -20,19 +24,29 @@ public class ParticipateService {
     @Autowired
     private final ParticipateRepository participateRepository;
 
-    public List<Integer> getRank(int round){
-        return participateRepository.findByRoundOrderByAvgMAscAvgSAsc(round);
+    public List<Integer> getRank(Integer round){
+        return participateRepository.findByRoundOrder(round);
     }
 
-    public List<Participate> getParticipate(int round){
-        return participateRepository.findByRound(round);
+    public List<ParticipateDTO> getParticipate(Integer round){
+        List<Participate> list=participateRepository.findByRound(round);
+        List<ParticipateDTO> listDTO=new ArrayList<>();
+        for (Participate participate:list) {
+            listDTO.add(new ParticipateDTO(participate));
+        }
+        return listDTO;
     }
 
-    public List<Participate> getSearchedParticipate(int round, String search){
-        return participateRepository.search(round, search);
+    public List<ParticipateDTO> getSearchedParticipate(Integer round, String search){
+        List<Participate> list=participateRepository.search(round, search);
+        List<ParticipateDTO> listDTO=new ArrayList<>();
+        for (Participate participate:list) {
+            listDTO.add(new ParticipateDTO(participate));
+        }
+        return listDTO;
     }
 
-    public Integer updateRecordAo5(Recorder recorder,String checkerName, int idx){
+    public Integer updateRecordAo5(Recorder recorder,String checkerName, Integer idx){
         int m1,m2,m3,m4,m5,singleM,avgM;
         double s1,s2,s3,s4,s5,singleS,avgS;
         double f,s,t,o,i;
@@ -173,7 +187,7 @@ public class ParticipateService {
         }
     }
 
-    public Integer updateRecordMo3(Recorder recorder, String checkerName, int idx){
+    public Integer updateRecordMo3(Recorder recorder, String checkerName, Integer idx){
         int m1,m2,m3,singleM,avgM;
         double s1,s2,s3,singleS,avgS;
         double f,s,t;
@@ -279,29 +293,29 @@ public class ParticipateService {
         }
     }
 
-    public void deleteParticipate(int idx){
+    public void deleteParticipate(Integer idx){
         participateRepository.deleteByIdx(idx);
     }
 
-    public void deleteByRoundIdx(int idx){
+    public void deleteByRoundIdx(Integer idx){
         participateRepository.deleteByRound(idx);
     }
 
-    public int addParticipate(Participate participate){
+    public Integer addParticipate(Participate participate){
         return participateRepository.save(participate).getIdx();
     }
 
-    public void goAdvance(List<Participate> participate, int advance){
+    public void goAdvance(List<ParticipateDTO> participate, Integer advance){
         for(int i=0; i<advance; i++){
-            participateRepository.save(participate.get(i));
+            participateRepository.save(participate.get(i).toEntity());
         }
     }
 
-    public void updateChecker(String checker, int idx){
+    public void updateChecker(String checker, Integer idx){
         participateRepository.updateChecker2(checker, idx);
     }
 
-    public void updateRanking(int ranking, int idx){
+    public void updateRanking(Integer ranking, Integer idx){
         participateRepository.updateRanking(ranking, idx);
     }
 }

@@ -10,58 +10,36 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 public class ParticipateDTO {
-
-    private int Idx;
-
-    private String UserName;
-
-    private String EventName;
-
-    private String Email;
-
-    private int Round;
-
-    private int m1;
-
-    private float s1;
-
-    private int m2;
-
-    private float s2;
-
-    private int m3;
-
-    private float s3;
-
-    private int m4;
-
-    private float s4;
-
-    private int m5;
-
-    private float s5;
-
-    private int SingleM;
-
-    private float SingleS;
-
-    private int AvgM;
-
-    private float AvgS;
-
-    private Integer Ranking;
-
-    private String Checker1;
-
-    private String Checker2;
+    private Integer idx;
+    private String userName;
+    private String eventName;
+    private String email;
+    private Integer round;
+    private Integer m1;
+    private Float s1;
+    private Integer m2;
+    private Float s2;
+    private Integer m3;
+    private Float s3;
+    private Integer m4;
+    private Float s4;
+    private Integer m5;
+    private Float s5;
+    private Integer singleM;
+    private Float singleS;
+    private Integer avgM;
+    private Float avgS;
+    private Integer ranking;
+    private String checker1;
+    private String checker2;
 
 
     public ParticipateDTO(Participate entity){
-        this.Idx=entity.getIdx();
-        this.UserName=entity.getUserName();
-        this.EventName=entity.getEventName();
-        this.Email=entity.getEmail();
-        this.Round=entity.getRound();
+        this.idx=entity.getIdx();
+        this.userName=entity.getUserName();
+        this.eventName=entity.getEventName();
+        this.email=entity.getEmail();
+        this.round=entity.getRound();
         this.m1=entity.getM1();
         this.s1=entity.getS1();
         this.m2=entity.getM2();
@@ -72,21 +50,21 @@ public class ParticipateDTO {
         this.s4=entity.getS4();
         this.m5=entity.getM5();
         this.s5=entity.getS5();
-        this.SingleM=entity.getSingleM();
-        this.SingleS=entity.getSingleS();
-        this.AvgM=entity.getAvgM();
-        this.AvgS=entity.getAvgS();
-        this.Ranking=entity.getRanking();
-        this.Checker1=entity.getChecker1();
-        this.Checker2=entity.getChecker2();
+        this.singleM=entity.getSingleM();
+        this.singleS=entity.getSingleS();
+        this.avgM=entity.getAvgM();
+        this.avgS=entity.getAvgS();
+        this.ranking=entity.getRanking();
+        this.checker1=entity.getChecker1();
+        this.checker2=entity.getChecker2();
     }
 
     public Participate toEntity(){
         return Participate.builder()
-                .UserName(UserName)
-                .EventName(EventName)
-                .Email(Email)
-                .Round(Round)
+                .UserName(userName)
+                .EventName(eventName)
+                .Email(email)
+                .Round(round)
                 .build();
     }
 }
