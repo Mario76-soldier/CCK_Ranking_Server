@@ -36,6 +36,15 @@ public class ListController {
             default -> ResponseEntity.badRequest().build();
         };
     }
+    @GetMapping("/compname/{compIdx}")
+    public ResponseEntity<String> Comp(@PathVariable(value="compIdx")Integer compIdx){
+        try{
+            return ResponseEntity.ok(complistService.getOne(compIdx).getCompName());
+        }
+        catch(Exception e) {
+            return ResponseEntity.badRequest().build();
+        }
+    }
     @PostMapping("/comp")
     public ResponseEntity<Integer> MakeComp(@RequestBody CompListDTO compList){
         return ResponseEntity.ok(complistService.create(compList));
