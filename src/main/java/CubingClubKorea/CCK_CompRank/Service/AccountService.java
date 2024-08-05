@@ -3,15 +3,8 @@ package CubingClubKorea.CCK_CompRank.Service;
 import CubingClubKorea.CCK_CompRank.DTO.AccountDTO;
 import CubingClubKorea.CCK_CompRank.DTO.AccountRequest;
 import CubingClubKorea.CCK_CompRank.Entity.Account;
-import CubingClubKorea.CCK_CompRank.Handler.LoginCheckFailException;
 import CubingClubKorea.CCK_CompRank.Repository.AccountRepository;
-import CubingClubKorea.CCK_CompRank.Structure.AccountDetail;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -26,43 +19,21 @@ public class AccountService {
     public boolean checkEmailDuplicate(String email){
         return accountRepository.existsByEmail(email);
     }
-    public void join(AccountDTO accountDTO){
-        accountRepository.save(accountDTO.toEntity(encoder.encode(accountDTO.getPassword())));
+    public Account join(AccountDTO accountDTO){
+        return accountRepository.save(accountDTO.toEntity(encoder.encode(accountDTO.getPassword())));
     }
-
     public Account login(AccountRequest accountRequest){
         Optional<Account> account=accountRepository.findByEmail(accountRequest.getEmail());
-
         if(account.isEmpty()){
             return null;
         }
-
         Account account1=account.get();
-
-        if(!account1.getPassword().equals(accountRequest.getPassword())){
+        if(!encoder.matches(accountRequest.getPassword(), account1.getPassword())){
             return null;
         }
-
         return account1;
     }
-
-
-    public Account getLoginUserByLoginId(String email) {
-        if(email == null) return null;
-
-        Optional<Account> optionalUser = accountRepository.findByEmail(email);
-        if(optionalUser.isEmpty()) return null;
-
-        return optionalUser.get();
-    }
-
     public String getUserName(String email){
         return accountRepository.findByEmail(email).get().getName();
-    }
-
-    public Account getAccount(String email){
-        Optional<Account> acc=accountRepository.findByEmail(email);
-        if(acc.isEmpty()) return null;
-        return acc.get();
     }
 }

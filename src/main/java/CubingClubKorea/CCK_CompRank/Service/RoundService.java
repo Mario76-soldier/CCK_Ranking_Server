@@ -20,8 +20,6 @@ import java.util.List;
 @RequiredArgsConstructor
 @Transactional
 public class RoundService {
-
-    @Autowired
     private final RoundRepository roundRepository;
 
     public Integer create(RoundDTO round){
