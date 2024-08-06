@@ -10,7 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -19,18 +19,15 @@ import java.util.List;
 @RequiredArgsConstructor
 @Transactional
 public class CompListService {
-    @Autowired
     private final CompListRepository complistRepository;
     private final RoundRepository roundRepository;
     public Integer create(CompListDTO comp){
         return complistRepository.save(comp.toEntity()).getIdx();
     }
-
     public CompListDTO getOne(Integer idx){
         return new CompListDTO(complistRepository.findByIdx(idx));
     }
-
-    public List<CompListDTO> getListToday(LocalDateTime date){
+    public List<CompListDTO> getListToday(LocalDate date){
         List<CompList> list=complistRepository.findByCompDateEndAfterAndCompDateStartBefore(date, date);
         List<CompListDTO> listDTO=new ArrayList<>();
         for (CompList now:list) {
@@ -38,8 +35,7 @@ public class CompListService {
         }
         return listDTO;
     }
-
-    public List<CompListDTO> getListPast(LocalDateTime date){
+    public List<CompListDTO> getListPast(LocalDate date){
         List<CompList> list=complistRepository.findByCompDateEndBefore(date);
         List<CompListDTO> listDTO=new ArrayList<>();
         for (CompList past:list) {
@@ -47,8 +43,7 @@ public class CompListService {
         }
         return listDTO;
     }
-
-    public List<CompListDTO> getListFuture(LocalDateTime date){
+    public List<CompListDTO> getListFuture(LocalDate date){
         List<CompList> list=complistRepository.findByCompDateStartAfter(date);
         List<CompListDTO> listDTO=new ArrayList<>();
         for (CompList future:list) {
@@ -56,8 +51,7 @@ public class CompListService {
         }
         return listDTO;
     }
-
-    public List<CompListDTO> getListJoin(LocalDateTime date){
+    public List<CompListDTO> getListJoin(LocalDate date){
         List<CompList> list=complistRepository.findByJoinDateEndAfterAndJoinDateStartBefore(date, date);
         List<CompListDTO> listDTO=new ArrayList<>();
         for (CompList join:list) {
@@ -65,10 +59,8 @@ public class CompListService {
         }
         return listDTO;
     }
-
     public void deleteByIdx(int Idx){
         roundRepository.deleteByCompIdx(Idx);
         complistRepository.deleteByIdx(Idx);
     }
-
 }

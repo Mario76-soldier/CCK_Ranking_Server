@@ -159,7 +159,7 @@ public class ParticipateService {
             avgM=0;
             avgS=-1;
         }
-        else if(canAvg==false){
+        else if(!canAvg){
             avgM=0;
             avgS=0;
         }

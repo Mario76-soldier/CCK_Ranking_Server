@@ -5,7 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 @Getter
 @Setter
@@ -13,10 +13,10 @@ import java.time.LocalDateTime;
 public class CompListDTO {
     private Integer idx;
     private String compName;
-    private LocalDateTime compDateStart;
-    private LocalDateTime compDateEnd;
-    private LocalDateTime joinDateStart;
-    private LocalDateTime joinDateEnd;
+    private LocalDate compDateStart;
+    private LocalDate compDateEnd;
+    private LocalDate joinDateStart;
+    private LocalDate joinDateEnd;
     private Integer maxParticipate;
     public CompListDTO(CompList entity){
         this.idx=entity.getIdx();

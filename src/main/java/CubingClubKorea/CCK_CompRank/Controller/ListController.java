@@ -14,6 +14,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.text.ParseException;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -28,7 +29,7 @@ public class ListController {
     private final AccountService accountService;
     @GetMapping("/comp/{time}")
     public ResponseEntity<List<CompListDTO>> CompList(@PathVariable(value="time")String time){
-        LocalDateTime now=LocalDateTime.now();
+        LocalDate now=LocalDate.now();
         return switch (time) {
             case "past" -> ResponseEntity.ok(complistService.getListPast(now));
             case "now" -> ResponseEntity.ok(complistService.getListToday(now));
@@ -69,6 +70,8 @@ public class ListController {
             default -> ResponseEntity.badRequest().build();
         };
     }
+
+
     @PostMapping("/round")
     public ResponseEntity<List<Integer>> MakeRound(@RequestBody List<RoundDTO> roundList){
         List<Integer> list=new ArrayList<>();
@@ -82,8 +85,8 @@ public class ListController {
         roundService.deleteByRoundIdx(roundIdx);
         return ResponseEntity.ok().build();
     }
-    @GetMapping("/record")
-    public ResponseEntity<List<ParticipateDTO>> RecordList(@RequestParam(name="roundIdx") Integer roundIdx, @RequestParam(required=false, name="search")String search){
+    @GetMapping(value={"/record/{roundIdx}", "/record/{roundIdx}/{search}"})
+    public ResponseEntity<List<ParticipateDTO>> RecordList(@PathVariable(name="roundIdx") Integer roundIdx, @PathVariable(required=false, name="search")String search){
         if(search==null) {
             return ResponseEntity.ok(participateService.getParticipate(roundIdx));
         }
