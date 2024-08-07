@@ -28,7 +28,7 @@ public class CompListService {
         return new CompListDTO(complistRepository.findByIdx(idx));
     }
     public List<CompListDTO> getListToday(LocalDate date){
-        List<CompList> list=complistRepository.findByCompDateEndAfterAndCompDateStartBefore(date, date);
+        List<CompList> list=complistRepository.findByCompDateEndAfterAndCompDateStartBeforeOrderByCompDateStartDesc(date, date);
         List<CompListDTO> listDTO=new ArrayList<>();
         for (CompList now:list) {
             listDTO.add(new CompListDTO(now));
@@ -36,7 +36,7 @@ public class CompListService {
         return listDTO;
     }
     public List<CompListDTO> getListPast(LocalDate date){
-        List<CompList> list=complistRepository.findByCompDateEndBefore(date);
+        List<CompList> list=complistRepository.findByCompDateEndBeforeOrderByCompDateStartDesc(date);
         List<CompListDTO> listDTO=new ArrayList<>();
         for (CompList past:list) {
             listDTO.add(new CompListDTO(past));
@@ -44,7 +44,7 @@ public class CompListService {
         return listDTO;
     }
     public List<CompListDTO> getListFuture(LocalDate date){
-        List<CompList> list=complistRepository.findByCompDateStartAfter(date);
+        List<CompList> list=complistRepository.findByCompDateStartAfterOrderByCompDateStartDesc(date);
         List<CompListDTO> listDTO=new ArrayList<>();
         for (CompList future:list) {
             listDTO.add(new CompListDTO(future));

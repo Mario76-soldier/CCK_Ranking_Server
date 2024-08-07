@@ -1,8 +1,10 @@
 package CubingClubKorea.CCK_CompRank.Controller;
 
 import CubingClubKorea.CCK_CompRank.DTO.CompListDTO;
+import CubingClubKorea.CCK_CompRank.DTO.CreateRoundDTO;
 import CubingClubKorea.CCK_CompRank.DTO.ParticipateDTO;
 import CubingClubKorea.CCK_CompRank.DTO.RoundDTO;
+import CubingClubKorea.CCK_CompRank.Repository.EventRepository;
 import CubingClubKorea.CCK_CompRank.Service.*;
 import CubingClubKorea.CCK_CompRank.Structure.Recorder;
 import lombok.RequiredArgsConstructor;
@@ -27,6 +29,7 @@ public class ListController {
     private final RoundService roundService;
     private final ParticipateService participateService;
     private final AccountService accountService;
+    private final EventRepository eventRepository;
     @GetMapping("/comp/{time}")
     public ResponseEntity<List<CompListDTO>> CompList(@PathVariable(value="time")String time){
         LocalDate now=LocalDate.now();
@@ -50,8 +53,8 @@ public class ListController {
     public ResponseEntity<Integer> MakeComp(@RequestBody CompListDTO compList){
         return ResponseEntity.ok(complistService.create(compList));
     }
-    @DeleteMapping("/comp")
-    public ResponseEntity<?> DeleteComp(@RequestParam(name="compIdx") Integer compIdx){
+    @DeleteMapping("/comp/{compIdx}")
+    public ResponseEntity<?> DeleteComp(@PathVariable(value="compIdx") Integer compIdx){
         List<RoundDTO> list=roundService.getCompRound(compIdx);
         for (RoundDTO roundDTO : list) {
             participateService.deleteByRoundIdx(roundDTO.getIdx());
@@ -73,15 +76,17 @@ public class ListController {
 
 
     @PostMapping("/round")
-    public ResponseEntity<List<Integer>> MakeRound(@RequestBody List<RoundDTO> roundList){
+    public ResponseEntity<List<Integer>> MakeRound(@RequestBody List<CreateRoundDTO> roundList){
         List<Integer> list=new ArrayList<>();
-        for(RoundDTO roundDTO:roundList){
-            list.add(roundService.create(roundDTO));
+        for(CreateRoundDTO roundDTO:roundList){
+            RoundDTO round=new RoundDTO(roundDTO);
+            round.setCubeEvent(eventRepository.findByEventName(roundDTO.getCubeEvent()));
+            list.add(roundService.create(round));
         }
         return ResponseEntity.ok(list);
     }
-    @DeleteMapping("/round")
-    public ResponseEntity<?> DeleteRound(@RequestParam(name="roundIdx")Integer roundIdx){
+    @DeleteMapping("/round/{roundIdx}")
+    public ResponseEntity<?> DeleteRound(@PathVariable(value="roundIdx")Integer roundIdx){
         roundService.deleteByRoundIdx(roundIdx);
         return ResponseEntity.ok().build();
     }

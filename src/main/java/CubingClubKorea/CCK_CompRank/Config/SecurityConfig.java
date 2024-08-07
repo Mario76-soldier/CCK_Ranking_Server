@@ -1,5 +1,6 @@
 package CubingClubKorea.CCK_CompRank.Config;
 
+import CubingClubKorea.CCK_CompRank.Entity.UserRole;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
@@ -34,7 +35,7 @@ public class SecurityConfig{
                 .httpBasic(Customizer.withDefaults())
                 .sessionManagement(sess->sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(request -> request
-                        //.requestMatchers("/makecomp","/makeround","/addparticipate","/recordcomp","/advance","/deletecomp","/deleterecord","/updateadvance").hasAuthority(UserRole.admin.name())
+                        .requestMatchers("/makecomp","/makeround","/addparticipate","/recordcomp","/advance","/deletecomp","/deleterecord","/updateadvance").hasAuthority(UserRole.admin.name())
                         .requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll()
                         .anyRequest().permitAll()
                 )
