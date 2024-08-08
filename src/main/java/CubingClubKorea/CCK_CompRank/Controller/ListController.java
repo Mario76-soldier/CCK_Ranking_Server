@@ -4,6 +4,7 @@ import CubingClubKorea.CCK_CompRank.DTO.CompListDTO;
 import CubingClubKorea.CCK_CompRank.DTO.CreateRoundDTO;
 import CubingClubKorea.CCK_CompRank.DTO.ParticipateDTO;
 import CubingClubKorea.CCK_CompRank.DTO.RoundDTO;
+import CubingClubKorea.CCK_CompRank.Entity.Participate;
 import CubingClubKorea.CCK_CompRank.Repository.EventRepository;
 import CubingClubKorea.CCK_CompRank.Service.*;
 import CubingClubKorea.CCK_CompRank.Structure.Recorder;
@@ -123,8 +124,8 @@ public class ListController {
         participateService.deleteParticipate(idx);
         return ResponseEntity.ok().build();
     }
-    @PostMapping("/advance")//기록에서 어드밴스 인원 다음 라운드로 넘기는 콜
-    public ResponseEntity<List<Integer>> Advance(@RequestParam(name="pastRoundIdx")Integer pastRoundIdx, @RequestParam(name="advanceRoundIdx")Integer advanceRoundIdx){
+    @PostMapping("/advance/{pastRoundIdx}/{advanceRoundIdx}")//기록에서 어드밴스 인원 다음 라운드로 넘기는 콜
+    public ResponseEntity<List<Integer>> Advance(@PathVariable(value="pastRoundIdx")Integer pastRoundIdx, @PathVariable(value="advanceRoundIdx")Integer advanceRoundIdx){
         RoundDTO past=roundService.getOne(pastRoundIdx);
         List<ParticipateDTO> list=participateService.getParticipate(pastRoundIdx);
         List<Integer> numList=new ArrayList<>();
@@ -135,14 +136,17 @@ public class ListController {
         }
         return ResponseEntity.ok(numList);
     }
-    @PutMapping("/advance")//어드밴스 인원 조정 콜
-    public ResponseEntity<Integer> UpdateAdvance(@RequestParam(name="roundIdx")Integer roundIdx, @RequestParam(name="advance")Integer advance) {
+    @PutMapping("/advance/{roundIdx}/{advance}")//어드밴스 인원 조정 콜
+    public ResponseEntity<Integer> UpdateAdvance(@PathVariable(value="roundIdx")Integer roundIdx, @PathVariable(value="advance")Integer advance) {
         roundService.updateAdvance(roundIdx, advance);
         return ResponseEntity.ok(roundService.getOne(roundIdx).getAdvance());
     }
     @PostMapping("/participate")//선수 추가 콜
-    public ResponseEntity<Integer> AddParticipate(@RequestBody ParticipateDTO participate){
-        return ResponseEntity.ok(participateService.addParticipate(participate));
+    public ResponseEntity<Integer> AddParticipate(@RequestBody List<ParticipateDTO> participates){
+        for(ParticipateDTO participate:participates){
+            participateService.addParticipate(participate);
+        }
+        return ResponseEntity.ok().build();
     }
 
     @PutMapping("/checker")//checker 갱신 콜
