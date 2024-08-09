@@ -1,7 +1,9 @@
 package CubingClubKorea.CCK_CompRank.Service;
 
 import CubingClubKorea.CCK_CompRank.DTO.CompListDTO;
+import CubingClubKorea.CCK_CompRank.DTO.RoundDTO;
 import CubingClubKorea.CCK_CompRank.Repository.CompListRepository;
+import CubingClubKorea.CCK_CompRank.Repository.ParticipateRepository;
 import CubingClubKorea.CCK_CompRank.Repository.RoundRepository;
 import CubingClubKorea.CCK_CompRank.Entity.CompList;
 import jakarta.transaction.Transactional;
@@ -20,7 +22,7 @@ import java.util.List;
 @Transactional
 public class CompListService {
     private final CompListRepository complistRepository;
-    private final RoundRepository roundRepository;
+    private final RoundService roundService;
     public Integer create(CompListDTO comp){
         return complistRepository.save(comp.toEntity()).getIdx();
     }
@@ -60,7 +62,10 @@ public class CompListService {
         return listDTO;
     }
     public void deleteByIdx(int Idx){
-        roundRepository.deleteByCompIdx(Idx);
+        List<RoundDTO> roundList=roundService.getCompRound(Idx);
+        for(RoundDTO round:roundList) {
+            roundService.deleteByRoundIdx(round.getIdx());
+        }
         complistRepository.deleteByIdx(Idx);
     }
 }

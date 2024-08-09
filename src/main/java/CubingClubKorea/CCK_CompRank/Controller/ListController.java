@@ -74,7 +74,15 @@ public class ListController {
             default -> ResponseEntity.badRequest().build();
         };
     }
-
+    @GetMapping("/roundinfo/{roundIdx}")
+    public ResponseEntity<RoundDTO> RoundInfo(@PathVariable(value="roundIdx")Integer roundIdx){
+        try{
+            return ResponseEntity.ok(roundService.getOne(roundIdx));
+        }
+        catch(Exception e) {
+            return ResponseEntity.badRequest().build();
+        }
+    }
 
     @PostMapping("/round")
     public ResponseEntity<List<Integer>> MakeRound(@RequestBody List<CreateRoundDTO> roundList){
@@ -91,25 +99,20 @@ public class ListController {
         roundService.deleteByRoundIdx(roundIdx);
         return ResponseEntity.ok().build();
     }
-    @GetMapping(value={"/record/{roundIdx}", "/record/{roundIdx}/{search}"})
-    public ResponseEntity<List<ParticipateDTO>> RecordList(@PathVariable(name="roundIdx") Integer roundIdx, @PathVariable(required=false, name="search")String search){
-        if(search==null) {
-            return ResponseEntity.ok(participateService.getParticipate(roundIdx));
-        }
-        else{
-            return ResponseEntity.ok(participateService.getSearchedParticipate(roundIdx, search));
-        }
+    @GetMapping("/record/{roundIdx}")
+    public ResponseEntity<List<ParticipateDTO>> RecordList(@PathVariable(value="roundIdx") Integer roundIdx){
+        return ResponseEntity.ok(participateService.getParticipate(roundIdx));
     }
-    @PostMapping("/record")
-    public ResponseEntity<?> UpdateRecord(@RequestBody Recorder recorder, @RequestParam(name="roundIdx")Integer roundIdx ,@RequestParam(name="idx")Integer idx){
+    @PostMapping("/record/{roundIdx}/{idx}")
+    public ResponseEntity<?> UpdateRecord(@RequestBody Recorder recorder, @PathVariable(value="roundIdx")Integer roundIdx ,@PathVariable(value="idx")Integer idx){
         Authentication authentication=SecurityContextHolder.getContext().getAuthentication();
-        String checkerName=accountService.getUserName(authentication.getName());
+        //String checkerName=accountService.getUserName(authentication.getName());
         String avgType=roundService.getOne(roundIdx).getCubeEvent().getAvgCalc();
         if(avgType.equals("ao5")){
-            participateService.updateRecordAo5(recorder, checkerName, idx);
+            participateService.updateRecordAo5(recorder, "홍민기", idx);
         }
         else if(avgType.equals("mo3")){
-            participateService.updateRecordMo3(recorder, checkerName, idx);
+            participateService.updateRecordMo3(recorder, "홍민기", idx);
         }
         participateService.updateChecker(null, idx);
         List<Integer> list=participateService.getRank(roundIdx);
@@ -119,8 +122,8 @@ public class ListController {
         }
         return ResponseEntity.ok().build();
     }
-    @DeleteMapping("/record")
-    public ResponseEntity<?> DeleteRecord(@RequestParam(name="idx")Integer idx){
+    @DeleteMapping("/record/{idx}")
+    public ResponseEntity<?> DeleteRecord(@PathVariable(value="idx")Integer idx){
         participateService.deleteParticipate(idx);
         return ResponseEntity.ok().build();
     }
@@ -149,8 +152,8 @@ public class ListController {
         return ResponseEntity.ok().build();
     }
 
-    @PutMapping("/checker")//checker 갱신 콜
-    public ResponseEntity<?> UpdateChecker(@RequestParam(name="idx")int idx){
+    @PutMapping("/checker/{idx}")//checker 갱신 콜
+    public ResponseEntity<?> UpdateChecker(@PathVariable(value="idx")int idx){
         Authentication authentication= SecurityContextHolder.getContext().getAuthentication();
         String checkerName=accountService.getUserName(authentication.getName());
         participateService.updateChecker(checkerName, idx);
