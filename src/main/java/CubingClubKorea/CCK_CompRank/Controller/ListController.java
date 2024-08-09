@@ -1,242 +1,162 @@
 package CubingClubKorea.CCK_CompRank.Controller;
 
 import CubingClubKorea.CCK_CompRank.DTO.CompListDTO;
+import CubingClubKorea.CCK_CompRank.DTO.CreateRoundDTO;
 import CubingClubKorea.CCK_CompRank.DTO.ParticipateDTO;
 import CubingClubKorea.CCK_CompRank.DTO.RoundDTO;
-import CubingClubKorea.CCK_CompRank.Entity.CompList;
-import CubingClubKorea.CCK_CompRank.Entity.CubeEvent;
 import CubingClubKorea.CCK_CompRank.Entity.Participate;
-import CubingClubKorea.CCK_CompRank.Entity.Round;
+import CubingClubKorea.CCK_CompRank.Repository.EventRepository;
 import CubingClubKorea.CCK_CompRank.Service.*;
-import CubingClubKorea.CCK_CompRank.Structure.MultRound;
 import CubingClubKorea.CCK_CompRank.Structure.Recorder;
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
-import org.springframework.ui.Model;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
+@Slf4j
 @RestController
 @RequiredArgsConstructor
+@RequestMapping("/api")
 public class ListController {
-
-    @Autowired
     private final CompListService complistService;
-    @Autowired
     private final RoundService roundService;
-    @Autowired
     private final ParticipateService participateService;
-    @Autowired
     private final AccountService accountService;
-    @Autowired
-    private final EventService eventService;
-    SimpleDateFormat formatter=new SimpleDateFormat("yyyy-MM-dd'T'HH:mm");
-
-    @GetMapping("/pastlist")
-    public List<CompListDTO> PastList(){
-        LocalDateTime now=LocalDateTime.now();
-        return complistService.getListPast(now);
+    private final EventRepository eventRepository;
+    @GetMapping("/comp/{time}")
+    public ResponseEntity<List<CompListDTO>> CompList(@PathVariable(value="time")String time){
+        LocalDate now=LocalDate.now();
+        return switch (time) {
+            case "past" -> ResponseEntity.ok(complistService.getListPast(now));
+            case "now" -> ResponseEntity.ok(complistService.getListToday(now));
+            case "future" -> ResponseEntity.ok(complistService.getListFuture(now));
+            default -> ResponseEntity.badRequest().build();
+        };
     }
-    @GetMapping("/nowlist")
-    public List<CompListDTO> NowList(){
-        LocalDateTime now=LocalDateTime.now();
-        return complistService.getListToday(now);
-    }
-    @GetMapping("/futurelist")
-    public List<CompListDTO> FutureList(){
-        LocalDateTime now=LocalDateTime.now();
-        return complistService.getListFuture(now);
-    }
-    @GetMapping("/pastround")
-    public List<RoundDTO> PastRound(@RequestParam(name="compIdx") Integer compIdx){
-        LocalDateTime now=LocalDateTime.now();
-        return roundService.getRoundPast(now, compIdx);
-    }
-    @GetMapping("/nowround")
-    public List<RoundDTO> NowRound(@RequestParam(name="compIdx") Integer compIdx){
-        LocalDateTime now=LocalDateTime.now();
-        return roundService.getRoundNow(now, compIdx);
-    }
-    @GetMapping("/futureround")
-    public List<RoundDTO> FutureRound(@RequestParam(name="compIdx") Integer compIdx){
-        LocalDateTime now=LocalDateTime.now();
-        return roundService.getRoundFuture(now, compIdx);
-    }
-    @GetMapping("/record")
-    public List<ParticipateDTO> Record(@RequestParam(name="roundIdx") Integer roundIdx, @RequestParam(required=false, name="search")String search){
-        List<ParticipateDTO> participates;
-        if(search==null) {
-            participates = participateService.getParticipate(roundIdx);
+    @GetMapping("/compname/{compIdx}")
+    public ResponseEntity<String> Comp(@PathVariable(value="compIdx")Integer compIdx){
+        try{
+            return ResponseEntity.ok(complistService.getOne(compIdx).getCompName());
         }
-        else{
-            participates=participateService.getSearchedParticipate(roundIdx, search);
+        catch(Exception e) {
+            return ResponseEntity.badRequest().build();
         }
-        return participates;
     }
-
-    /*@PreAuthorize("hasAuthority('admin')")
-    @GetMapping("/makecomp")
-    public String MakeComp(Model model){
-        model.addAttribute("compList",new CompListDTO());
-        return "makecomp";
+    @PostMapping("/comp")
+    public ResponseEntity<Integer> MakeComp(@RequestBody CompListDTO compList){
+        return ResponseEntity.ok(complistService.create(compList));
     }
-
-    @PreAuthorize("hasAuthority('admin')")
-    @PostMapping("/makecomp")
-    public String NewComp(@ModelAttribute("compList")CompListDTO compList){
-        int index=complistService.create(compList);
-        int countRound=complistService.getOne(index).getCountRound();
-        return "redirect:/makeround?countRound="+countRound+"&compIdx="+index;
-    }
-
-    @PreAuthorize("hasAuthority('admin')")
-    @PostMapping("/deletecomp")
-    public String DeleteComp(@RequestParam(name="idx") int idx){
-        List<Round> list=roundService.getCompRound(idx);
-        for(int i=0; i<list.size(); i++) {
-            participateService.deleteByRoundIdx(list.get(i).getIdx());
+    @DeleteMapping("/comp/{compIdx}")
+    public ResponseEntity<?> DeleteComp(@PathVariable(value="compIdx") Integer compIdx){
+        List<RoundDTO> list=roundService.getCompRound(compIdx);
+        for (RoundDTO roundDTO : list) {
+            participateService.deleteByRoundIdx(roundDTO.getIdx());
         }
-        roundService.deleteRound(idx);
-        complistService.deleteByIdx(idx);
-        return "redirect:/";
+        roundService.deleteRound(compIdx);
+        complistService.deleteByIdx(compIdx);
+        return ResponseEntity.ok().build();
     }
-    @PreAuthorize("hasAuthority('admin')")
-    @GetMapping("/makeround")
-    public String MakeRound(@RequestParam(name="countRound") int countRound, @RequestParam(name="compIdx") int compIdx, Model model){
-        model.addAttribute("countRound", countRound);
-        MultRound round=new MultRound();
-        model.addAttribute("round", round);
-        model.addAttribute("compIdx", compIdx);
-        return "makeround";
+    @GetMapping("/round/{time}/{compIdx}")
+    public ResponseEntity<List<RoundDTO>> RoundList(@PathVariable(value="compIdx") Integer compIdx, @PathVariable(value = "time")String time){
+        LocalDateTime now=LocalDateTime.now();
+        return switch (time) {
+            case "past" -> ResponseEntity.ok(roundService.getRoundPast(now, compIdx));
+            case "now" -> ResponseEntity.ok(roundService.getRoundNow(now, compIdx));
+            case "future" -> ResponseEntity.ok(roundService.getRoundFuture(now, compIdx));
+            default -> ResponseEntity.badRequest().build();
+        };
     }
-    @PreAuthorize("hasAuthority('admin')")
-    @PostMapping("/makeround")
-    public String NewRound(@ModelAttribute MultRound round, @RequestParam(name="compIdx")int compIdx) throws ParseException {
-        for(int i=0; i<round.getEventStart().length; i++){
-            RoundDTO roundDTO=new RoundDTO();
-            roundDTO.setCompIdx(compIdx);
-            roundDTO.setSeq(i+1);
-            roundDTO.setRound(round.getRound().get(i));
-            CubeEvent cubeEvent=eventService.findByEventName(round.getEventName().get(i));
-            roundDTO.setCubeEvent(cubeEvent);
-            roundDTO.setEventStart(formatter.parse(round.getEventStart()[i]));
-            roundDTO.setEventEnd(formatter.parse(round.getEventEnd()[i]));
-            roundDTO.setAdvance(round.getAdvance().get(i));
-            roundService.create(roundDTO);
+    @GetMapping("/roundinfo/{roundIdx}")
+    public ResponseEntity<RoundDTO> RoundInfo(@PathVariable(value="roundIdx")Integer roundIdx){
+        try{
+            return ResponseEntity.ok(roundService.getOne(roundIdx));
         }
-        return "redirect:/";
+        catch(Exception e) {
+            return ResponseEntity.badRequest().build();
+        }
     }
 
-    @PreAuthorize("hasAuthority('admin')")
-    @PostMapping("/deleteround")
-    public String DeleteRound(@RequestParam(name="compIdx")int compIdx, @RequestParam(name="roundIdx")int roundIdx) throws ParseException {
+    @PostMapping("/round")
+    public ResponseEntity<List<Integer>> MakeRound(@RequestBody List<CreateRoundDTO> roundList){
+        List<Integer> list=new ArrayList<>();
+        for(CreateRoundDTO roundDTO:roundList){
+            RoundDTO round=new RoundDTO(roundDTO);
+            round.setCubeEvent(eventRepository.findByEventName(roundDTO.getCubeEvent()));
+            list.add(roundService.create(round));
+        }
+        return ResponseEntity.ok(list);
+    }
+    @DeleteMapping("/round/{roundIdx}")
+    public ResponseEntity<?> DeleteRound(@PathVariable(value="roundIdx")Integer roundIdx){
         roundService.deleteByRoundIdx(roundIdx);
-        return "redirect:/round?compIdx="+compIdx;
+        return ResponseEntity.ok().build();
     }
-
-    @PreAuthorize("hasAuthority('admin')")
-    @GetMapping("/recordcomp")
-    public String RecordComp(@RequestParam(name="compIdx") int compIdx, @RequestParam(name="roundIdx") int roundIdx, @RequestParam(required = false, name = "search")String search, Model model){
-        CompList comp=complistService.getOne(compIdx);
-        Round round=roundService.getOne(roundIdx);
-        List<Participate> participates;
-        if(search==null) {
-            participates = participateService.getParticipate(roundIdx);
-        }
-        else{
-            participates=participateService.getSearchedParticipate(roundIdx, search);
-        }
-        model.addAttribute("compIdx",compIdx);
-        model.addAttribute("roundIdx",roundIdx);
-        model.addAttribute("comp",comp);
-        model.addAttribute("round",round);
-        model.addAttribute("partList",participates);
-        Recorder recorder=new Recorder();
-        model.addAttribute("recorder",recorder);
-        return "recordcomp";
+    @GetMapping("/record/{roundIdx}")
+    public ResponseEntity<List<ParticipateDTO>> RecordList(@PathVariable(value="roundIdx") Integer roundIdx){
+        return ResponseEntity.ok(participateService.getParticipate(roundIdx));
     }
-    @PreAuthorize("hasAuthority('admin')")
-    @PostMapping("/recordcomp")
-    public String UpdateRecord(@ModelAttribute Recorder recorder, @RequestParam(name="compIdx") int compIdx, @RequestParam(name="roundIdx") int roundIdx, @RequestParam(name="idx")int idx, Authentication authentication)throws ParseException{
-        String checkerName=accountService.getUserName(authentication.getName());
+    @PostMapping("/record/{roundIdx}/{idx}")
+    public ResponseEntity<?> UpdateRecord(@RequestBody Recorder recorder, @PathVariable(value="roundIdx")Integer roundIdx ,@PathVariable(value="idx")Integer idx){
+        Authentication authentication=SecurityContextHolder.getContext().getAuthentication();
+        //String checkerName=accountService.getUserName(authentication.getName());
         String avgType=roundService.getOne(roundIdx).getCubeEvent().getAvgCalc();
         if(avgType.equals("ao5")){
-            participateService.updateRecordAo5(recorder, checkerName, idx);
+            participateService.updateRecordAo5(recorder, "홍민기", idx);
         }
         else if(avgType.equals("mo3")){
-            participateService.updateRecordMo3(recorder, checkerName, idx);
+            participateService.updateRecordMo3(recorder, "홍민기", idx);
         }
         participateService.updateChecker(null, idx);
         List<Integer> list=participateService.getRank(roundIdx);
         for(int i=0; i<list.size(); i++) {
-            System.out.println(list.get(i));
+            log.info(String.valueOf(list.get(i)));
             participateService.updateRanking(i+1,list.get(i));
         }
-        return "redirect:/recordcomp?compIdx="+compIdx+"&roundIdx="+roundIdx;
+        return ResponseEntity.ok().build();
+    }
+    @DeleteMapping("/record/{idx}")
+    public ResponseEntity<?> DeleteRecord(@PathVariable(value="idx")Integer idx){
+        participateService.deleteParticipate(idx);
+        return ResponseEntity.ok().build();
+    }
+    @PostMapping("/advance/{pastRoundIdx}/{advanceRoundIdx}")//기록에서 어드밴스 인원 다음 라운드로 넘기는 콜
+    public ResponseEntity<List<Integer>> Advance(@PathVariable(value="pastRoundIdx")Integer pastRoundIdx, @PathVariable(value="advanceRoundIdx")Integer advanceRoundIdx){
+        RoundDTO past=roundService.getOne(pastRoundIdx);
+        List<ParticipateDTO> list=participateService.getParticipate(pastRoundIdx);
+        List<Integer> numList=new ArrayList<>();
+        for(int i=0; i<past.getAdvance(); i++){
+            ParticipateDTO p=list.get(i);
+            ParticipateDTO advance=new ParticipateDTO(p.getUserName(), p.getEventName(), p.getEmail(),  advanceRoundIdx);
+            numList.add(participateService.addParticipate(advance));
+        }
+        return ResponseEntity.ok(numList);
+    }
+    @PutMapping("/advance/{roundIdx}/{advance}")//어드밴스 인원 조정 콜
+    public ResponseEntity<Integer> UpdateAdvance(@PathVariable(value="roundIdx")Integer roundIdx, @PathVariable(value="advance")Integer advance) {
+        roundService.updateAdvance(roundIdx, advance);
+        return ResponseEntity.ok(roundService.getOne(roundIdx).getAdvance());
+    }
+    @PostMapping("/participate")//선수 추가 콜
+    public ResponseEntity<Integer> AddParticipate(@RequestBody List<ParticipateDTO> participates){
+        for(ParticipateDTO participate:participates){
+            participateService.addParticipate(participate);
+        }
+        return ResponseEntity.ok().build();
     }
 
-    @PreAuthorize("hasAuthority('admin')")
-    @PostMapping("/updatechecker")
-    public String UpdateChecker(@RequestParam(name="compIdx") int compIdx, @RequestParam(name="roundIdx") int roundIdx, @RequestParam(name="idx")int idx, Authentication authentication)throws ParseException{
+    @PutMapping("/checker/{idx}")//checker 갱신 콜
+    public ResponseEntity<?> UpdateChecker(@PathVariable(value="idx")int idx){
+        Authentication authentication= SecurityContextHolder.getContext().getAuthentication();
         String checkerName=accountService.getUserName(authentication.getName());
         participateService.updateChecker(checkerName, idx);
-        return "redirect:/record?compIdx="+compIdx+"&roundIdx="+roundIdx;
+        return ResponseEntity.ok().build();
     }
-    @PreAuthorize("hasAuthority('admin')")
-    @PostMapping("/updateadvance")
-    public String UpdateAdvance(@RequestParam(name="compIdx") int compIdx, @RequestParam(name="roundIdx")int roundIdx, Model model, HttpServletRequest request){
-        roundService.updateAdvance(roundIdx,Integer.parseInt(request.getParameter("advance")));
-        return "redirect:/recordcomp?compIdx="+compIdx+"&roundIdx="+roundIdx;
-    }
-    @PreAuthorize("hasAuthority('admin')")
-    @PostMapping("/deleterecord")
-    public String UpdateRecord(@RequestParam(name="compIdx") int compIdx, @RequestParam(name="roundIdx") int roundIdx, @RequestParam(name="idx")int idx)throws ParseException{
-        participateService.deleteParticipate(idx);
-        return "redirect:/recordcomp?compIdx="+compIdx+"&roundIdx="+roundIdx;
-    }
-    @PreAuthorize("hasAuthority('admin')")
-    @GetMapping("/addparticipate")
-    public String AddParticipate(@RequestParam(name="compIdx") int compIdx, @RequestParam(name="roundIdx") int roundIdx, Model model){
-        CompList comp=complistService.getOne(compIdx);
-        Round round=roundService.getOne(roundIdx);
-        model.addAttribute("compIdx",compIdx);
-        model.addAttribute("roundIdx",roundIdx);
-        model.addAttribute("comp",comp);
-        model.addAttribute("round",round);
-        model.addAttribute("participate",new ParticipateDTO());
-        return "addparticipate";
-    }
-    @PreAuthorize("hasAuthority('admin')")
-    @PostMapping("/addparticipate")
-    public String AddingParticipate(@ModelAttribute("participate")ParticipateDTO participate, @RequestParam(name="compIdx") int compIdx, @RequestParam(name="roundIdx") int roundIdx){
-        participateService.addParticipate(participate.toEntity());
-        return "redirect:/recordcomp?compIdx="+compIdx+"&roundIdx="+roundIdx;
-    }
-    @PreAuthorize("hasAuthority('admin')")
-    @GetMapping("/advance")
-    public String Advance(@RequestParam(name="compIdx")int compIdx, @RequestParam(name="roundIdx")int roundIdx, Model model){
-        List<Round> list=roundService.getCompRound(compIdx);
-        model.addAttribute("compIdx", compIdx);
-        model.addAttribute("roundIdx",roundIdx);
-        model.addAttribute("list",list);
-        return "advance";
-    }
-    @PreAuthorize("hasAuthority('admin')")
-    @PostMapping("/advance")
-    public String sendAdvance(@RequestParam(name="compIdx")int compIdx, @RequestParam(name="pastRoundIdx")int pastRoundIdx,  @RequestParam(name="nowRoundIdx")int nowRoundIdx){
-        Round past=roundService.getOne(pastRoundIdx);
-        List<Participate> list=participateService.getParticipate(pastRoundIdx);
-        for(int i=0; i<past.getAdvance(); i++){
-            Participate p=list.get(i);
-            Participate advance=new Participate(p.getUserName(), p.getEmail(), p.getEventName(), nowRoundIdx);
-            participateService.addParticipate(advance);
-        }
-        return "redirect:/round?compIdx="+compIdx;
-    }*/
 }

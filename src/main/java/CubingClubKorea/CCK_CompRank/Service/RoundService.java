@@ -4,6 +4,8 @@ package CubingClubKorea.CCK_CompRank.Service;
 import CubingClubKorea.CCK_CompRank.DTO.CompListDTO;
 import CubingClubKorea.CCK_CompRank.DTO.RoundDTO;
 import CubingClubKorea.CCK_CompRank.Entity.CompList;
+import CubingClubKorea.CCK_CompRank.Entity.Participate;
+import CubingClubKorea.CCK_CompRank.Repository.ParticipateRepository;
 import CubingClubKorea.CCK_CompRank.Repository.RoundRepository;
 import CubingClubKorea.CCK_CompRank.Entity.Round;
 import jakarta.transaction.Transactional;
@@ -20,8 +22,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @Transactional
 public class RoundService {
-
-    @Autowired
+    private final ParticipateRepository participateRepository;
     private final RoundRepository roundRepository;
 
     public Integer create(RoundDTO round){
@@ -65,15 +66,14 @@ public class RoundService {
         }
         return listDTO;
     }
-
-    public void deleteRound(Integer idx){
-        roundRepository.deleteByCompIdx(idx);
+    public void deleteRound(Integer compIdx){
+        roundRepository.deleteByCompIdx(compIdx);
     }
-
-    public void deleteByRoundIdx(Integer idx){
-        roundRepository.deleteByIdx(idx);
+    public void deleteByRoundIdx(Integer roundIdx){
+        participateRepository.deleteByRound(roundIdx);
+        roundRepository.deleteByIdx(roundIdx);
     }
-    public void updateAdvance(Integer idx, Integer advance){
-        roundRepository.updateAdvance(idx, advance);
+    public void updateAdvance(Integer nextCompIdx, Integer advance){
+        roundRepository.updateAdvance(nextCompIdx, advance);
     }
 }

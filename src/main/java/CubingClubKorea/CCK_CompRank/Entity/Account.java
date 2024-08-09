@@ -17,10 +17,10 @@ import java.util.Date;
 @Table(name="Accounts")
 public class Account {
     @Id
-    @Column(name="email")
+    @Column(name="email", length=30)
     private String email;
 
-    @Column(name="name")
+    @Column(name="name", length=30)
     private String name;
 
     @Column(name="password")
@@ -34,12 +34,12 @@ public class Account {
     @DateTimeFormat(pattern="yyyy-MM-dd")
     private Date birthDate;
 
-    @Column(name="state")
+    @Column(name="state", length=15)
     private String state;
 
-    @Column(name="sex")
+    @Column(name="sex", length=10)
     private String sex;
 
-    @Column(name="phoneNum")
+    @Column(name="phoneNum", length=20)
     private String phoneNum;
 }

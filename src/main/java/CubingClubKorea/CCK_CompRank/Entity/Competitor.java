@@ -15,25 +15,25 @@ import lombok.NoArgsConstructor;
 public class Competitor {
 
     @Id
-    @Column(name="email")
+    @Column(name="email", length=30)
     private String email;
 
-    @Column(name="username")
+    @Column(name="username", length=30)
     private String username;
 
-    @Column(name="enusername")
+    @Column(name="enusername", length=30)
     private String enusername;
 
-    @Column(name="nation")
+    @Column(name="nation", length=30)
     private String nation;
 
-    @Column(name="sex")
+    @Column(name="sex", length=10)
     private String sex;
 
     @Column(name="compIdx")
     private int compIdx;
 
-    @Column(name="eventname")
+    @Column(name="eventname", length=20)
     private String eventname;
 
     @Builder

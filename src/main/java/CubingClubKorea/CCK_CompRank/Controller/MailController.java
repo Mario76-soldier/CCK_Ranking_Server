@@ -6,41 +6,41 @@ import CubingClubKorea.CCK_CompRank.Service.AccountService;
 import CubingClubKorea.CCK_CompRank.Service.MailSendService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.validation.FieldError;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.RestController;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
+@Slf4j
 @RestController
 @RequiredArgsConstructor
+@RequestMapping("/mail")
 public class MailController {
     private final MailSendService mailService;
     private final AccountService accountService;
-    @PostMapping ("/mailsend")
-    public String mailSend(@Valid EmailRequestDTO emailDto){
-        System.out.println("이메일 인증 요청이 들어옴");
-        System.out.println("이메일 인증 이메일 :"+emailDto.getEmail());
-        return mailService.joinEmail(emailDto.getEmail());
+    @PostMapping ("/send")
+    public ResponseEntity<?> mailSend(@Valid EmailRequestDTO emailDto){
+        log.info("Email request created");
+        log.info("Email request address :"+emailDto.getEmail());
+        return ResponseEntity.ok(mailService.joinEmail(emailDto.getEmail()));
     }
-    @PostMapping("/mailauthcheck")
-    public String AuthCheck(@Valid EmailCheckDTO emailCheckDto){
-        Boolean Checked=mailService.CheckAuthNum(emailCheckDto.getEmail(),emailCheckDto.getAuthNum());
+    @PostMapping("/check")
+    public ResponseEntity<?> AuthCheck(@Valid EmailCheckDTO emailCheckDto){
+        boolean Checked=mailService.CheckAuthNum(emailCheckDto.getEmail(),emailCheckDto.getAuthNum());
         if(Checked){
-            return "ok";
+            return ResponseEntity.ok().build();
         }
         else{
-            throw new NullPointerException("뭔가 잘못!");
+            return ResponseEntity.internalServerError().body("Something Issues");
         }
     }
-
-    @PostMapping("/dupcheck")
-    public String DupCheck(@Valid EmailRequestDTO email){
+    @PostMapping("/duplicate")
+    public ResponseEntity<?> DupCheck(@Valid EmailRequestDTO email){
         if(accountService.checkEmailDuplicate(email.getEmail())) {
-            return "error";
+            return ResponseEntity.status(HttpStatus.CONFLICT).build();
         }
         else{
-            return "ok";
+            return ResponseEntity.ok().build();
         }
     }
 }

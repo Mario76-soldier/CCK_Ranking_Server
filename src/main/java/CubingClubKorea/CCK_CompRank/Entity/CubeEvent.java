@@ -11,10 +11,10 @@ import lombok.NoArgsConstructor;
 @Table(name="CubeEvent")
 public class CubeEvent {
     @Id
-    @Column(name="EventName")
+    @Column(name="EventName", length=20)
     private String eventName;
 
-    @Column(name = "AvgCalc")
+    @Column(name = "AvgCalc", length=15)
     private String avgCalc;
 
     @Builder

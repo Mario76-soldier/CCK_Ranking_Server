@@ -11,11 +11,11 @@ import java.util.List;
 
 public interface RoundRepository extends JpaRepository<Round, Integer> {
     Round findByIdx(Integer idx);
-    @Query("select r from Round r join fetch r.cubeEvent where r.compIdx=:compIdx and r.eventEnd<:date")
+    @Query("select r from Round r join fetch r.cubeEvent where r.compIdx=:compIdx and r.eventEnd<:date order by r.eventStart asc")
     List<Round> findPast(@Param(value="date")LocalDateTime date, @Param(value="compIdx")Integer compIdx);
-    @Query("select r from Round r join fetch r.cubeEvent where r.compIdx=:compIdx and r.eventEnd>:date and r.eventStart<:date")
+    @Query("select r from Round r join fetch r.cubeEvent where r.compIdx=:compIdx and r.eventEnd>:date and r.eventStart<:date order by r.eventStart asc")
     List<Round> findNow(@Param(value="date")LocalDateTime date, @Param(value="compIdx")Integer compIdx);
-    @Query("select r from Round r join fetch r.cubeEvent where r.compIdx=:compIdx and r.eventStart>:date")
+    @Query("select r from Round r join fetch r.cubeEvent where r.compIdx=:compIdx and r.eventStart>:date order by r.eventStart asc")
     List<Round> findFuture(@Param(value="date")LocalDateTime date, @Param(value="compIdx")Integer compIdx);
 
     List<Round> findByCompIdx(Integer compIdx);
