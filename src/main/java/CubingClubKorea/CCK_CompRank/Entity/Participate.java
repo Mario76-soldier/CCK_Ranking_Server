@@ -86,6 +86,20 @@ public class Participate {
         this.eventName=EventName;
         this.email=Email;
         this.round=Round;
+        this.m1=0;
+        this.s1=(float)0;
+        this.m2=0;
+        this.s2=(float)0;
+        this.m3=0;
+        this.s3=(float)0;
+        this.m4=0;
+        this.s4=(float)0;
+        this.m5=0;
+        this.s5=(float)0;
+        this.singleM=0;
+        this.singleS=(float)0;
+        this.avgM=0;
+        this.avgS=(float)0;
     }
 
     public Participate update( Integer m1, Float s1, Integer m2, Float s2,

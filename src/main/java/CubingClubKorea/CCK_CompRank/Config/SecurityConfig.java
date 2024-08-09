@@ -1,10 +1,12 @@
 package CubingClubKorea.CCK_CompRank.Config;
 
+import CubingClubKorea.CCK_CompRank.Entity.UserRole;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -34,7 +36,9 @@ public class SecurityConfig{
                 .httpBasic(Customizer.withDefaults())
                 .sessionManagement(sess->sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(request -> request
-                        //.requestMatchers("/makecomp","/makeround","/addparticipate","/recordcomp","/advance","/deletecomp","/deleterecord","/updateadvance").hasAuthority(UserRole.admin.name())
+                        .requestMatchers(HttpMethod.POST,"/api/comp/","/api/round","/api/advance/**","/api/record/**").authenticated()
+                        .requestMatchers(HttpMethod.DELETE,"/api/comp/**","/api/round/**","/api/record/**").authenticated()
+                        .requestMatchers(HttpMethod.PUT,"/api/advance/**","/api/checker/**").authenticated()
                         .requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll()
                         .anyRequest().permitAll()
                 )

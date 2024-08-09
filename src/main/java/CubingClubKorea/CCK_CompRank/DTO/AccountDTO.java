@@ -30,7 +30,7 @@ public class AccountDTO {
                 .email(this.email)
                 .name(this.name)
                 .password(encodedPassword)
-                .position(UserRole.customer)
+                .position(UserRole.ROLE_CUSTOMER)
                 .birthDate(this.birthDate)
                 .state(this.state)
                 .sex(this.sex)

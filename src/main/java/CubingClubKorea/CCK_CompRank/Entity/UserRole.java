@@ -4,5 +4,5 @@ import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 
 public enum UserRole {
-    customer, admin, root;
+    ROLE_CUSTOMER, ROLE_ADMIN, ROLE_ROOT;
 }

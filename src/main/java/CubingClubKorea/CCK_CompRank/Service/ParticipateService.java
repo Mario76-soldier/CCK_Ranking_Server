@@ -7,6 +7,7 @@ import CubingClubKorea.CCK_CompRank.Entity.Round;
 import CubingClubKorea.CCK_CompRank.Repository.AccountRepository;
 import CubingClubKorea.CCK_CompRank.Repository.ParticipateRepository;
 import CubingClubKorea.CCK_CompRank.Entity.Participate;
+import CubingClubKorea.CCK_CompRank.Repository.RoundRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,7 +22,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @Transactional
 public class ParticipateService {
-    @Autowired
+    private final RoundRepository roundRepository;
     private final ParticipateRepository participateRepository;
 
     public List<Integer> getRank(Integer round){
@@ -159,7 +160,7 @@ public class ParticipateService {
             avgM=0;
             avgS=-1;
         }
-        else if(canAvg==false){
+        else if(!canAvg){
             avgM=0;
             avgS=0;
         }
@@ -302,6 +303,8 @@ public class ParticipateService {
     }
 
     public Integer addParticipate(ParticipateDTO participate){
+        String event=roundRepository.findByIdx(participate.getRound()).getCubeEvent().getEventName();
+        participate.setEventName(event);
         return participateRepository.save(participate.toEntity()).getIdx();
     }
     public void updateChecker(String checker, Integer idx){
