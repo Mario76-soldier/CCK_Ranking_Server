@@ -134,7 +134,7 @@ public class ListController {
         List<Integer> numList=new ArrayList<>();
         for(int i=0; i<past.getAdvance(); i++){
             ParticipateDTO p=list.get(i);
-            ParticipateDTO advance=new ParticipateDTO(p.getUserName(), p.getEventName(), p.getEmail(),  advanceRoundIdx);
+            ParticipateDTO advance=new ParticipateDTO(p.getUserName(), p.getPdx(),p.getEventName(), p.getEmail(),  advanceRoundIdx);
             numList.add(participateService.addParticipate(advance));
         }
         return ResponseEntity.ok(numList);

@@ -11,6 +11,7 @@ import lombok.Setter;
 @NoArgsConstructor
 public class ParticipateDTO {
     private Integer idx;
+    private Integer pdx;
     private String userName;
     private String eventName;
     private String email;
@@ -34,6 +35,7 @@ public class ParticipateDTO {
     private String checker2;
     public ParticipateDTO(Participate entity){
         this.idx=entity.getIdx();
+        this.pdx=entity.getPdx();
         this.userName=entity.getUserName();
         this.eventName=entity.getEventName();
         this.email=entity.getEmail();
@@ -56,8 +58,9 @@ public class ParticipateDTO {
         this.checker1=entity.getChecker1();
         this.checker2=entity.getChecker2();
     }
-    public ParticipateDTO(String userName, String eventName, String email, Integer advanceRoundIdx) {
+    public ParticipateDTO(String userName, Integer pdx, String eventName, String email, Integer advanceRoundIdx) {
         this.userName=userName;
+        this.pdx=pdx;
         this.eventName=eventName;
         this.email=email;
         this.round=advanceRoundIdx;
@@ -65,6 +68,7 @@ public class ParticipateDTO {
     public Participate toEntity(){
         return Participate.builder()
                 .UserName(userName)
+                .Pdx(pdx)
                 .EventName(eventName)
                 .Email(email)
                 .Round(round)

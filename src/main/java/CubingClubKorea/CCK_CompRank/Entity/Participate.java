@@ -17,6 +17,9 @@ public class Participate {
     @Column(name="Idx")
     private Integer idx;
 
+    @Column(name="Pdx")
+    private Integer pdx;
+
     @Column(name="UserName", length=40)
     private String userName;
 
@@ -81,8 +84,9 @@ public class Participate {
     private String checker2;
 
     @Builder
-    public Participate(String UserName, String Email, String EventName, Integer Round){
+    public Participate(String UserName, Integer Pdx, String Email, String EventName, Integer Round){
         this.userName=UserName;
+        this.pdx=Pdx;
         this.eventName=EventName;
         this.email=Email;
         this.round=Round;
