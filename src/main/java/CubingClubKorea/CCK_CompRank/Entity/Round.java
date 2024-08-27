@@ -38,7 +38,7 @@ public class Round {
     private Integer advance;
 
     @Builder
-    public Round(Integer Idx, Integer CompIdx, Integer Seq, CubeEvent cubeEvent, String Round, LocalDateTime EventStart, LocalDateTime EventEnd, Integer Advance){
+    public Round(Integer Idx, Integer CompIdx, CubeEvent cubeEvent, String Round, LocalDateTime EventStart, LocalDateTime EventEnd, Integer Advance){
         this.idx=Idx;
         this.compIdx=CompIdx;
         this.cubeEvent=cubeEvent;
