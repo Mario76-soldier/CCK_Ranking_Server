@@ -4,19 +4,16 @@ import CubingClubKorea.CCK_CompRank.DTO.CompListDTO;
 import CubingClubKorea.CCK_CompRank.DTO.CreateRoundDTO;
 import CubingClubKorea.CCK_CompRank.DTO.ParticipateDTO;
 import CubingClubKorea.CCK_CompRank.DTO.RoundDTO;
-import CubingClubKorea.CCK_CompRank.Entity.Participate;
 import CubingClubKorea.CCK_CompRank.Repository.EventRepository;
 import CubingClubKorea.CCK_CompRank.Service.*;
 import CubingClubKorea.CCK_CompRank.Structure.Recorder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
-import java.text.ParseException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -106,25 +103,24 @@ public class ListController {
     @PostMapping("/record/{roundIdx}/{idx}")
     public ResponseEntity<?> UpdateRecord(@RequestBody Recorder recorder, @PathVariable(value="roundIdx")Integer roundIdx ,@PathVariable(value="idx")Integer idx){
         Authentication authentication=SecurityContextHolder.getContext().getAuthentication();
-        //String checkerName=accountService.getUserName(authentication.getName());
+        String checkerName=accountService.getUserName(authentication.getName());
         String avgType=roundService.getOne(roundIdx).getCubeEvent().getAvgCalc();
-        if(avgType.equals("ao5")){
-            participateService.updateRecordAo5(recorder, "홍민기", idx);
-        }
-        else if(avgType.equals("mo3")){
-            participateService.updateRecordMo3(recorder, "홍민기", idx);
-        }
+        participateService.updateRecord(recorder, checkerName, idx,avgType);
         participateService.updateChecker(null, idx);
         List<Integer> list=participateService.getRank(roundIdx);
         for(int i=0; i<list.size(); i++) {
-            log.info(String.valueOf(list.get(i)));
             participateService.updateRanking(i+1,list.get(i));
         }
         return ResponseEntity.ok().build();
     }
     @DeleteMapping("/record/{idx}")
     public ResponseEntity<?> DeleteRecord(@PathVariable(value="idx")Integer idx){
+        Integer roundIdx=participateService.getOne(idx).getRound();
         participateService.deleteParticipate(idx);
+        List<Integer> list=participateService.getRank(roundIdx);
+        for(int i=0; i<list.size(); i++) {
+            participateService.updateRanking(i+1,list.get(i));
+        }
         return ResponseEntity.ok().build();
     }
     @PostMapping("/advance/{pastRoundIdx}/{advanceRoundIdx}")//기록에서 어드밴스 인원 다음 라운드로 넘기는 콜
@@ -153,7 +149,7 @@ public class ListController {
     }
 
     @PutMapping("/checker/{idx}")//checker 갱신 콜
-    public ResponseEntity<?> UpdateChecker(@PathVariable(value="idx")int idx){
+    public ResponseEntity<?> UpdateChecker(@PathVariable(value="idx")Integer idx){
         Authentication authentication= SecurityContextHolder.getContext().getAuthentication();
         String checkerName=accountService.getUserName(authentication.getName());
         participateService.updateChecker(checkerName, idx);

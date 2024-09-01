@@ -10,17 +10,14 @@ import java.util.List;
 
 public interface ParticipateRepository extends JpaRepository<Participate, Integer> {
 
-    @Query("select u.idx from Participate u where u.round=:round and u.checker1 is not null order by (case when u.avgM=0 and u.avgS=0 then 1 else 0 end) asc, (case when u.avgS=-2 then 1 else 0 end) asc, (case when u.avgS=-1 then 1 else 0 end) asc, (case when u.singleS=-2 then 1 else 0 end) asc,(case when u.singleS=-1 then 1 else 0 end) asc, u.avgM asc, u.avgS asc, u.singleM asc, u.singleS asc")
+    @Query("select u.idx from Participate u where u.round=:round and (u.singleM!=0 or u.singleS!=0) order by (case when u.avgM=0 and u.avgS=0 then 1 else 0 end) asc, (case when u.avgS=-2 then 1 else 0 end) asc, (case when u.avgS=-1 then 1 else 0 end) asc, (case when u.singleS=-2 then 1 else 0 end) asc,(case when u.singleS=-1 then 1 else 0 end) asc, u.avgM asc, u.avgS asc, u.singleM asc, u.singleS asc")
     List<Integer> findByRoundOrder(@Param(value="round")int round);
 
     @Query("select u from Participate u where u.round=:round order by (case when u.ranking is null or u.ranking=0 then 1 else 0 end) asc, u.ranking asc")
     List<Participate> findByRound(@Param(value="round")int round);
 
-    @Query("select u from Participate u where u.round=:round and u.userName like %:search%  order by (case when u.ranking is null or u.ranking=0 then 1 else 0 end) asc, u.ranking asc")
-    List<Participate> search(@Param(value="round")int round, @Param(value="search")String search);
-
     @Modifying
-    @Query("update Participate p set p.ranking=:ranking where p.idx=:idx")
+    @Query("update Participate p set p.ranking=:ranking where p.idx=:idx and (p.singleM!=0 or p.singleS!=0)")
     void updateRanking(@Param(value="ranking")int ranking, @Param(value="idx")int idx);
 
     @Modifying

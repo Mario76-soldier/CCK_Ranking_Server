@@ -7,7 +7,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 
-import java.util.Date;
+import java.time.LocalDate;
 
 @Entity
 @Builder
@@ -32,7 +32,7 @@ public class Account {
 
     @Column(name="birthDate")
     @DateTimeFormat(pattern="yyyy-MM-dd")
-    private Date birthDate;
+    private LocalDate birthDate;
 
     @Column(name="state", length=15)
     private String state;

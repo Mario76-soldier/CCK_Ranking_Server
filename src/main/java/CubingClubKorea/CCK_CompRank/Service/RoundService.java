@@ -1,21 +1,15 @@
 package CubingClubKorea.CCK_CompRank.Service;
 
-
-import CubingClubKorea.CCK_CompRank.DTO.CompListDTO;
 import CubingClubKorea.CCK_CompRank.DTO.RoundDTO;
-import CubingClubKorea.CCK_CompRank.Entity.CompList;
-import CubingClubKorea.CCK_CompRank.Entity.Participate;
 import CubingClubKorea.CCK_CompRank.Repository.ParticipateRepository;
 import CubingClubKorea.CCK_CompRank.Repository.RoundRepository;
 import CubingClubKorea.CCK_CompRank.Entity.Round;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 @Service

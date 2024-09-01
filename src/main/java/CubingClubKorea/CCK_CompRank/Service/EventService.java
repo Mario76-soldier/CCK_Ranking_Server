@@ -2,7 +2,6 @@ package CubingClubKorea.CCK_CompRank.Service;
 
 import CubingClubKorea.CCK_CompRank.Entity.CubeEvent;
 import CubingClubKorea.CCK_CompRank.Repository.EventRepository;
-import CubingClubKorea.CCK_CompRank.Repository.ParticipateRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;

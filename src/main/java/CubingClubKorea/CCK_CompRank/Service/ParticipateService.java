@@ -2,15 +2,11 @@ package CubingClubKorea.CCK_CompRank.Service;
 
 
 import CubingClubKorea.CCK_CompRank.DTO.ParticipateDTO;
-import CubingClubKorea.CCK_CompRank.DTO.RoundDTO;
-import CubingClubKorea.CCK_CompRank.Entity.Round;
-import CubingClubKorea.CCK_CompRank.Repository.AccountRepository;
 import CubingClubKorea.CCK_CompRank.Repository.ParticipateRepository;
 import CubingClubKorea.CCK_CompRank.Entity.Participate;
 import CubingClubKorea.CCK_CompRank.Repository.RoundRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import CubingClubKorea.CCK_CompRank.Structure.Recorder;
 
@@ -25,293 +21,145 @@ public class ParticipateService {
     private final RoundRepository roundRepository;
     private final ParticipateRepository participateRepository;
 
-    public List<Integer> getRank(Integer round){
+    private static final double MAX_TIME = 36000.0;
+    private static final double DNF_TIME = -1;
+    private static final double DNS_TIME = -2;
+
+    public List<Integer> getRank(Integer round) {
         return participateRepository.findByRoundOrder(round);
     }
 
-    public List<ParticipateDTO> getParticipate(Integer round){
-        List<Participate> list=participateRepository.findByRound(round);
-        List<ParticipateDTO> listDTO=new ArrayList<>();
-        for (Participate participate:list) {
+    public ParticipateDTO getOne(Integer idx) {
+        return new ParticipateDTO(participateRepository.findById(idx).orElseThrow(null));
+    }
+
+    public List<ParticipateDTO> getParticipate(Integer round) {
+        List<Participate> list = participateRepository.findByRound(round);
+        List<ParticipateDTO> listDTO = new ArrayList<>();
+        for (Participate participate : list) {
             listDTO.add(new ParticipateDTO(participate));
         }
         return listDTO;
     }
 
-    public List<ParticipateDTO> getSearchedParticipate(Integer round, String search){
-        List<Participate> list=participateRepository.search(round, search);
-        List<ParticipateDTO> listDTO=new ArrayList<>();
-        for (Participate participate:list) {
-            listDTO.add(new ParticipateDTO(participate));
-        }
-        return listDTO;
+    private double convertToSeconds(int time) {
+        if (time == -1) return DNF_TIME;
+        else if (time == -2) return DNS_TIME;
+
+        int minutes = time / 10000;
+        double seconds = (time % 10000) / 100.0;
+        return minutes * 60 + seconds;
     }
 
-    public Integer updateRecordAo5(Recorder recorder,String checkerName, Integer idx){
-        int m1,m2,m3,m4,m5,singleM,avgM;
-        double s1,s2,s3,s4,s5,singleS,avgS;
-        double f,s,t,o,i;
+    private double calculateAverage(double[] record, int validTimes) {
+        // 상위 validTimes개의 기록의 평균 계산
+        double average = (record[validTimes - 1] + record[validTimes - 2] + record[validTimes - 3]) / 3.0;
+        // 소수점 두 번째 자리까지 남기고 버림
+        return Math.floor(average * 100) / 100;
+    }
 
-        if (recorder.getFirst()==-1) {
-            f=-1;
-            m1=0;
-            s1=-1;
-        }
-        else if (recorder.getFirst()==-2) {
-            f=-2;
-            m1=0;
-            s1=-2;
-        }
-        else{
-            m1 = recorder.getFirst() / 10000;
-            s1 = ((double) recorder.getFirst() % 10000) / 100;
-            f = m1 * 60 + s1;
-        }
-        if (recorder.getSecond()==-1) {
-            s=-1;
-            m2=0;
-            s2=-1;
-        }
-        else if (recorder.getSecond()==-2) {
-            s=-2;
-            m2=0;
-            s2=-2;
-        }
-        else {
-            m2 = recorder.getSecond() / 10000;
-            s2 = ((double) recorder.getSecond() % 10000) / 100;
-            s = m2 * 60 + s2;
-        }
-        if (recorder.getThird()==-1) {
-            t=-1;
-            m3=0;
-            s3=-1;
-        }
-        else if (recorder.getThird()==-2) {
-            t=-2;
-            m3=0;
-            s3=-2;
-        }
-        else {
-            m3 = recorder.getThird() / 10000;
-            s3 = ((double) recorder.getThird() % 10000) / 100;
-            t = m3 * 60 + s3;
-        }
-        if (recorder.getFourth()==-1) {
-            o=-1;
-            m4=0;
-            s4=-1;
-        }
-        else if (recorder.getFourth()==-2) {
-            o=-2;
-            m4=0;
-            s4=-2;
-        }
-        else {
-            m4 = recorder.getFourth() / 10000;
-            s4 = ((double) recorder.getFourth() % 10000) / 100;
-            o = m4 * 60 + s4;
-        }
-        if (recorder.getFifth()==-1) {
-            i=-1;
-            m5=0;
-            s5=-1;
-        }
-        else if (recorder.getFifth()==-2) {
-            i=-2;
-            m5=0;
-            s5=-2;
-        }
-        else {
-            m5 = recorder.getFifth() / 10000;
-            s5 = ((double) recorder.getFifth() % 10000) / 100;
-            i = m5 * 60 + s5;
-        }
-
-        double record[]={f,s,t,o,i};
-
-
-        double single=36000;
-
-        int dnfCounter=0;
-
-        boolean canAvg=true;
-
-        for(int j=0; j<5; j++){
-            if(record[j]==-1 || record[j]==-2){
-                dnfCounter++;
-                record[j]=36000;
+    private boolean validateSeconds(double[] times) {
+        for (double time : times) {
+            if (time >= -2) {
                 continue;
             }
-            else if(record[j]==0){
-                canAvg=false;
-                continue;
-            }
-            else{
-                if(record[j]<single){
-                    single=record[j];
-                }
-            }
+            return false;
+        }
+        return true;
+    }
+
+    public Integer updateRecord(Recorder recorder, String checkerName, Integer idx, String calcType) {
+        double[] record;
+        int validTimes;
+
+        // calcType 에 따른 레코드 배열 크기 설정
+        switch (calcType.toLowerCase()) {
+            case "single":
+                record = new double[]{convertToSeconds(recorder.getFirst())};
+                validTimes = 1;
+                break;
+            case "mo3":
+                record = new double[]{
+                        convertToSeconds(recorder.getFirst()),
+                        convertToSeconds(recorder.getSecond()),
+                        convertToSeconds(recorder.getThird())
+                };
+                validTimes = 3;
+                break;
+            case "ao5":
+                record = new double[]{
+                        convertToSeconds(recorder.getFirst()),
+                        convertToSeconds(recorder.getSecond()),
+                        convertToSeconds(recorder.getThird()),
+                        convertToSeconds(recorder.getFourth()),
+                        convertToSeconds(recorder.getFifth())
+                };
+                validTimes = 4;
+                break;
+            default:
+                return -1;  // 잘못된 입력
         }
 
+        double single = Arrays.stream(record).filter(t -> t >= 0).min().orElse(Arrays.stream(record).filter(t -> t == -1 || t== -2).max().orElse(0));
+        int dnfCounter = (int) Arrays.stream(record).filter(t -> t == DNF_TIME).count();
+        int dnsCounter = (int) Arrays.stream(record).filter(t -> t == DNS_TIME).count();
 
-
-        if(dnfCounter>=2){
-            avgM=0;
+        int avgM = 0;
+        double avgS;
+        if ((calcType.equalsIgnoreCase("mo3") && dnfCounter < 1) || (calcType.equalsIgnoreCase("ao5") && dnfCounter < 2)) {
+            double[] sortedRecord = Arrays.copyOf(record, record.length);
+            Arrays.sort(sortedRecord);
+            double validAvg = calculateAverage(sortedRecord, validTimes);
+            avgM = (int) validAvg / 60;
+            avgS = ((validAvg % 60) * 100) / 100;
+        }
+        else if((calcType.equalsIgnoreCase("mo3") && dnsCounter < 1) || (calcType.equalsIgnoreCase("ao5") && dnsCounter < 2)){
             avgS=-1;
         }
-        else if(!canAvg){
-            avgM=0;
-            avgS=0;
-        }
         else{
-            Arrays.sort(record);
-            avgM=(((int)record[1]+(int)record[2]+(int)record[3])/3)/60;
-            avgS=Math.floor((((record[1]+record[2]+record[3])/3)%60)*100)/100;
+            avgS=-2;
         }
 
-        if(single==36000){
-            singleM=0;
-            singleS=-1;
-        }
-        else {
-            singleM = (int) single / 60;
-            singleS = single % 60;
-        }
-
-        if(s1>=-2 && s1<60 && s2>=-2 && s2<60 &&s3>=-2 && s3<60 &&s4>=-2 && s4<60 && s5>=-2 && s5<60) {
-            participateRepository.updateRecord(m1, s1, m2, s2, m3, s3, m4, s4, m5, s5, avgM, avgS, singleM, singleS, checkerName, idx);
+        int singleM = (int) single / 60;
+        double singleS = single % 60;
+        // 시간 검증
+        if (validateSeconds(record)) {
+            // 저장 로직
+            participateRepository.updateRecord(
+                    (int) (record[0] / 60), record[0] % 60,
+                    record.length > 1 ? (int) (record[1] / 60) : 0, record.length > 1 ? record[1] % 60 : 0,
+                    record.length > 2 ? (int) (record[2] / 60) : 0, record.length > 2 ? record[2] % 60 : 0,
+                    record.length > 3 ? (int) (record[3] / 60) : 0, record.length > 3 ? record[3] % 60 : 0,
+                    record.length > 4 ? (int) (record[4] / 60) : 0, record.length > 4 ? record[4] % 60 : 0,
+                    avgM, avgS,
+                    singleM, singleS,
+                    checkerName, idx
+            );
             return idx;
-        }
-        else{
+        } else {
             return -1;
         }
     }
 
-    public Integer updateRecordMo3(Recorder recorder, String checkerName, Integer idx){
-        int m1,m2,m3,singleM,avgM;
-        double s1,s2,s3,singleS,avgS;
-        double f,s,t;
-
-        if (recorder.getFirst()==-1) {
-            f=-1;
-            m1=0;
-            s1=-1;
-        }
-        else if (recorder.getFirst()==-2) {
-            f=-2;
-            m1=0;
-            s1=-2;
-        }
-        else{
-            m1 = recorder.getFirst() / 10000;
-            s1 = ((double) recorder.getFirst() % 10000) / 100;
-            f = m1 * 60 + s1;
-        }
-        if (recorder.getSecond()==-1) {
-            s=-1;
-            m2=0;
-            s2=-1;
-        }
-        else if (recorder.getSecond()==-2) {
-            s=-2;
-            m2=0;
-            s2=-2;
-        }
-        else {
-            m2 = recorder.getSecond() / 10000;
-            s2 = ((double) recorder.getSecond() % 10000) / 100;
-            s = m2 * 60 + s2;
-        }
-        if (recorder.getThird()==-1) {
-            t=-1;
-            m3=0;
-            s3=-1;
-        }
-        else if (recorder.getThird()==-2) {
-            t=-2;
-            m3=0;
-            s3=-2;
-        }
-        else {
-            m3 = recorder.getThird() / 10000;
-            s3 = ((double) recorder.getThird() % 10000) / 100;
-            t = m3 * 60 + s3;
-        }
-
-        double record[]={f,s,t};
-        double single=36000;
-
-        int dnfCounter=0;
-
-        boolean canAvg=true;
-
-        for(int j=0; j<3; j++){
-            if(record[j]==-1 || record[j]==-2){
-                dnfCounter++;
-                record[j]=36000;
-                continue;
-            }
-            else if(record[j]==0){
-                canAvg=false;
-                continue;
-            }
-            else{
-                if(record[j]<single){
-                    single=record[j];
-                }
-            }
-        }
-
-        if(dnfCounter>=1) {
-            avgM=0;
-            avgS=-1;
-        }
-        else if(canAvg==false){
-            avgM=0;
-            avgS=0;
-        }
-        else{
-            avgM=(((int)record[0]+(int)record[1]+(int)record[2])/3)/60;
-            avgS=Math.floor((((record[0]+record[1]+record[2])/3)%60)*100)/100;
-        }
-
-        if(single==36000){
-            singleM=0;
-            singleS=-1;
-        }
-        else {
-            singleM = (int) single / 60;
-            singleS = single % 60;
-        }
-
-        if(s1>=-2 && s1<60 && s2>=-2 && s2<60 &&s3>=-2 && s3<60) {
-            participateRepository.updateRecord(m1, s1, m2, s2, m3, s3, 0, 0, 0, 0, avgM, avgS, singleM, singleS,checkerName, idx);
-            return idx;
-        }
-        else{
-            return -1;
-        }
-    }
-
-    public void deleteParticipate(Integer idx){
+    public void deleteParticipate(Integer idx) {
         participateRepository.deleteByIdx(idx);
     }
 
-    public void deleteByRoundIdx(Integer idx){
+    public void deleteByRoundIdx(Integer idx) {
         participateRepository.deleteByRound(idx);
     }
 
-    public Integer addParticipate(ParticipateDTO participate){
-        String event=roundRepository.findByIdx(participate.getRound()).getCubeEvent().getEventName();
+    public Integer addParticipate(ParticipateDTO participate) {
+        String event = roundRepository.findByIdx(participate.getRound()).getCubeEvent().getEventName();
         participate.setEventName(event);
         return participateRepository.save(participate.toEntity()).getIdx();
     }
-    public void updateChecker(String checker, Integer idx){
+
+    public void updateChecker(String checker, Integer idx) {
         participateRepository.updateChecker2(checker, idx);
     }
 
-    public void updateRanking(Integer ranking, Integer idx){
+    public void updateRanking(Integer ranking, Integer idx) {
         participateRepository.updateRanking(ranking, idx);
     }
 }
