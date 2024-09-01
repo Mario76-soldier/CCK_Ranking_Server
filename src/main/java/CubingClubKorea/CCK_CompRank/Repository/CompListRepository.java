@@ -13,7 +13,7 @@ public interface CompListRepository extends JpaRepository<CompList, Integer> {
     CompList findByIdx(Integer idx);
     List<CompList> findAll();
     List<CompList> findByCompDateEndBeforeOrderByCompDateStartDesc(LocalDate date);
-    List<CompList> findByCompDateEndAfterAndCompDateStartBeforeOrderByCompDateStartDesc(LocalDate date1, LocalDate date2);
+    List<CompList> findByCompDateEndGreaterThanEqualAndCompDateStartLessThanEqualOrderByCompDateStartDesc(LocalDate date1, LocalDate date2);
     List<CompList> findByCompDateStartAfterOrderByCompDateStartDesc(LocalDate date);
 
     List<CompList> findByJoinDateEndAfterAndJoinDateStartBefore(LocalDate date1, LocalDate date2);

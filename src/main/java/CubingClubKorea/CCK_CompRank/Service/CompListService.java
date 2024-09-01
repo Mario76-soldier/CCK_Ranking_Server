@@ -30,7 +30,7 @@ public class CompListService {
         return new CompListDTO(complistRepository.findByIdx(idx));
     }
     public List<CompListDTO> getListToday(LocalDate date){
-        List<CompList> list=complistRepository.findByCompDateEndAfterAndCompDateStartBeforeOrderByCompDateStartDesc(date, date);
+        List<CompList> list=complistRepository.findByCompDateEndGreaterThanEqualAndCompDateStartLessThanEqualOrderByCompDateStartDesc(date, date);
         List<CompListDTO> listDTO=new ArrayList<>();
         for (CompList now:list) {
             listDTO.add(new CompListDTO(now));
