@@ -1,12 +1,8 @@
 package CubingClubKorea.CCK_CompRank.Controller;
 
-import CubingClubKorea.CCK_CompRank.DTO.CompListDTO;
-import CubingClubKorea.CCK_CompRank.DTO.CreateRoundDTO;
-import CubingClubKorea.CCK_CompRank.DTO.ParticipateDTO;
-import CubingClubKorea.CCK_CompRank.DTO.RoundDTO;
+import CubingClubKorea.CCK_CompRank.DTO.*;
 import CubingClubKorea.CCK_CompRank.Repository.EventRepository;
 import CubingClubKorea.CCK_CompRank.Service.*;
-import CubingClubKorea.CCK_CompRank.Structure.Recorder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -29,7 +25,7 @@ public class ListController {
     private final AccountService accountService;
     private final EventRepository eventRepository;
     @GetMapping("/comp/{time}")
-    public ResponseEntity<List<CompListDTO>> CompList(@PathVariable(value="time")String time){
+    public ResponseEntity<List<CompetitionDTO>> CompList(@PathVariable(value="time")String time){
         LocalDate now=LocalDate.now();
         return switch (time) {
             case "past" -> ResponseEntity.ok(complistService.getListPast(now));
@@ -48,7 +44,7 @@ public class ListController {
         }
     }
     @PostMapping("/comp")
-    public ResponseEntity<Integer> MakeComp(@RequestBody CompListDTO compList){
+    public ResponseEntity<Integer> MakeComp(@RequestBody CompetitionDTO compList){
         return ResponseEntity.ok(complistService.create(compList));
     }
     @DeleteMapping("/comp/{compIdx}")
@@ -101,12 +97,12 @@ public class ListController {
         return ResponseEntity.ok(participateService.getParticipate(roundIdx));
     }
     @PostMapping("/record/{roundIdx}/{idx}")
-    public ResponseEntity<?> UpdateRecord(@RequestBody Recorder recorder, @PathVariable(value="roundIdx")Integer roundIdx ,@PathVariable(value="idx")Integer idx){
+    public ResponseEntity<?> UpdateRecord(@RequestBody Records records, @PathVariable(value="roundIdx")Integer roundIdx , @PathVariable(value="idx")Integer idx){
         Authentication authentication=SecurityContextHolder.getContext().getAuthentication();
         String checkerName=accountService.getUserName(authentication.getName());
         String avgType=roundService.getOne(roundIdx).getCubeEvent().getAvgCalc();
-        participateService.updateRecord(recorder, checkerName, idx,avgType);
-        participateService.updateChecker(null, idx);
+        participateService.updateRecord(records.getFirst(), records.getSecond(), records.getThird(), records.getFourth(), records.getFifth(), checkerName, idx,avgType);
+        participateService.updateChecker(checkerName, idx);
         List<Integer> list=participateService.getRank(roundIdx);
         for(int i=0; i<list.size(); i++) {
             participateService.updateRanking(i+1,list.get(i));
@@ -115,7 +111,7 @@ public class ListController {
     }
     @DeleteMapping("/record/{idx}")
     public ResponseEntity<?> DeleteRecord(@PathVariable(value="idx")Integer idx){
-        Integer roundIdx=participateService.getOne(idx).getRound();
+        Integer roundIdx=participateService.getOne(idx).getRound().getIdx();
         participateService.deleteParticipate(idx);
         List<Integer> list=participateService.getRank(roundIdx);
         for(int i=0; i<list.size(); i++) {
@@ -130,7 +126,7 @@ public class ListController {
         List<Integer> numList=new ArrayList<>();
         for(int i=0; i<past.getAdvance(); i++){
             ParticipateDTO p=list.get(i);
-            ParticipateDTO advance=new ParticipateDTO(p.getUserName(), p.getPdx(),p.getEventName(), p.getEmail(),  advanceRoundIdx);
+            ParticipateDTO advance=new ParticipateDTO(p.getUserName(), p.getPdx(),p.getEventName(), p.getEmail(), roundService.getOne(advanceRoundIdx).toEntity());
             numList.add(participateService.addParticipate(advance));
         }
         return ResponseEntity.ok(numList);

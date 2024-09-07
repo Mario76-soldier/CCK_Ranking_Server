@@ -18,15 +18,12 @@ import java.util.List;
 public class RoundService {
     private final ParticipateRepository participateRepository;
     private final RoundRepository roundRepository;
-
     public Integer create(RoundDTO round){
         return roundRepository.save(round.toEntity()).getIdx();
     }
-
     public RoundDTO getOne(Integer idx){
         return new RoundDTO(roundRepository.findByIdx(idx));
     }
-
     public List<RoundDTO> getCompRound(Integer idx){
         List<Round> list=roundRepository.findByCompIdx(idx);
         List<RoundDTO> listDTO=new ArrayList<>();
@@ -64,7 +61,7 @@ public class RoundService {
         roundRepository.deleteByCompIdx(compIdx);
     }
     public void deleteByRoundIdx(Integer roundIdx){
-        participateRepository.deleteByRound(roundIdx);
+        participateRepository.deleteByRound_Idx(roundIdx);
         roundRepository.deleteByIdx(roundIdx);
     }
     public void updateAdvance(Integer nextCompIdx, Integer advance){

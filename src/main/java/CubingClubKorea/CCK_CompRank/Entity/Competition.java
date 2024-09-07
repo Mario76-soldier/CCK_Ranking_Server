@@ -8,41 +8,33 @@ import lombok.NoArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Entity
 @Getter
 @NoArgsConstructor
-@Table(name="CompList")
-public class CompList {
+@Table
+public class Competition {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name="Idx")
+    @Column
     private Integer idx;
-
-    @Column(name = "CompName", length=50)
+    @Column(length=50)
     private String compName;
-
-    @Column(name = "CompDateStart")
+    @Column
     @DateTimeFormat(pattern="yyyy-MM-dd")
     private LocalDate compDateStart;
-
-    @Column(name = "CompDateEnd")
+    @Column
     @DateTimeFormat(pattern="yyyy-MM-dd")
     private LocalDate compDateEnd;
-
-    @Column(name = "joinDateStart")
-    @DateTimeFormat(pattern="yyyy-MM-dd")
-    private LocalDate joinDateStart;
-
-    @Column(name = "JoinDateEnd")
-    @DateTimeFormat(pattern="yyyy-MM-dd")
-    private LocalDate joinDateEnd;
-
-    @Column(name = "maxParticipate")
+    @Column
+    private LocalDateTime joinDateStart;
+    @Column
+    private LocalDateTime joinDateEnd;
+    @Column
     private Integer maxParticipate;
-
     @Builder
-    public CompList(String CompName, LocalDate CompDateStart, LocalDate CompDateEnd,LocalDate JoinDateStart, LocalDate JoinDateEnd, Integer MaxParticipate){
+    public Competition(String CompName, LocalDate CompDateStart, LocalDate CompDateEnd, LocalDateTime JoinDateStart, LocalDateTime JoinDateEnd, Integer MaxParticipate){
         this.compName=CompName;
         this.compDateStart=CompDateStart;
         this.compDateEnd=CompDateEnd;
@@ -50,5 +42,4 @@ public class CompList {
         this.joinDateEnd=JoinDateEnd;
         this.maxParticipate=MaxParticipate;
     }
-
 }

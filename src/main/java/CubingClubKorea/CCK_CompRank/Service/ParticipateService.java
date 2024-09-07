@@ -8,7 +8,6 @@ import CubingClubKorea.CCK_CompRank.Repository.RoundRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import CubingClubKorea.CCK_CompRank.Structure.Recorder;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -42,15 +41,6 @@ public class ParticipateService {
         return listDTO;
     }
 
-    private double convertToSeconds(int time) {
-        if (time == -1) return DNF_TIME;
-        else if (time == -2) return DNS_TIME;
-
-        int minutes = time / 10000;
-        double seconds = (time % 10000) / 100.0;
-        return minutes * 60 + seconds;
-    }
-
     private double calculateAverage(double[] record, int validTimes) {
         // 상위 validTimes개의 기록의 평균 계산
         double average = (record[validTimes - 1] + record[validTimes - 2] + record[validTimes - 3]) / 3.0;
@@ -68,32 +58,22 @@ public class ParticipateService {
         return true;
     }
 
-    public Integer updateRecord(Recorder recorder, String checkerName, Integer idx, String calcType) {
+    public Integer updateRecord(Double first, Double second, Double third, Double fourth, Double fifth, String checkerName, Integer idx, String calcType) {
         double[] record;
         int validTimes;
 
         // calcType 에 따른 레코드 배열 크기 설정
         switch (calcType.toLowerCase()) {
             case "single":
-                record = new double[]{convertToSeconds(recorder.getFirst())};
+                record = new double[]{first};
                 validTimes = 1;
                 break;
             case "mo3":
-                record = new double[]{
-                        convertToSeconds(recorder.getFirst()),
-                        convertToSeconds(recorder.getSecond()),
-                        convertToSeconds(recorder.getThird())
-                };
+                record = new double[]{first, second, third};
                 validTimes = 3;
                 break;
             case "ao5":
-                record = new double[]{
-                        convertToSeconds(recorder.getFirst()),
-                        convertToSeconds(recorder.getSecond()),
-                        convertToSeconds(recorder.getThird()),
-                        convertToSeconds(recorder.getFourth()),
-                        convertToSeconds(recorder.getFifth())
-                };
+                record = new double[]{first, second, third, fourth, fifth};
                 validTimes = 4;
                 break;
             default:
@@ -103,36 +83,29 @@ public class ParticipateService {
         double single = Arrays.stream(record).filter(t -> t >= 0).min().orElse(Arrays.stream(record).filter(t -> t == -1 || t== -2).max().orElse(0));
         int dnfCounter = (int) Arrays.stream(record).filter(t -> t == DNF_TIME).count();
         int dnsCounter = (int) Arrays.stream(record).filter(t -> t == DNS_TIME).count();
+        double average;
 
-        int avgM = 0;
-        double avgS;
         if ((calcType.equalsIgnoreCase("mo3") && dnfCounter < 1) || (calcType.equalsIgnoreCase("ao5") && dnfCounter < 2)) {
             double[] sortedRecord = Arrays.copyOf(record, record.length);
             Arrays.sort(sortedRecord);
-            double validAvg = calculateAverage(sortedRecord, validTimes);
-            avgM = (int) validAvg / 60;
-            avgS = ((validAvg % 60) * 100) / 100;
+            average=calculateAverage(sortedRecord, validTimes);
         }
         else if((calcType.equalsIgnoreCase("mo3") && dnsCounter < 1) || (calcType.equalsIgnoreCase("ao5") && dnsCounter < 2)){
-            avgS=-1;
+            average=-1;
         }
         else{
-            avgS=-2;
+            average=-2;
         }
-
-        int singleM = (int) single / 60;
-        double singleS = single % 60;
         // 시간 검증
         if (validateSeconds(record)) {
             // 저장 로직
             participateRepository.updateRecord(
-                    (int) (record[0] / 60), record[0] % 60,
-                    record.length > 1 ? (int) (record[1] / 60) : 0, record.length > 1 ? record[1] % 60 : 0,
-                    record.length > 2 ? (int) (record[2] / 60) : 0, record.length > 2 ? record[2] % 60 : 0,
-                    record.length > 3 ? (int) (record[3] / 60) : 0, record.length > 3 ? record[3] % 60 : 0,
-                    record.length > 4 ? (int) (record[4] / 60) : 0, record.length > 4 ? record[4] % 60 : 0,
-                    avgM, avgS,
-                    singleM, singleS,
+                    first,
+                    record.length > 1 ? second : 0,
+                    record.length > 2 ? third : 0,
+                    record.length > 3 ? fourth : 0,
+                    record.length > 4 ? fifth : 0,
+                    average, single,
                     checkerName, idx
             );
             return idx;
@@ -145,12 +118,12 @@ public class ParticipateService {
         participateRepository.deleteByIdx(idx);
     }
 
-    public void deleteByRoundIdx(Integer idx) {
-        participateRepository.deleteByRound(idx);
+    public void deleteByRoundIdx(Integer roundIdx) {
+        participateRepository.deleteByRound_Idx(roundIdx);
     }
 
     public Integer addParticipate(ParticipateDTO participate) {
-        String event = roundRepository.findByIdx(participate.getRound()).getCubeEvent().getEventName();
+        String event = roundRepository.findByIdx(participate.getRound().getIdx()).getCubeEvent().getEventName();
         participate.setEventName(event);
         return participateRepository.save(participate.toEntity()).getIdx();
     }

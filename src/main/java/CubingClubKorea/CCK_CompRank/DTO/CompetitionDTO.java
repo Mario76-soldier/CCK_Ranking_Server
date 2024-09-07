@@ -1,24 +1,24 @@
 package CubingClubKorea.CCK_CompRank.DTO;
 
-import CubingClubKorea.CCK_CompRank.Entity.CompList;
-import lombok.AllArgsConstructor;
+import CubingClubKorea.CCK_CompRank.Entity.Competition;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Getter
 @Setter
 @NoArgsConstructor
-public class CompListDTO {
+public class CompetitionDTO {
     private Integer idx;
     private String compName;
     private LocalDate compDateStart;
     private LocalDate compDateEnd;
-    private LocalDate joinDateStart;
-    private LocalDate joinDateEnd;
+    private LocalDateTime joinDateStart;
+    private LocalDateTime joinDateEnd;
     private Integer maxParticipate;
-    public CompListDTO(CompList entity){
+    public CompetitionDTO(Competition entity){
         this.idx=entity.getIdx();
         this.compName=entity.getCompName();
         this.compDateStart=entity.getCompDateStart();
@@ -28,8 +28,8 @@ public class CompListDTO {
         this.maxParticipate=entity.getMaxParticipate();
     }
 
-    public CompList toEntity(){
-        return CompList.builder()
+    public Competition toEntity(){
+        return Competition.builder()
                 .CompName(compName)
                 .CompDateStart(compDateStart)
                 .CompDateEnd(compDateEnd)

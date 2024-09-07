@@ -11,38 +11,32 @@ import java.time.LocalDateTime;
 @Entity
 @Getter
 @NoArgsConstructor
-@Table(name="Round")
+@Table
 public class Round {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name="Idx")
+    @Column
     private Integer idx;
-
-    @Column(name="CompIdx")
-    private Integer compIdx;
-
+    @ManyToOne(fetch = FetchType.EAGER)
+    private Competition comp;
     @ManyToOne(fetch=FetchType.EAGER)
-    @JoinColumn(name="EventName")
+    @JoinColumn(name="eventName")
     private CubeEvent cubeEvent;
-
-    @Column(name="Round", length=30)
-    private String round;
-
-    @Column(name="EventStart")
+    @Column(length=30)
+    private String roundName;
+    @Column
     private LocalDateTime eventStart;
-
-    @Column(name="EventEnd")
+    @Column
     private LocalDateTime eventEnd;
-
-    @Column(name="Advance")
+    @Column
     private Integer advance;
 
     @Builder
-    public Round(Integer Idx, Integer CompIdx, CubeEvent cubeEvent, String Round, LocalDateTime EventStart, LocalDateTime EventEnd, Integer Advance){
+    public Round(Integer Idx, Competition Comp, CubeEvent cubeEvent, String RoundName, LocalDateTime EventStart, LocalDateTime EventEnd, Integer Advance){
         this.idx=Idx;
-        this.compIdx=CompIdx;
+        this.comp=Comp;
         this.cubeEvent=cubeEvent;
-        this.round=Round;
+        this.roundName=RoundName;
         this.eventStart=EventStart;
         this.eventEnd=EventEnd;
         this.advance=Advance;

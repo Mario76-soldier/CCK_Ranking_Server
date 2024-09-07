@@ -9,9 +9,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class CubeEventDTO {
     private String EventName;
-
     private String AvgCalc;
-
     public CubeEventDTO(CubeEvent entity){
         this.EventName=entity.getEventName();
         this.AvgCalc=entity.getAvgCalc();
