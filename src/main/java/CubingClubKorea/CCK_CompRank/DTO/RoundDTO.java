@@ -31,7 +31,6 @@ public class RoundDTO {
     }
     public RoundDTO(CreateRoundDTO roundDTO){
         this.idx=roundDTO.getIdx();
-        this.comp=roundDTO.getComp();
         this.roundName=roundDTO.getRoundName();
         this.eventStart=roundDTO.getEventStart();
         this.eventEnd=roundDTO.getEventEnd();

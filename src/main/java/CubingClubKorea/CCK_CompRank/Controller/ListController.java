@@ -1,6 +1,7 @@
 package CubingClubKorea.CCK_CompRank.Controller;
 
 import CubingClubKorea.CCK_CompRank.DTO.*;
+import CubingClubKorea.CCK_CompRank.Repository.CompetitionRepository;
 import CubingClubKorea.CCK_CompRank.Repository.EventRepository;
 import CubingClubKorea.CCK_CompRank.Service.*;
 import lombok.RequiredArgsConstructor;
@@ -20,6 +21,7 @@ import java.util.List;
 @RequestMapping("/api")
 public class ListController {
     private final CompListService complistService;
+    private final CompetitionRepository competitionRepository;
     private final RoundService roundService;
     private final ParticipateService participateService;
     private final AccountService accountService;
@@ -83,6 +85,7 @@ public class ListController {
         for(CreateRoundDTO roundDTO:roundList){
             RoundDTO round=new RoundDTO(roundDTO);
             round.setCubeEvent(eventRepository.findByEventName(roundDTO.getCubeEvent()));
+            round.setComp(competitionRepository.findByIdx(roundDTO.getComp()));
             list.add(roundService.create(round));
         }
         return ResponseEntity.ok(list);
@@ -101,6 +104,7 @@ public class ListController {
         Authentication authentication=SecurityContextHolder.getContext().getAuthentication();
         String checkerName=accountService.getUserName(authentication.getName());
         String avgType=roundService.getOne(roundIdx).getCubeEvent().getAvgCalc();
+        System.out.println(records.getFifth());
         participateService.updateRecord(records.getFirst(), records.getSecond(), records.getThird(), records.getFourth(), records.getFifth(), checkerName, idx,avgType);
         participateService.updateChecker(checkerName, idx);
         List<Integer> list=participateService.getRank(roundIdx);
@@ -126,7 +130,7 @@ public class ListController {
         List<Integer> numList=new ArrayList<>();
         for(int i=0; i<past.getAdvance(); i++){
             ParticipateDTO p=list.get(i);
-            ParticipateDTO advance=new ParticipateDTO(p.getUserName(), p.getPdx(),p.getEventName(), p.getEmail(), roundService.getOne(advanceRoundIdx).toEntity());
+            ParticipateRequestDTO advance=new ParticipateRequestDTO(p.getUserName(), p.getPdx(), p.getEmail(), advanceRoundIdx);
             numList.add(participateService.addParticipate(advance));
         }
         return ResponseEntity.ok(numList);
@@ -137,8 +141,8 @@ public class ListController {
         return ResponseEntity.ok(roundService.getOne(roundIdx).getAdvance());
     }
     @PostMapping("/participate")//선수 추가 콜
-    public ResponseEntity<Integer> AddParticipate(@RequestBody List<ParticipateDTO> participates){
-        for(ParticipateDTO participate:participates){
+    public ResponseEntity<Integer> AddParticipate(@RequestBody List<ParticipateRequestDTO> participates){
+        for(ParticipateRequestDTO participate:participates){
             participateService.addParticipate(participate);
         }
         return ResponseEntity.ok().build();

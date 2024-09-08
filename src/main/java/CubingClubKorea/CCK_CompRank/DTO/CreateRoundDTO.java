@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 public class CreateRoundDTO {
     private Integer idx;
-    private Competition comp;
+    private Integer comp;
     private String cubeEvent;
     private String roundName;
     private LocalDateTime eventStart;

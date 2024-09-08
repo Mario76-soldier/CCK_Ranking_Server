@@ -6,6 +6,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.DynamicInsert;
 
+import java.math.BigDecimal;
+
 @Entity
 @Getter
 @NoArgsConstructor
@@ -23,24 +25,22 @@ public class Participate {
     private Round round;
     @Column(length=40)
     private String userName;
-    @Column(length=15)
-    private String eventName;
     @Column(length=30)
     private String email;
-    @Column(columnDefinition = "INTEGER DEFAULT 0")
-    private Double first;
-    @Column(columnDefinition = "INTEGER DEFAULT 0")
-    private Double second;
-    @Column(columnDefinition = "INTEGER DEFAULT 0")
-    private Double third;
-    @Column(columnDefinition = "INTEGER DEFAULT 0")
-    private Double fourth;
-    @Column(columnDefinition = "INTEGER DEFAULT 0")
-    private Double fifth;
-    @Column(columnDefinition = "INTEGER DEFAULT 0")
-    private Double single;
-    @Column(columnDefinition = "INTEGER DEFAULT 0")
-    private Double average;
+    @Column(columnDefinition = "DECIMAL(10,2) DEFAULT 0")
+    private BigDecimal first;
+    @Column(columnDefinition = "DECIMAL(10,2) DEFAULT 0")
+    private BigDecimal second;
+    @Column(columnDefinition = "DECIMAL(10,2) DEFAULT 0")
+    private BigDecimal third;
+    @Column(columnDefinition = "DECIMAL(10,2) DEFAULT 0")
+    private BigDecimal fourth;
+    @Column(columnDefinition = "DECIMAL(10,2) DEFAULT 0")
+    private BigDecimal fifth;
+    @Column(columnDefinition = "DECIMAL(10,2) DEFAULT 0")
+    private BigDecimal single;
+    @Column(columnDefinition = "DECIMAL(10,2) DEFAULT 0")
+    private BigDecimal average;
     @Column
     private Integer ranking;
     @Column(length=20)
@@ -49,15 +49,14 @@ public class Participate {
     private String checker2;
 
     @Builder
-    public Participate(String UserName, Integer Pdx, String Email, String EventName, Round Round){
+    public Participate(String UserName, Integer Pdx, String Email, Round Round){
         this.userName=UserName;
         this.pdx=Pdx;
-        this.eventName=EventName;
         this.email=Email;
         this.round=Round;
     }
 
-    public Participate update(Double First, Double Second, Double Third, Double Fourth, Double Fifth, Double Single, Double Average, Integer Ranking, String Checker1){
+    public Participate update(BigDecimal First, BigDecimal Second, BigDecimal Third, BigDecimal Fourth, BigDecimal Fifth, BigDecimal Single, BigDecimal Average, Integer Ranking, String Checker1){
         this.first=First;
         this.second=Second;
         this.third=Third;

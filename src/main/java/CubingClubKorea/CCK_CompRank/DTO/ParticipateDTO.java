@@ -6,6 +6,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.math.BigDecimal;
+
 
 @Getter
 @Setter
@@ -14,16 +16,15 @@ public class ParticipateDTO {
     private Integer idx;
     private Integer pdx;
     private String userName;
-    private String eventName;
     private String email;
     private Round round;
-    private Double first;
-    private Double second;
-    private Double third;
-    private Double fourth;
-    private Double fifth;
-    private Double single;
-    private Double average;
+    private BigDecimal first;
+    private BigDecimal second;
+    private BigDecimal third;
+    private BigDecimal fourth;
+    private BigDecimal fifth;
+    private BigDecimal single;
+    private BigDecimal average;
     private Integer ranking;
     private String checker1;
     private String checker2;
@@ -31,7 +32,6 @@ public class ParticipateDTO {
         this.idx=entity.getIdx();
         this.pdx=entity.getPdx();
         this.userName=entity.getUserName();
-        this.eventName=entity.getEventName();
         this.email=entity.getEmail();
         this.round=entity.getRound();
         this.first=entity.getFirst();
@@ -45,10 +45,9 @@ public class ParticipateDTO {
         this.checker1=entity.getChecker1();
         this.checker2=entity.getChecker2();
     }
-    public ParticipateDTO(String userName, Integer pdx, String eventName, String email, Round round) {
+    public ParticipateDTO(String userName, Integer pdx, String email, Round round) {
         this.userName=userName;
         this.pdx=pdx;
-        this.eventName=eventName;
         this.email=email;
         this.round=round;
     }
@@ -56,7 +55,6 @@ public class ParticipateDTO {
         return Participate.builder()
                 .UserName(userName)
                 .Pdx(pdx)
-                .EventName(eventName)
                 .Email(email)
                 .Round(round)
                 .build();

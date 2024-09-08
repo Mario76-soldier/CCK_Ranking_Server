@@ -2,6 +2,7 @@ package CubingClubKorea.CCK_CompRank.Service;
 
 
 import CubingClubKorea.CCK_CompRank.DTO.ParticipateDTO;
+import CubingClubKorea.CCK_CompRank.DTO.ParticipateRequestDTO;
 import CubingClubKorea.CCK_CompRank.Repository.ParticipateRepository;
 import CubingClubKorea.CCK_CompRank.Entity.Participate;
 import CubingClubKorea.CCK_CompRank.Repository.RoundRepository;
@@ -122,10 +123,9 @@ public class ParticipateService {
         participateRepository.deleteByRound_Idx(roundIdx);
     }
 
-    public Integer addParticipate(ParticipateDTO participate) {
-        String event = roundRepository.findByIdx(participate.getRound().getIdx()).getCubeEvent().getEventName();
-        participate.setEventName(event);
-        return participateRepository.save(participate.toEntity()).getIdx();
+    public Integer addParticipate(ParticipateRequestDTO participate) {
+        ParticipateDTO addPart=new ParticipateDTO(participate.getUserName(), participate.getPdx(), participate.getEmail(), roundRepository.findByIdx(participate.getRound()));
+        return participateRepository.save(addPart.toEntity()).getIdx();
     }
 
     public void updateChecker(String checker, Integer idx) {

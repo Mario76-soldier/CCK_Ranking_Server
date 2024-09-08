@@ -9,19 +9,19 @@ import org.springframework.data.repository.query.Param;
 import java.util.List;
 
 public interface ParticipateRepository extends JpaRepository<Participate, Integer> {
-    @Query("select p.idx from Participate p where p.round=:round and p.single!=0 order by " +
+    @Query("select p.idx from Participate p where p.round.idx=:roundIdx and p.single!=0 order by " +
             "(case when p.average=0 then 1 else 0 end) asc, " +
             "(case when p.single=-2 then 1 else 0 end) asc," +
             "(case when p.single=-1 then 1 else 0 end) asc, " +
             "(case when p.average=-2 then 1 else 0 end) asc, " +
             "(case when p.average=-1 then 1 else 0 end) asc, " +
             "p.average asc, p.single asc")
-    List<Integer> findByRoundOrder(@Param(value="round")Integer round);
-    @Query("select p from Participate p where p.round=:round order by (case when p.ranking is null or p.ranking=0 then 1 else 0 end) asc, p.ranking asc")
-    List<Participate> findByRound(@Param(value="round")Integer round);
+    List<Integer> findByRoundOrder(@Param(value="roundIdx")Integer roundIdx);
+    @Query("select p from Participate p where p.round.idx=:roundIdx order by (case when p.ranking is null or p.ranking=0 then 1 else 0 end) asc, p.ranking asc")
+    List<Participate> findByRound(@Param(value="roundIdx")Integer roundIdx);
     @Modifying
     @Query("update Participate p set p.ranking=:ranking where p.idx=:idx and p.single!=0")
-    void updateRanking(@Param(value="ranking")int ranking, @Param(value="idx")int idx);
+    void updateRanking(@Param(value="ranking")Integer ranking, @Param(value="idx")Integer idx);
     @Modifying
     @Query("update Participate p set " +
             "p.first=:first," +
@@ -38,7 +38,7 @@ public interface ParticipateRepository extends JpaRepository<Participate, Intege
                       @Param(value="third")Double third,
                       @Param(value="fourth")Double fourth,
                       @Param(value="fifth")Double fifth,
-                      @Param(value="average")Double average,
+                      @Param(value="average") Double average,
                       @Param(value="single")Double single,
                       @Param(value="checker1")String checker1,
                       @Param(value="idx")Integer idx);
