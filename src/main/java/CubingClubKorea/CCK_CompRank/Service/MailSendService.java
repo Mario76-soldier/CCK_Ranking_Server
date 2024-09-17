@@ -1,53 +1,64 @@
 package CubingClubKorea.CCK_CompRank.Service;
 
-import CubingClubKorea.CCK_CompRank.Config.RedisUtil;
-import org.springframework.beans.factory.annotation.Autowired;
+import CubingClubKorea.CCK_CompRank.Entity.RandomNum;
+import CubingClubKorea.CCK_CompRank.Repository.RandomNumRepository;
+import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
+import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Random;
 
+
 @Service
+@RequiredArgsConstructor
+@Transactional
 public class MailSendService {
-    @Autowired
-    private JavaMailSender mailSender;
-    @Autowired
-    private RedisUtil redisUtil;
-    private int authNumber;
+    private final JavaMailSender mailSender;
+    private final RandomNumRepository randomNumRepository;
 
     public boolean CheckAuthNum(String email,String authNum){
-        if(redisUtil.getData(authNum)==null){
+        if(randomNumRepository.findRandomNumByRandNum(authNum)==null){
             return false;
         }
-        else if(redisUtil.getData(authNum).equals(email)){
-            return true;
-        }
-        else{
+        else if(!randomNumRepository.findRandomNumByRandNum(authNum).getExpire().isAfter((LocalDateTime.now()))){
             return false;
         }
+        else return randomNumRepository.findRandomNumByRandNum(authNum).getEmail().equals(email);
     }
 
+    @Scheduled(fixedDelay = 1000*60*60)
+    public void clearAuthNum(){
+        List<RandomNum> randList=randomNumRepository.findRandomNumByExpireBefore(LocalDateTime.now());
+        for(RandomNum rand:randList) {
+            randomNumRepository.deleteByEmail(rand.getEmail());
+        }
+    }
 
     //임의의 6자리 양수를 반환합니다.
-    public void makeRandomNumber() {
+    public String makeRandomNumber() {
         Random r = new Random();
-        String randomNumber = "";
+        StringBuilder randomNumber = new StringBuilder();
         for(int i = 0; i < 6; i++) {
-            randomNumber += Integer.toString(r.nextInt(10));
+            randomNumber.append(r.nextInt(10));
         }
-
-        authNumber = Integer.parseInt(randomNumber);
+        return randomNumber.toString();
     }
 
 
-    //mail을 어디서 보내는지, 어디로 보내는지 , 인증 번호를 html 형식으로 어떻게 보내는지 작성합니다.
+    //Mail을 어디서 보내는지, 어디로 보내는지 , 인증 번호를 html 형식으로 어떻게 보내는지 작성합니다.
     public String joinEmail(String email) {
-        makeRandomNumber();
-        String setFrom = "dionisos198@naver.com"; // email-config에 설정한 자신의 이메일 주소를 입력
-        String toMail = email;
+        String authNumber=makeRandomNumber();
+        while (randomNumRepository.findRandomNumByRandNum(authNumber)==null){
+            authNumber=makeRandomNumber();
+        }
+        String setFrom = "2001cupid@gmail.com"; // email-config에 설정한 자신의 이메일 주소를 입력
         String title = "CCK CompRanking 회원 가입 인증요청"; // 이메일 제목
         String content =
                 "큐빙클럽코리아 기록관에 오신 것을 환영합니다!" + 	//html 형식으로 작성 !
@@ -55,12 +66,12 @@ public class MailSendService {
                         "인증 번호는 " + authNumber + "입니다." +
                         "<br>" +
                         "인증번호를 제대로 입력해주세요"; //이메일 내용 삽입
-        mailSend(setFrom, toMail, title, content);
-        return Integer.toString(authNumber);
+        mailSend(setFrom, email, title, content, authNumber);
+        return authNumber;
     }
 
     //이메일을 전송합니다.
-    public void mailSend(String setFrom, String toMail, String title, String content) {
+    public void mailSend(String setFrom, String toMail, String title, String content, String authNumber) {
         MimeMessage message = mailSender.createMimeMessage();//JavaMailSender 객체를 사용하여 MimeMessage 객체를 생성
         try {
             MimeMessageHelper helper = new MimeMessageHelper(message,true,"utf-8");//이메일 메시지와 관련된 설정을 수행합니다.
@@ -74,7 +85,9 @@ public class MailSendService {
             // 이러한 경우 MessagingException이 발생
             e.printStackTrace();//e.printStackTrace()는 예외를 기본 오류 스트림에 출력하는 메서드
         }
-        redisUtil.setDataExpire(Integer.toString(authNumber),toMail,60*3L);
-
+        if(randomNumRepository.findRandomNumByEmail(toMail)!=null){
+            randomNumRepository.deleteByEmail(toMail);
+        }
+        randomNumRepository.save(RandomNum.builder().randNum(authNumber).email(toMail).expire(LocalDateTime.now().plusMinutes(5)).build());
     }
 }

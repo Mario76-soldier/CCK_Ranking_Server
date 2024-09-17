@@ -25,6 +25,7 @@ public class AccountDTO {
     private String state;
     private String sex;
     private String phoneNum;
+    private String authNum;
     public Account toEntity(String encodedPassword){
         return Account.builder()
                 .email(this.email)
