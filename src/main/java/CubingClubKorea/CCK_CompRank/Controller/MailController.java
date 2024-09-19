@@ -5,8 +5,12 @@ import CubingClubKorea.CCK_CompRank.Service.MailSendService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Objects;
 
 @Slf4j
 @RestController
@@ -18,6 +22,9 @@ public class MailController {
     public ResponseEntity<?> mailSend(@Valid @RequestBody EmailRequestDTO emailDto){
         log.info("Email request created");
         log.info("Email request address :"+emailDto.getEmail());
-        return ResponseEntity.ok(mailService.joinEmail(emailDto.getEmail()));
+        if(Objects.equals(mailService.joinEmail(emailDto.getEmail()), "-1")){
+            return ResponseEntity.status(HttpStatus.CONFLICT).body("Email duplicate");
+        }
+        return ResponseEntity.ok().build();
     }
 }
