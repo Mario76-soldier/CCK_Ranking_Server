@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.format.annotation.DateTimeFormat;
 
-import java.util.Date;
+import java.time.LocalDate;
 
 @Getter
 @Setter
@@ -21,10 +21,11 @@ public class AccountDTO {
     private String password;
     private String passwordCheck;
     @DateTimeFormat(pattern="yyyy-MM-dd")
-    private Date birthDate;
+    private LocalDate birthDate;
     private String state;
     private String sex;
     private String phoneNum;
+    private String authNum;
     public Account toEntity(String encodedPassword){
         return Account.builder()
                 .email(this.email)

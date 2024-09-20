@@ -7,39 +7,32 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 
-import java.util.Date;
+import java.time.LocalDate;
 
 @Entity
 @Builder
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name="Accounts")
+@Table
 public class Account {
     @Id
-    @Column(name="email", length=30)
+    @Column(length=30)
     private String email;
-
-    @Column(name="name", length=30)
+    @Column(length=30)
     private String name;
-
-    @Column(name="password")
+    @Column
     private String password;
-
-    @Column(name="position")
+    @Column
     @Enumerated(EnumType.STRING)
     private UserRole position;
-
-    @Column(name="birthDate")
+    @Column
     @DateTimeFormat(pattern="yyyy-MM-dd")
-    private Date birthDate;
-
-    @Column(name="state", length=15)
+    private LocalDate birthDate;
+    @Column(length=15)
     private String state;
-
-    @Column(name="sex", length=10)
+    @Column(length=10)
     private String sex;
-
-    @Column(name="phoneNum", length=20)
+    @Column(length=20)
     private String phoneNum;
 }

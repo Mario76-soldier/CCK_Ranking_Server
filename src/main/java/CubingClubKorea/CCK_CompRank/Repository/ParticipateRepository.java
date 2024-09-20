@@ -9,45 +9,42 @@ import org.springframework.data.repository.query.Param;
 import java.util.List;
 
 public interface ParticipateRepository extends JpaRepository<Participate, Integer> {
-
-    @Query("select u.idx from Participate u where u.round=:round and u.checker1 is not null order by (case when u.avgM=0 and u.avgS=0 then 1 else 0 end) asc, (case when u.avgS=-2 then 1 else 0 end) asc, (case when u.avgS=-1 then 1 else 0 end) asc, (case when u.singleS=-2 then 1 else 0 end) asc,(case when u.singleS=-1 then 1 else 0 end) asc, u.avgM asc, u.avgS asc, u.singleM asc, u.singleS asc")
-    List<Integer> findByRoundOrder(@Param(value="round")int round);
-
-    @Query("select u from Participate u where u.round=:round order by (case when u.ranking is null or u.ranking=0 then 1 else 0 end) asc, u.ranking asc")
-    List<Participate> findByRound(@Param(value="round")int round);
-
-    @Query("select u from Participate u where u.round=:round and u.userName like %:search%  order by (case when u.ranking is null or u.ranking=0 then 1 else 0 end) asc, u.ranking asc")
-    List<Participate> search(@Param(value="round")int round, @Param(value="search")String search);
-
+    @Query("select p.idx from Participate p where p.round.idx=:roundIdx and p.single!=0 order by " +
+            "(case when p.average=0 then 1 else 0 end) asc, " +
+            "(case when p.single=-2 then 1 else 0 end) asc," +
+            "(case when p.single=-1 then 1 else 0 end) asc, " +
+            "(case when p.average=-2 then 1 else 0 end) asc, " +
+            "(case when p.average=-1 then 1 else 0 end) asc, " +
+            "p.average asc, p.single asc")
+    List<Integer> findByRoundOrder(@Param(value="roundIdx")Integer roundIdx);
+    @Query("select p from Participate p where p.round.idx=:roundIdx order by (case when p.ranking is null or p.ranking=0 then 1 else 0 end) asc, p.ranking asc")
+    List<Participate> findByRound(@Param(value="roundIdx")Integer roundIdx);
     @Modifying
-    @Query("update Participate p set p.ranking=:ranking where p.idx=:idx")
-    void updateRanking(@Param(value="ranking")int ranking, @Param(value="idx")int idx);
-
+    @Query("update Participate p set p.ranking=:ranking where p.idx=:idx and p.single!=0")
+    void updateRanking(@Param(value="ranking")Integer ranking, @Param(value="idx")Integer idx);
     @Modifying
-    @Query("update Participate p set p.m1=:m1, p.s1=:s1, " +
-            "p.m2=:m2, p.s2=:s2," +
-            "p.m3=:m3, p.s3=:s3," +
-            "p.m4=:m4, p.s4=:s4," +
-            "p.m5=:m5, p.s5=:s5," +
-            " p.avgM=:avgM, p.avgS=:avgS, " +
-            "p.singleM=:singleM, p.singleS=:singleS," +
+    @Query("update Participate p set " +
+            "p.first=:first," +
+            "p.second=:second," +
+            "p.third=:third," +
+            "p.fourth=:fourth," +
+            "p.fifth=:fifth," +
+            "p.average=:average," +
+            "p.single=:single," +
             "p.checker1=:checker1 "+
             "where p.idx=:idx")
-    void updateRecord(@Param(value="m1")int m1, @Param(value="s1")double s1,
-                      @Param(value="m2")int m2, @Param(value="s2")double s2,
-                      @Param(value="m3")int m3, @Param(value="s3")double s3,
-                      @Param(value="m4")int m4, @Param(value="s4")double s4,
-                      @Param(value="m5")int m5, @Param(value="s5")double s5,
-                      @Param(value="avgM")int avgM, @Param(value="avgS")double avgS,
-                      @Param(value="singleM")int singleM, @Param(value="singleS")double singleS,
+    void updateRecord(@Param(value="first")Double first,
+                      @Param(value="second")Double second,
+                      @Param(value="third")Double third,
+                      @Param(value="fourth")Double fourth,
+                      @Param(value="fifth")Double fifth,
+                      @Param(value="average") Double average,
+                      @Param(value="single")Double single,
                       @Param(value="checker1")String checker1,
-                      @Param(value="idx")int idx);
-
-    void deleteByIdx(int idx);
-
-    void deleteByRound(int idx);
-
+                      @Param(value="idx")Integer idx);
+    void deleteByIdx(Integer idx);
+    void deleteByRound_Idx(Integer idx);
     @Modifying
     @Query("update Participate p set p.checker2=:checker2 where p.idx=:idx")
-    void updateChecker2(@Param(value="checker2")String checker2, @Param(value="idx")int idx);
+    void updateChecker2(@Param(value="checker2")String checker2, @Param(value="idx")Integer idx);
 }

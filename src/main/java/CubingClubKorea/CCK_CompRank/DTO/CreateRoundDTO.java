@@ -1,5 +1,6 @@
 package CubingClubKorea.CCK_CompRank.DTO;
 
+import CubingClubKorea.CCK_CompRank.Entity.Competition;
 import CubingClubKorea.CCK_CompRank.Entity.CubeEvent;
 import CubingClubKorea.CCK_CompRank.Entity.Round;
 import lombok.Getter;
@@ -13,9 +14,9 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 public class CreateRoundDTO {
     private Integer idx;
-    private Integer compIdx;
+    private Integer comp;
     private String cubeEvent;
-    private String round;
+    private String roundName;
     private LocalDateTime eventStart;
     private LocalDateTime eventEnd;
     private Integer advance;

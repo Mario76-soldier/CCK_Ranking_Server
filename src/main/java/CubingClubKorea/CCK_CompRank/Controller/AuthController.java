@@ -6,14 +6,12 @@ import CubingClubKorea.CCK_CompRank.DTO.AccountRequest;
 import CubingClubKorea.CCK_CompRank.DTO.AccountResponseDTO;
 import CubingClubKorea.CCK_CompRank.Entity.Account;
 import CubingClubKorea.CCK_CompRank.Service.AccountService;
+import CubingClubKorea.CCK_CompRank.Service.MailSendService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.ui.Model;
-import org.springframework.validation.BindingResult;
-import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
 
 @Slf4j
@@ -23,6 +21,7 @@ import org.springframework.web.bind.annotation.*;
 public class AuthController {
     private final AccountService accountService;
     private final TokenProvider tokenProvider;
+    private final MailSendService mailSendService;
     @PostMapping("/login")
     public ResponseEntity<?> Login(@Valid @RequestBody AccountDTO accountDTO){
         if(accountDTO.getEmail()==null){
@@ -51,8 +50,11 @@ public class AuthController {
             if (accountDTO.getPassword().length() < 8 || accountDTO.getPassword().length() > 16) {
                 return ResponseEntity.badRequest().body("Password size should be in 8~16");
             }
-            if(!accountDTO.getPassword().equals(accountDTO.getPasswordCheck())){
+            if (!accountDTO.getPassword().equals(accountDTO.getPasswordCheck())){
                 return ResponseEntity.badRequest().body("Password check incorrect");
+            }
+            if (!mailSendService.CheckAuthNum(accountDTO.getEmail(), accountDTO.getAuthNum())){
+                return ResponseEntity.badRequest().body("Mail authenticate incorrect");
             }
             Account account=accountService.join(accountDTO);
             return ResponseEntity.ok().body(account);

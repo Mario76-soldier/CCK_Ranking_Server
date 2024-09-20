@@ -6,120 +6,64 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.DynamicInsert;
 
+import java.math.BigDecimal;
+
 @Entity
 @Getter
 @NoArgsConstructor
 @DynamicInsert
-@Table(name="Participate")
+@Table
 public class Participate {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name="Idx")
+    @Column
     private Integer idx;
-
-    @Column(name="UserName", length=40)
+    @Column
+    private Integer pdx;
+    @ManyToOne(fetch=FetchType.EAGER)
+    @JoinColumn
+    private Round round;
+    @Column(length=40)
     private String userName;
-
-    @Column(name="EventName", length=15)
-    private String eventName;
-
-    @Column(name="Email", length=30)
+    @Column(length=30)
     private String email;
-
-    @Column(name="Round")
-    private Integer round;
-
-    @Column(name="m1")
-    private Integer m1;
-
-    @Column(name = "s1")
-    private Float s1;
-
-    @Column(name="m2")
-    private Integer m2;
-
-    @Column(name = "s2")
-    private Float s2;
-
-    @Column(name="m3")
-    private Integer m3;
-
-    @Column(name = "s3")
-    private Float s3;
-
-    @Column(name="m4")
-    private Integer m4;
-
-    @Column(name = "s4")
-    private Float s4;
-
-    @Column(name="m5")
-    private Integer m5;
-
-    @Column(name = "s5")
-    private Float s5;
-
-    @Column(name="SingleM")
-    private Integer singleM;
-
-    @Column(name = "SingleS")
-    private Float singleS;
-
-    @Column(name="AvgM")
-    private Integer avgM;
-
-    @Column(name = "AvgS")
-    private Float avgS;
-
-    @Column(name="ranking")
+    @Column(columnDefinition = "DECIMAL(10,2) DEFAULT 0")
+    private BigDecimal first;
+    @Column(columnDefinition = "DECIMAL(10,2) DEFAULT 0")
+    private BigDecimal second;
+    @Column(columnDefinition = "DECIMAL(10,2) DEFAULT 0")
+    private BigDecimal third;
+    @Column(columnDefinition = "DECIMAL(10,2) DEFAULT 0")
+    private BigDecimal fourth;
+    @Column(columnDefinition = "DECIMAL(10,2) DEFAULT 0")
+    private BigDecimal fifth;
+    @Column(columnDefinition = "DECIMAL(10,2) DEFAULT 0")
+    private BigDecimal single;
+    @Column(columnDefinition = "DECIMAL(10,2) DEFAULT 0")
+    private BigDecimal average;
+    @Column
     private Integer ranking;
-
-    @Column(name="Checker1", length=20)
+    @Column(length=20)
     private String checker1;
-
-    @Column(name = "Checker2", length=20)
+    @Column(length=20)
     private String checker2;
 
     @Builder
-    public Participate(String UserName, String Email, String EventName, Integer Round){
+    public Participate(String UserName, Integer Pdx, String Email, Round Round){
         this.userName=UserName;
-        this.eventName=EventName;
+        this.pdx=Pdx;
         this.email=Email;
         this.round=Round;
-        this.m1=0;
-        this.s1=(float)0;
-        this.m2=0;
-        this.s2=(float)0;
-        this.m3=0;
-        this.s3=(float)0;
-        this.m4=0;
-        this.s4=(float)0;
-        this.m5=0;
-        this.s5=(float)0;
-        this.singleM=0;
-        this.singleS=(float)0;
-        this.avgM=0;
-        this.avgS=(float)0;
     }
 
-    public Participate update( Integer m1, Float s1, Integer m2, Float s2,
-                               Integer m3, Float s3, Integer m4, Float s4,
-                               Integer m5, Float s5,Integer SingleM, Float SingleS,
-                               Integer AvgM, Float AvgS, Integer Ranking, String Checker1){
-        this.m1=m1;
-        this.s1=s1;
-        this.m2=m2;
-        this.s2=s2;
-        this.m3=m3;
-        this.s3=s3;
-        this.m4=m4;
-        this.s4=s4;
-        this.m5=m5;
-        this.s5=s5;
-        this.singleM=SingleM;
-        this.singleS=SingleS;
-        this.avgM=AvgM;
-        this.avgS=AvgS;
+    public Participate update(BigDecimal First, BigDecimal Second, BigDecimal Third, BigDecimal Fourth, BigDecimal Fifth, BigDecimal Single, BigDecimal Average, Integer Ranking, String Checker1){
+        this.first=First;
+        this.second=Second;
+        this.third=Third;
+        this.fourth=Fourth;
+        this.fifth=Fifth;
+        this.single=Single;
+        this.average=Average;
         this.ranking=Ranking;
         this.checker1=Checker1;
         return this;
