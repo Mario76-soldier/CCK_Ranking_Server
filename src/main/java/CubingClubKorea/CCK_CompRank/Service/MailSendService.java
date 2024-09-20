@@ -65,11 +65,35 @@ public class MailSendService {
         String setFrom = "2001cupid@gmail.com"; // email-config에 설정한 자신의 이메일 주소를 입력
         String title = "CCK CompRanking 회원 가입 인증요청"; // 이메일 제목
         String content =
-                "큐빙클럽코리아 기록관에 오신 것을 환영합니다!" + 	//html 형식으로 작성 !
-                        "<br><br>" +
-                        "인증 번호는 " + authNumber + "입니다." +
-                        "<br>" +
-                        "인증번호를 제대로 입력해주세요"; //이메일 내용 삽입
+                """
+                        <div
+                        \tstyle="font-family: 'Apple SD Gothic Neo', 'sans-serif' !important; width: 540px; height: 600px; border-top: 4px solid #4D6BB2; margin: 100px auto; padding: 15px 0; box-sizing: border-box;">
+                        \t<h1 style="margin: 20px 0; padding: 0 5px; font-size: 28px; font-weight: 400;">
+                        \t\t<a href="https://ibb.co/dJrR2r4"><img src="https://i.ibb.co/x8DNjDq/compranking.png"
+                        \t\t\t\tstyle="height: 100px; width: 350px; margin-bottom: 20px;" alt="compranking"><br /></a>
+                        \t\t<span style="color: #4D6BB2;">메일인증</span> 안내입니다.
+                        \t</h1>
+                        \t<div style="border-top: 1px solid #DDD;">
+                        \t\t<p style="font-size: 16px; line-height: 26px; padding: 0 5px;">
+                        \t\t\t안녕하세요.<br />
+                        \t\t\t큐빙클럽코리아 CompRanking에 가입해 주셔서 진심으로 감사드립니다.<br />
+                        \t\t\t아래 <b style="color: #4D6BB2;">인증번호를 입력</b>하여 회원가입을 완료해 주세요.<br />
+                        \t\t</p>
+                        \t</div>
+                        \t<div style="border-top: 1px solid #DDD;">
+                        \t\t<h1 style="padding: 0 10px;">"""
+                        +authNumber+
+                        """
+                        </h1>
+                        \t</div>
+                        \t<div style="border-top: 1px solid #DDD;">
+                        \t\t<p style="font-size: 16px; line-height: 26px; padding: 0 5px;">
+                        \t\t\t제한시간은 <b style="color: #ff0000;">5분</b>입니다.<br />
+                        \t\t\t감사합니다.
+                        \t\t</p>
+                        \t</div>
+                        </div>
+                        """; //이메일 내용 삽입
         mailSend(setFrom, email, title, content, authNumber);
         return authNumber;
     }
