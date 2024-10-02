@@ -1,6 +1,7 @@
 package CubingClubKorea.CCK_CompRank.Controller;
 
 import CubingClubKorea.CCK_CompRank.DTO.*;
+import CubingClubKorea.CCK_CompRank.Entity.Competition;
 import CubingClubKorea.CCK_CompRank.Repository.CompetitionRepository;
 import CubingClubKorea.CCK_CompRank.Repository.EventRepository;
 import CubingClubKorea.CCK_CompRank.Service.*;
@@ -20,26 +21,33 @@ import java.util.List;
 @RequiredArgsConstructor
 @RequestMapping("/api")
 public class ListController {
-    private final CompListService complistService;
-    private final CompetitionRepository competitionRepository;
+    private final CompetitionService competitionService;
     private final RoundService roundService;
     private final ParticipateService participateService;
     private final AccountService accountService;
-    private final EventRepository eventRepository;
     @GetMapping("/comp/{time}")
     public ResponseEntity<List<CompetitionDTO>> CompList(@PathVariable(value="time")String time){
         LocalDate now=LocalDate.now();
         return switch (time) {
-            case "past" -> ResponseEntity.ok(complistService.getListPast(now));
-            case "now" -> ResponseEntity.ok(complistService.getListToday(now));
-            case "future" -> ResponseEntity.ok(complistService.getListFuture(now));
+            case "past" -> ResponseEntity.ok(competitionService.getListPast(now));
+            case "now" -> ResponseEntity.ok(competitionService.getListToday(now));
+            case "future" -> ResponseEntity.ok(competitionService.getListFuture(now));
             default -> ResponseEntity.badRequest().build();
         };
     }
     @GetMapping("/compname/{compIdx}")
     public ResponseEntity<String> Comp(@PathVariable(value="compIdx")Integer compIdx){
         try{
-            return ResponseEntity.ok(complistService.getOne(compIdx).getCompName());
+            return ResponseEntity.ok(competitionService.getOne(compIdx).getCompName());
+        }
+        catch(Exception e) {
+            return ResponseEntity.badRequest().build();
+        }
+    }
+    @GetMapping("/compinfo/{compIdx}")
+    public ResponseEntity<CompetitionDTO> CompInfo(@PathVariable(value="compIdx")Integer compIdx){
+        try{
+            return ResponseEntity.ok(competitionService.getOne(compIdx));
         }
         catch(Exception e) {
             return ResponseEntity.badRequest().build();
@@ -47,8 +55,9 @@ public class ListController {
     }
     @PostMapping("/comp")
     public ResponseEntity<Integer> MakeComp(@RequestBody CompetitionDTO compList){
-        return ResponseEntity.ok(complistService.create(compList));
+        return ResponseEntity.ok(competitionService.create(compList));
     }
+
     @DeleteMapping("/comp/{compIdx}")
     public ResponseEntity<?> DeleteComp(@PathVariable(value="compIdx") Integer compIdx){
         List<RoundDTO> list=roundService.getCompRound(compIdx);
@@ -56,9 +65,10 @@ public class ListController {
             participateService.deleteByRoundIdx(roundDTO.getIdx());
         }
         roundService.deleteRound(compIdx);
-        complistService.deleteByIdx(compIdx);
+        competitionService.deleteByIdx(compIdx);
         return ResponseEntity.ok().build();
     }
+
     @GetMapping("/round/{time}/{compIdx}")
     public ResponseEntity<List<RoundDTO>> RoundList(@PathVariable(value="compIdx") Integer compIdx, @PathVariable(value = "time")String time){
         LocalDateTime now=LocalDateTime.now();
@@ -83,10 +93,7 @@ public class ListController {
     public ResponseEntity<List<Integer>> MakeRound(@RequestBody List<CreateRoundDTO> roundList){
         List<Integer> list=new ArrayList<>();
         for(CreateRoundDTO roundDTO:roundList){
-            RoundDTO round=new RoundDTO(roundDTO);
-            round.setCubeEvent(eventRepository.findByEventName(roundDTO.getCubeEvent()));
-            round.setComp(competitionRepository.findByIdx(roundDTO.getComp()));
-            list.add(roundService.create(round));
+            list.add(roundService.create(roundDTO));
         }
         return ResponseEntity.ok(list);
     }
@@ -106,7 +113,6 @@ public class ListController {
         String avgType=roundService.getOne(roundIdx).getCubeEvent().getAvgCalc();
         System.out.println(records.getFifth());
         participateService.updateRecord(records.getFirst(), records.getSecond(), records.getThird(), records.getFourth(), records.getFifth(), checkerName, idx,avgType);
-        participateService.updateChecker(checkerName, idx);
         List<Integer> list=participateService.getRank(roundIdx);
         for(int i=0; i<list.size(); i++) {
             participateService.updateRanking(i+1,list.get(i));

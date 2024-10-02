@@ -28,7 +28,7 @@ public class TokenProvider {
 
 
     public String create(Account account) {
-        Date expiryDate = new Date(System.currentTimeMillis() + 1000 * 60 * 60);
+        Date expiryDate = new Date(System.currentTimeMillis() + 1000 * 60 * 60*8);
         //1시간 후 토큰 만료되도록 설정
         return Jwts.builder()
                 .signWith(secretKey, Jwts.SIG.HS512)

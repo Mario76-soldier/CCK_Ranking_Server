@@ -3,6 +3,7 @@ package CubingClubKorea.CCK_CompRank.DTO;
 import CubingClubKorea.CCK_CompRank.Entity.Competition;
 import CubingClubKorea.CCK_CompRank.Entity.CubeEvent;
 import CubingClubKorea.CCK_CompRank.Entity.Round;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -12,6 +13,7 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @NoArgsConstructor
+@AllArgsConstructor
 public class RoundDTO {
     private Integer idx;
     private Competition comp;
@@ -37,6 +39,17 @@ public class RoundDTO {
         this.advance=roundDTO.getAdvance();
     }
     public Round toEntity(){
+        return Round.builder()
+                .Idx(idx)
+                .Comp(comp)
+                .cubeEvent(cubeEvent)
+                .RoundName(roundName)
+                .EventStart(eventStart)
+                .EventEnd(eventEnd)
+                .Advance(advance)
+                .build();
+    }
+    public Round toEntityNoIdx(){
         return Round.builder()
                 .Comp(comp)
                 .cubeEvent(cubeEvent)

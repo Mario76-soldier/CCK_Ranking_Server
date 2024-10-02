@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 public interface ParticipateRepository extends JpaRepository<Participate, Integer> {
@@ -33,13 +34,13 @@ public interface ParticipateRepository extends JpaRepository<Participate, Intege
             "p.single=:single," +
             "p.checker1=:checker1 "+
             "where p.idx=:idx")
-    void updateRecord(@Param(value="first")Double first,
-                      @Param(value="second")Double second,
-                      @Param(value="third")Double third,
-                      @Param(value="fourth")Double fourth,
-                      @Param(value="fifth")Double fifth,
-                      @Param(value="average") Double average,
-                      @Param(value="single")Double single,
+    void updateRecord(@Param(value="first")BigDecimal first,
+                      @Param(value="second")BigDecimal second,
+                      @Param(value="third")BigDecimal third,
+                      @Param(value="fourth") BigDecimal fourth,
+                      @Param(value="fifth")BigDecimal fifth,
+                      @Param(value="average") BigDecimal average,
+                      @Param(value="single")BigDecimal single,
                       @Param(value="checker1")String checker1,
                       @Param(value="idx")Integer idx);
     void deleteByIdx(Integer idx);

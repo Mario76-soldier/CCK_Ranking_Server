@@ -34,7 +34,8 @@ public class Competition {
     @Column
     private Integer maxParticipate;
     @Builder
-    public Competition(String CompName, LocalDate CompDateStart, LocalDate CompDateEnd, LocalDateTime JoinDateStart, LocalDateTime JoinDateEnd, Integer MaxParticipate){
+    public Competition(Integer Idx, String CompName, LocalDate CompDateStart, LocalDate CompDateEnd, LocalDateTime JoinDateStart, LocalDateTime JoinDateEnd, Integer MaxParticipate){
+        this.idx=Idx;
         this.compName=CompName;
         this.compDateStart=CompDateStart;
         this.compDateEnd=CompDateEnd;

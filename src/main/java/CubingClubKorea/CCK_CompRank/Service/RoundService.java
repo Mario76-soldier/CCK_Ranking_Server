@@ -1,6 +1,9 @@
 package CubingClubKorea.CCK_CompRank.Service;
 
+import CubingClubKorea.CCK_CompRank.DTO.CreateRoundDTO;
 import CubingClubKorea.CCK_CompRank.DTO.RoundDTO;
+import CubingClubKorea.CCK_CompRank.Repository.CompetitionRepository;
+import CubingClubKorea.CCK_CompRank.Repository.EventRepository;
 import CubingClubKorea.CCK_CompRank.Repository.ParticipateRepository;
 import CubingClubKorea.CCK_CompRank.Repository.RoundRepository;
 import CubingClubKorea.CCK_CompRank.Entity.Round;
@@ -18,8 +21,14 @@ import java.util.List;
 public class RoundService {
     private final ParticipateRepository participateRepository;
     private final RoundRepository roundRepository;
-    public Integer create(RoundDTO round){
-        return roundRepository.save(round.toEntity()).getIdx();
+    private final CompetitionRepository competitionRepository;
+    private final EventRepository eventRepository;
+    public Integer create(CreateRoundDTO round){
+        RoundDTO roundDTO=new RoundDTO(round.getIdx(), competitionRepository.findByIdx(round.getComp()), eventRepository.findByEventName(round.getCubeEvent()), round.getRoundName(), round.getEventStart(), round.getEventEnd(), round.getAdvance());
+        if(roundDTO.getIdx()!=null){
+            return roundRepository.save(roundDTO.toEntity()).getIdx();
+        }
+        return roundRepository.save(roundDTO.toEntityNoIdx()).getIdx();
     }
     public RoundDTO getOne(Integer idx){
         return new RoundDTO(roundRepository.findByIdx(idx));
