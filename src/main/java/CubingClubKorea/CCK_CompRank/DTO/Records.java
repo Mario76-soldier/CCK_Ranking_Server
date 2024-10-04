@@ -3,12 +3,14 @@ package CubingClubKorea.CCK_CompRank.DTO;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.math.BigDecimal;
+
 @Getter
 @Setter
 public class Records {
-    Double first;
-    Double second;
-    Double third;
-    Double fourth;
-    Double fifth;
+    BigDecimal first;
+    BigDecimal second;
+    BigDecimal third;
+    BigDecimal fourth;
+    BigDecimal fifth;
 }

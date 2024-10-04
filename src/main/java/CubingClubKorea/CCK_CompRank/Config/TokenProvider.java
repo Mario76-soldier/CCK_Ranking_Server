@@ -28,12 +28,13 @@ public class TokenProvider {
 
 
     public String create(Account account) {
-        Date expiryDate = new Date(System.currentTimeMillis() + 1000 * 60 * 60);
+        Date expiryDate = new Date(System.currentTimeMillis() + 1000 * 60 * 60*8);
         //1시간 후 토큰 만료되도록 설정
         return Jwts.builder()
                 .signWith(secretKey, Jwts.SIG.HS512)
                 .subject(account.getEmail())
                 .issuer("CCK")
+                .claim("roles", account.getPosition().name())
                 .issuedAt(new Date())
                 .expiration(expiryDate)
                 .compact();
@@ -45,13 +46,12 @@ public class TokenProvider {
 
      */
 
-    public String validateAndGetUserId(String token) {
-        Claims claims = Jwts.parser()
+    public Claims validateAndGetClaims(String token) {
+        return Jwts.parser()
                 .verifyWith(secretKey)
                 .build()
                 .parseSignedClaims(token)
                 .getPayload();
-        return claims.getSubject();
     }
     /*
     이 method는 토큰을 디코딩, 파싱, 위조여부확인 을 담당한다.

@@ -1,5 +1,6 @@
 package CubingClubKorea.CCK_CompRank.Config;
 
+import io.jsonwebtoken.Claims;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -31,10 +32,15 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         try{
             String token = parseBearerToken(request);
             if(token!=null&&!token.equalsIgnoreCase("null")){
-                String userId = tokenProvider.validateAndGetUserId(token);
-                log.info("Authenticated user: {}", userId);
-                AbstractAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(userId, null, AuthorityUtils.NO_AUTHORITIES);
+                Claims claims = tokenProvider.validateAndGetClaims(token); // Modify to return all claims
+                String userId = claims.getSubject();
+                String roles = claims.get("roles", String.class); // Extract the roles
+
+                log.info("Authenticated user: {}, with roles: {}", userId, roles);
+                AbstractAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(userId, null, AuthorityUtils.createAuthorityList(roles));
+
                 authenticationToken.setDetails(new WebAuthenticationDetails(request));
+
                 SecurityContext securityContext = SecurityContextHolder.createEmptyContext();
                 securityContext.setAuthentication(authenticationToken);
                 SecurityContextHolder.setContext(securityContext);

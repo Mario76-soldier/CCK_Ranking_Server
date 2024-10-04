@@ -16,11 +16,14 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 @Transactional
-public class CompListService {
+public class CompetitionService {
     private final CompetitionRepository competitionRepository;
     private final RoundService roundService;
     public Integer create(CompetitionDTO comp){
-        return competitionRepository.save(comp.toEntity()).getIdx();
+        if(comp.getIdx()!=null){
+            return competitionRepository.save(comp.toEntity()).getIdx();
+        }
+        return competitionRepository.save(comp.toEntityNoIdx()).getIdx();
     }
     public CompetitionDTO getOne(Integer idx){
         return new CompetitionDTO(competitionRepository.findByIdx(idx));

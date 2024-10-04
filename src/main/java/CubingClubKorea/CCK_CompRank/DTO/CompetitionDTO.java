@@ -27,8 +27,18 @@ public class CompetitionDTO {
         this.joinDateEnd=entity.getJoinDateEnd();
         this.maxParticipate=entity.getMaxParticipate();
     }
-
     public Competition toEntity(){
+        return Competition.builder()
+                .Idx(idx)
+                .CompName(compName)
+                .CompDateStart(compDateStart)
+                .CompDateEnd(compDateEnd)
+                .JoinDateStart(joinDateStart)
+                .JoinDateEnd(joinDateEnd)
+                .MaxParticipate(maxParticipate)
+                .build();
+    }
+    public Competition toEntityNoIdx(){
         return Competition.builder()
                 .CompName(compName)
                 .CompDateStart(compDateStart)
