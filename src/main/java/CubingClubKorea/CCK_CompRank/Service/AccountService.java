@@ -3,6 +3,7 @@ package CubingClubKorea.CCK_CompRank.Service;
 import CubingClubKorea.CCK_CompRank.DTO.AccountDTO;
 import CubingClubKorea.CCK_CompRank.DTO.AccountRequest;
 import CubingClubKorea.CCK_CompRank.Entity.Account;
+import CubingClubKorea.CCK_CompRank.Entity.UserRole;
 import CubingClubKorea.CCK_CompRank.Repository.AccountRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -35,5 +36,8 @@ public class AccountService {
     }
     public String getUserName(String email){
         return accountRepository.findByEmail(email).get().getName();
+    }
+    public UserRole getUserRole(String email){
+        return accountRepository.findByEmail(email).get().getPosition();
     }
 }
