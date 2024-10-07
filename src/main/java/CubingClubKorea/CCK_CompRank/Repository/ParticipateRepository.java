@@ -18,6 +18,8 @@ public interface ParticipateRepository extends JpaRepository<Participate, Intege
             "(case when p.average=-1 then 1 else 0 end) asc, " +
             "p.average asc, p.single asc")
     List<Integer> findByRoundOrder(@Param(value="roundIdx")Integer roundIdx);
+    List<Participate> findByEmailAndRound_Comp_Idx(String email, Integer compIdx);
+    Participate findByIdx(Integer idx);
     @Query("select p from Participate p where p.round.idx=:roundIdx order by (case when p.ranking is null or p.ranking=0 then 1 else 0 end) asc, p.ranking asc")
     List<Participate> findByRound(@Param(value="roundIdx")Integer roundIdx);
     @Modifying

@@ -13,5 +13,4 @@ public class ParticipateRequestDTO {
     private Integer pdx;
     private String email;
     private Integer round;
-
 }

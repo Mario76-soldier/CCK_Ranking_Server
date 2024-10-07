@@ -3,6 +3,7 @@ package CubingClubKorea.CCK_CompRank.Service;
 
 import CubingClubKorea.CCK_CompRank.DTO.ParticipateDTO;
 import CubingClubKorea.CCK_CompRank.DTO.ParticipateRequestDTO;
+import CubingClubKorea.CCK_CompRank.DTO.RecorderResponseDTO;
 import CubingClubKorea.CCK_CompRank.Repository.ParticipateRepository;
 import CubingClubKorea.CCK_CompRank.Entity.Participate;
 import CubingClubKorea.CCK_CompRank.Repository.RoundRepository;
@@ -12,9 +13,7 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -23,7 +22,6 @@ public class ParticipateService {
     private final RoundRepository roundRepository;
     private final ParticipateRepository participateRepository;
 
-    private static final BigDecimal MAX_TIME = BigDecimal.valueOf(36000.0);
     private static final BigDecimal DNF_TIME = BigDecimal.valueOf(-1);
     private static final BigDecimal DNS_TIME = BigDecimal.valueOf(-2);
 
@@ -33,6 +31,32 @@ public class ParticipateService {
 
     public ParticipateDTO getOne(Integer idx) {
         return new ParticipateDTO(participateRepository.findById(idx).orElseThrow(null));
+    }
+
+    public RecorderResponseDTO getForRecorder(String email, Integer compIdx){
+        List<Participate> list=participateRepository.findByEmailAndRound_Comp_Idx(email, compIdx);
+        for(Participate participate:list){
+            if(participate.getFirst() == null || participate.getFirst().equals(BigDecimal.ZERO)){
+                return new RecorderResponseDTO(participate.getRound().getIdx(), 1);
+            }
+            if(!Objects.equals(participate.getRound().getCubeEvent().getAvgCalc(), "single")) {
+                if (participate.getSecond() == null || participate.getSecond().equals(BigDecimal.ZERO)) {
+                    return new RecorderResponseDTO(participate.getRound().getIdx(), 2);
+                }
+                if (participate.getThird() == null || participate.getThird().equals(BigDecimal.ZERO)) {
+                    return new RecorderResponseDTO(participate.getRound().getIdx(), 3);
+                }
+            }
+            if(Objects.equals(participate.getRound().getCubeEvent().getAvgCalc(), "ao5")){
+                if(participate.getFourth() == null || participate.getFourth().equals(BigDecimal.ZERO)){
+                    return new RecorderResponseDTO(participate.getRound().getIdx(), 4);
+                }
+                if(participate.getFifth() == null || participate.getFifth().equals(BigDecimal.ZERO)){
+                    return new RecorderResponseDTO(participate.getRound().getIdx(), 5);
+                }
+            }
+        }
+        return null;
     }
 
     public List<ParticipateDTO> getParticipate(Integer round) {
@@ -117,6 +141,19 @@ public class ParticipateService {
         } else {
             return -1;
         }
+    }
+
+    public Integer updateRecordOne(Integer idx, Integer seq, BigDecimal record, String judgeEmail) {
+        Participate participate=participateRepository.findByIdx(idx);
+        ParticipateDTO participateDTO=new ParticipateDTO(participate);
+        switch(seq){
+            case 1:participateDTO.setFirst(record);
+            case 2:participateDTO.setSecond(record);
+            case 3:participateDTO.setThird(record);
+            case 4:participateDTO.setFourth(record);
+            case 5:participateDTO.setFifth(record);
+        }
+        return participateRepository.save(participateDTO.toEntity()).getIdx();
     }
 
     public void deleteParticipate(Integer idx) {

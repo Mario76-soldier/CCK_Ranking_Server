@@ -29,14 +29,24 @@ public class Participate {
     private String email;
     @Column(columnDefinition = "DECIMAL(10,2) DEFAULT 0")
     private BigDecimal first;
+    @Column(length=30)
+    private String firstJudge;
     @Column(columnDefinition = "DECIMAL(10,2) DEFAULT 0")
     private BigDecimal second;
+    @Column(length=30)
+    private String secondJudge;
     @Column(columnDefinition = "DECIMAL(10,2) DEFAULT 0")
     private BigDecimal third;
+    @Column(length=30)
+    private String thirdJudge;
     @Column(columnDefinition = "DECIMAL(10,2) DEFAULT 0")
     private BigDecimal fourth;
+    @Column(length=30)
+    private String fourthJudge;
     @Column(columnDefinition = "DECIMAL(10,2) DEFAULT 0")
     private BigDecimal fifth;
+    @Column(length=30)
+    private String fifthJudge;
     @Column(columnDefinition = "DECIMAL(10,2) DEFAULT 0")
     private BigDecimal single;
     @Column(columnDefinition = "DECIMAL(10,2) DEFAULT 0")
