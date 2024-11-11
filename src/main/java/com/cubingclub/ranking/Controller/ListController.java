@@ -160,4 +160,8 @@ public class ListController {
         participateService.updateChecker(checkerName, idx);
         return ResponseEntity.ok().build();
     }
+    @GetMapping("/event")
+    public ResponseEntity<?> EventList(){
+        return ResponseEntity.ok(roundService.getCubeEvent());
+    }
 }

@@ -1,7 +1,9 @@
 package com.cubingclub.ranking.Service;
 
 import com.cubingclub.ranking.DTO.CreateRoundDTO;
+import com.cubingclub.ranking.DTO.CubeEventDTO;
 import com.cubingclub.ranking.DTO.RoundDTO;
+import com.cubingclub.ranking.Entity.CubeEvent;
 import com.cubingclub.ranking.Repository.CompetitionRepository;
 import com.cubingclub.ranking.Repository.EventRepository;
 import com.cubingclub.ranking.Repository.ParticipateRepository;
@@ -32,6 +34,14 @@ public class RoundService {
     }
     public RoundDTO getOne(Integer idx){
         return new RoundDTO(roundRepository.findByIdx(idx));
+    }
+    public List<CubeEventDTO> getCubeEvent(){
+        List<CubeEvent> list=eventRepository.findAllBy();
+        List<CubeEventDTO> listDTO=new ArrayList<>();
+        for (CubeEvent cubeEvent:list) {
+            listDTO.add(new CubeEventDTO(cubeEvent));
+        }
+        return listDTO;
     }
     public List<RoundDTO> getCompRound(Integer idx){
         List<Round> list=roundRepository.findByCompIdx(idx);
