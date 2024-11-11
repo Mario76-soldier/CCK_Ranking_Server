@@ -36,22 +36,22 @@ public class ParticipateService {
         List<Participate> list=participateRepository.findByEmailAndRound_Comp_Idx(email, compIdx);
         for(Participate participate:list){
             if(participate.getFirst() == null || participate.getFirst().compareTo(BigDecimal.valueOf(0)) == 0){
-                return new RecorderResponseDTO(participate.getIdx(), 1);
+                return new RecorderResponseDTO(participate.getIdx(), 1, participate.getUserName());
             }
             if(!Objects.equals(participate.getRound().getCubeEvent().getAvgCalc(), "single")) {
                 if (participate.getSecond() == null || participate.getSecond().compareTo(BigDecimal.valueOf(0)) == 0) {
-                    return new RecorderResponseDTO(participate.getIdx(), 2);
+                    return new RecorderResponseDTO(participate.getIdx(), 2, participate.getUserName());
                 }
                 if (participate.getThird() == null || participate.getThird().compareTo(BigDecimal.valueOf(0)) == 0) {
-                    return new RecorderResponseDTO(participate.getIdx(), 3);
+                    return new RecorderResponseDTO(participate.getIdx(), 3, participate.getUserName());
                 }
             }
             if(Objects.equals(participate.getRound().getCubeEvent().getAvgCalc(), "ao5")){
                 if(participate.getFourth() == null || participate.getFourth().compareTo(BigDecimal.valueOf(0)) == 0){
-                    return new RecorderResponseDTO(participate.getIdx(), 4);
+                    return new RecorderResponseDTO(participate.getIdx(), 4, participate.getUserName());
                 }
                 if(participate.getFifth() == null || participate.getFifth().compareTo(BigDecimal.valueOf(0)) == 0){
-                    return new RecorderResponseDTO(participate.getIdx(), 5);
+                    return new RecorderResponseDTO(participate.getIdx(), 5, participate.getUserName());
                 }
             }
         }
