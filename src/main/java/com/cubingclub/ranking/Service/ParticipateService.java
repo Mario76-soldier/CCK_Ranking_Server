@@ -173,9 +173,13 @@ public class ParticipateService {
             }
         }
         participateRepository.save(participateDTO.toEntityFull());
-        return (seq == 1 && "single".equalsIgnoreCase(calcType)) || (seq == 3 && "mo3".equalsIgnoreCase(calcType)) || (seq == 5 && "ao5".equalsIgnoreCase(calcType))
-                ? updateSinAvg(new BigDecimal[]{participateDTO.getFirst(), participateDTO.getSecond(), participateDTO.getThird(), participateDTO.getFourth(), participateDTO.getFifth()}, calcType, idx)
-                : idx;
+        BigDecimal[] records = switch (calcType.toLowerCase()) {
+            case "single" -> new BigDecimal[]{participateDTO.getFirst()};
+            case "mo3" -> new BigDecimal[]{participateDTO.getFirst(), participateDTO.getSecond(), participateDTO.getThird()};
+            case "ao5" -> new BigDecimal[]{participateDTO.getFirst(), participateDTO.getSecond(), participateDTO.getThird(), participateDTO.getFourth(), participateDTO.getFifth()};
+            default -> null;
+        };
+        return updateSinAvg(records, calcType, idx);
     }
 
     public void deleteParticipate(Integer idx) {
