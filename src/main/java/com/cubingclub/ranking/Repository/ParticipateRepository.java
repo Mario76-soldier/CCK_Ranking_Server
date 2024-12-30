@@ -10,7 +10,7 @@ import java.math.BigDecimal;
 import java.util.List;
 
 public interface ParticipateRepository extends JpaRepository<Participate, Integer> {
-    @Query("select p.idx from Participate p where p.round.idx=:roundIdx and p.single!=0 order by " +
+    @Query("select p.idx from Participate p where p.round.idx=:roundIdx and p.average!=0 order by " +
             "(case when p.average=0 then 1 else 0 end) asc, " +
             "(case when p.single=-2 then 1 else 0 end) asc," +
             "(case when p.single=-1 then 1 else 0 end) asc, " +
