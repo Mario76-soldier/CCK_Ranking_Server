@@ -11,6 +11,6 @@ import java.util.Optional;
 public interface AccountRepository extends JpaRepository<Account, Integer> {
     Boolean existsByEmail(String email);
     Optional<Account> findByEmail(String email);
-    @Query("SELECT a.email, a.name, a.birthDate, a.state, a.sex, a.phoneNum, a.position FROM Account a")
+    @Query("SELECT a.email, a.name, a.enName, a.birthDate, a.state, a.sex, a.phoneNum, a.position FROM Account a")
     List<AccountListDTO> findAllList();
 }

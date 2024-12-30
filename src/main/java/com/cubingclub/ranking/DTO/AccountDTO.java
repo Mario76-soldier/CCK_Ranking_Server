@@ -17,6 +17,7 @@ public class AccountDTO {
     @NotBlank
     private String email;
     private String name;
+    private String enName;
     @NotBlank
     private String password;
     private String passwordCheck;
@@ -30,6 +31,7 @@ public class AccountDTO {
         return Account.builder()
                 .email(this.email)
                 .name(this.name)
+                .enName(this.enName)
                 .password(encodedPassword)
                 .position(UserRole.ROLE_CUSTOMER)
                 .birthDate(this.birthDate)

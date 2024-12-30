@@ -21,6 +21,8 @@ public class Account {
     private String email;
     @Column(length=30)
     private String name;
+    @Column(length=40)
+    private String enName;
     @Column
     private String password;
     @Column

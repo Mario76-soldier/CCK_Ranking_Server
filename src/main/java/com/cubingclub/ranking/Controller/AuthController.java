@@ -34,7 +34,7 @@ public class AuthController {
         Account account=accountService.login(accountRequest);
         if(account!=null) {
             final String token = tokenProvider.create(account);
-            final AccountResponseDTO accountResponseDTO=new AccountResponseDTO(account.getEmail(),account.getName(),token);
+            final AccountResponseDTO accountResponseDTO=new AccountResponseDTO(account.getEmail(),account.getName(), account.getEnName(), token);
             return ResponseEntity.ok(accountResponseDTO);
         }
         else{

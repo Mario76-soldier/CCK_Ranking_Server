@@ -12,5 +12,6 @@ import lombok.Setter;
 public class AccountResponseDTO {
     String email;
     String name;
+    String enName;
     String token;
 }

@@ -16,6 +16,7 @@ public class AccountListDTO {
     @NotBlank
     private String email;
     private String name;
+    private String enName;
     @DateTimeFormat(pattern="yyyy-MM-dd")
     private LocalDate birthDate;
     private String state;
