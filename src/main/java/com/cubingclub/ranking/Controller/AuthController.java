@@ -5,6 +5,7 @@ import com.cubingclub.ranking.DTO.AccountDTO;
 import com.cubingclub.ranking.DTO.AccountRequest;
 import com.cubingclub.ranking.DTO.AccountResponseDTO;
 import com.cubingclub.ranking.Entity.Account;
+import com.cubingclub.ranking.Entity.UserRole;
 import com.cubingclub.ranking.Service.AccountService;
 import com.cubingclub.ranking.Service.MailSendService;
 import jakarta.validation.Valid;
@@ -12,6 +13,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 @Slf4j
@@ -34,7 +37,7 @@ public class AuthController {
         Account account=accountService.login(accountRequest);
         if(account!=null) {
             final String token = tokenProvider.create(account);
-            final AccountResponseDTO accountResponseDTO=new AccountResponseDTO(account.getEmail(),account.getName(), account.getEnName(), token);
+            final AccountResponseDTO accountResponseDTO=new AccountResponseDTO(account.getEmail(),account.getName(), account.getEnName(), account.getPosition(), token);
             return ResponseEntity.ok(accountResponseDTO);
         }
         else{
@@ -58,6 +61,17 @@ public class AuthController {
             }
             Account account=accountService.join(accountDTO);
             return ResponseEntity.ok().body(account);
+        }
+        catch(Exception e){
+            return ResponseEntity.badRequest().body(e);
+        }
+    }
+    @GetMapping("/role")
+    public ResponseEntity<?> CheckRole(){
+        try {
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            UserRole myPosition = accountService.getUserRole(authentication.getName());
+            return ResponseEntity.ok().body(myPosition);
         }
         catch(Exception e){
             return ResponseEntity.badRequest().body(e);

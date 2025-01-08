@@ -1,5 +1,6 @@
 package com.cubingclub.ranking.DTO;
 
+import com.cubingclub.ranking.Entity.UserRole;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -13,5 +14,6 @@ public class AccountResponseDTO {
     String email;
     String name;
     String enName;
+    UserRole role;
     String token;
 }

@@ -90,8 +90,10 @@ public class ParticipateService {
                 .orElse(Arrays.stream(record).filter(t -> t.compareTo(DNF_TIME) == 0 || t.compareTo(DNS_TIME) == 0)
                         .max(BigDecimal::compareTo)
                         .orElse(BigDecimal.ZERO));
-        int dnfCount = (int) Arrays.stream(record).filter(t -> t.equals(DNF_TIME)).count();
-        int dnsCount = (int) Arrays.stream(record).filter(t -> t.equals(DNS_TIME)).count();
+        int dnfCount = (int) Arrays.stream(record).filter(t -> t.compareTo(DNF_TIME) == 0).count();
+        int dnsCount = (int) Arrays.stream(record).filter(t -> t.compareTo(DNS_TIME) == 0).count();
+        System.out.println(dnsCount);
+        System.out.println(dnfCount);
         BigDecimal average;
 
         if (("mo3".equalsIgnoreCase(calcType) || "ao5".equalsIgnoreCase(calcType)) && dnfCount + dnsCount < 1) {
