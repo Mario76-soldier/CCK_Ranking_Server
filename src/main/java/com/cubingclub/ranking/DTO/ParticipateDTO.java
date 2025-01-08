@@ -16,6 +16,7 @@ public class ParticipateDTO {
     private Integer idx;
     private Integer pdx;
     private String userName;
+    private String enUserName;
     private String email;
     private Round round;
     private BigDecimal first;
@@ -37,6 +38,7 @@ public class ParticipateDTO {
         this.idx=entity.getIdx();
         this.pdx=entity.getPdx();
         this.userName=entity.getUserName();
+        this.enUserName=entity.getEnUserName();
         this.email=entity.getEmail();
         this.round=entity.getRound();
         this.first=entity.getFirst();
@@ -50,8 +52,9 @@ public class ParticipateDTO {
         this.checker1=entity.getChecker1();
         this.checker2=entity.getChecker2();
     }
-    public ParticipateDTO(String userName, Integer pdx, String email, Round round) {
+    public ParticipateDTO(String userName, String enUserName, Integer pdx, String email, Round round) {
         this.userName=userName;
+        this.enUserName=enUserName;
         this.pdx=pdx;
         this.email=email;
         this.round=round;
@@ -59,6 +62,7 @@ public class ParticipateDTO {
     public Participate toEntity(){
         return Participate.builder()
                 .UserName(userName)
+                .enUserName(enUserName)
                 .Pdx(pdx)
                 .Email(email)
                 .Round(round)
@@ -68,6 +72,7 @@ public class ParticipateDTO {
         return Participate.builder()
                 .Idx(idx)
                 .UserName(userName)
+                .enUserName(enUserName)
                 .Pdx(pdx)
                 .Email(email)
                 .Round(round)

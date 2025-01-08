@@ -25,6 +25,8 @@ public class Participate {
     private Round round;
     @Column(length=40)
     private String userName;
+    @Column(length=40)
+    private String enUserName;
     @Column(length=30)
     private String email;
     @Column(columnDefinition = "DECIMAL(10,2) DEFAULT 0")
@@ -59,11 +61,12 @@ public class Participate {
     private String checker2;
 
     @Builder
-    public Participate(Integer Idx, String UserName, Integer Pdx, String Email, Round Round, BigDecimal first,
+    public Participate(Integer Idx, String UserName, String enUserName, Integer Pdx, String Email, Round Round, BigDecimal first,
                        String firstJudge, BigDecimal second, String secondJudge,
                        BigDecimal third, String thirdJudge, BigDecimal fourth, String fourthJudge,BigDecimal fifth, String fifthJudge){
         this.idx=Idx;
         this.userName=UserName;
+        this.enUserName=enUserName;
         this.pdx=Pdx;
         this.email=Email;
         this.round=Round;

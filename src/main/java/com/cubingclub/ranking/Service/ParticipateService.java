@@ -36,22 +36,22 @@ public class ParticipateService {
         List<Participate> list=participateRepository.findByEmailAndRound_Comp_Idx(email, compIdx);
         for(Participate participate:list){
             if(participate.getFirst() == null || participate.getFirst().compareTo(BigDecimal.valueOf(0)) == 0){
-                return new RecorderResponseDTO(participate.getIdx(), 1, participate.getUserName());
+                return new RecorderResponseDTO(participate.getIdx(), 1, participate.getEnUserName(),participate.getRound().getCubeEvent().getEventName()+" "+participate.getRound().getRoundName());
             }
             if(!Objects.equals(participate.getRound().getCubeEvent().getAvgCalc(), "single")) {
                 if (participate.getSecond() == null || participate.getSecond().compareTo(BigDecimal.valueOf(0)) == 0) {
-                    return new RecorderResponseDTO(participate.getIdx(), 2, participate.getUserName());
+                    return new RecorderResponseDTO(participate.getIdx(), 2, participate.getEnUserName(), participate.getRound().getCubeEvent().getEventName()+" "+participate.getRound().getRoundName());
                 }
                 if (participate.getThird() == null || participate.getThird().compareTo(BigDecimal.valueOf(0)) == 0) {
-                    return new RecorderResponseDTO(participate.getIdx(), 3, participate.getUserName());
+                    return new RecorderResponseDTO(participate.getIdx(), 3, participate.getEnUserName(), participate.getRound().getCubeEvent().getEventName()+" "+participate.getRound().getRoundName());
                 }
             }
             if(Objects.equals(participate.getRound().getCubeEvent().getAvgCalc(), "ao5")){
                 if(participate.getFourth() == null || participate.getFourth().compareTo(BigDecimal.valueOf(0)) == 0){
-                    return new RecorderResponseDTO(participate.getIdx(), 4, participate.getUserName());
+                    return new RecorderResponseDTO(participate.getIdx(), 4, participate.getEnUserName(), participate.getRound().getCubeEvent().getEventName()+" "+participate.getRound().getRoundName());
                 }
                 if(participate.getFifth() == null || participate.getFifth().compareTo(BigDecimal.valueOf(0)) == 0){
-                    return new RecorderResponseDTO(participate.getIdx(), 5, participate.getUserName());
+                    return new RecorderResponseDTO(participate.getIdx(), 5, participate.getEnUserName(), participate.getRound().getCubeEvent().getEventName()+" "+participate.getRound().getRoundName());
                 }
             }
         }
@@ -90,8 +90,10 @@ public class ParticipateService {
                 .orElse(Arrays.stream(record).filter(t -> t.compareTo(DNF_TIME) == 0 || t.compareTo(DNS_TIME) == 0)
                         .max(BigDecimal::compareTo)
                         .orElse(BigDecimal.ZERO));
-        int dnfCount = (int) Arrays.stream(record).filter(t -> t.equals(DNF_TIME)).count();
-        int dnsCount = (int) Arrays.stream(record).filter(t -> t.equals(DNS_TIME)).count();
+        int dnfCount = (int) Arrays.stream(record).filter(t -> t.compareTo(DNF_TIME) == 0).count();
+        int dnsCount = (int) Arrays.stream(record).filter(t -> t.compareTo(DNS_TIME) == 0).count();
+        System.out.println(dnsCount);
+        System.out.println(dnfCount);
         BigDecimal average;
 
         if (("mo3".equalsIgnoreCase(calcType) || "ao5".equalsIgnoreCase(calcType)) && dnfCount + dnsCount < 1) {
@@ -191,7 +193,7 @@ public class ParticipateService {
     }
 
     public Integer addParticipate(ParticipateRequestDTO participate) {
-        ParticipateDTO addPart = new ParticipateDTO(participate.getUserName(), participate.getPdx(), participate.getEmail(), roundRepository.findByIdx(participate.getRound()));
+        ParticipateDTO addPart = new ParticipateDTO(participate.getUserName(), participate.getEnUserName(),participate.getPdx(), participate.getEmail(), roundRepository.findByIdx(participate.getRound()));
         return participateRepository.save(addPart.toEntity()).getIdx();
     }
 

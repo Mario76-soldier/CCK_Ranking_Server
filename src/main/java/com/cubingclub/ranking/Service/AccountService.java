@@ -37,6 +37,9 @@ public class AccountService {
     public String getUserName(String email){
         return accountRepository.findByEmail(email).get().getName();
     }
+    public String getEnUserName(String email){
+        return accountRepository.findByEmail(email).get().getEnName();
+    }
     public UserRole getUserRole(String email){
         return accountRepository.findByEmail(email).get().getPosition();
     }
