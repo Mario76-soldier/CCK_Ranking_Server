@@ -18,26 +18,18 @@ public class AccountDTO {
     private String email;
     private String name;
     private String enName;
-    @NotBlank
-    private String password;
-    private String passwordCheck;
     @DateTimeFormat(pattern="yyyy-MM-dd")
     private LocalDate birthDate;
     private String state;
     private String sex;
     private String phoneNum;
-    private String authNum;
-    public Account toEntity(String encodedPassword){
-        return Account.builder()
-                .email(this.email)
-                .name(this.name)
-                .enName(this.enName)
-                .password(encodedPassword)
-                .position(UserRole.ROLE_CUSTOMER)
-                .birthDate(this.birthDate)
-                .state(this.state)
-                .sex(this.sex)
-                .phoneNum(this.phoneNum)
-                .build();
+    public AccountDTO(Account entity){
+        this.email=entity.getEmail();
+        this.name=entity.getName();
+        this.enName=entity.getEnName();
+        this.birthDate=entity.getBirthDate();
+        this.state=entity.getState();
+        this.sex=entity.getSex();
+        this.phoneNum=entity.getPhoneNum();
     }
 }

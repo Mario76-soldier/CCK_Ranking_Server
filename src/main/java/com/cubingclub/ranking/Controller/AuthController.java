@@ -1,7 +1,8 @@
 package com.cubingclub.ranking.Controller;
 
 import com.cubingclub.ranking.Config.TokenProvider;
-import com.cubingclub.ranking.DTO.AccountDTO;
+import com.cubingclub.ranking.DTO.AccountJoinDTO;
+import com.cubingclub.ranking.DTO.AccountEditDTO;
 import com.cubingclub.ranking.DTO.AccountRequest;
 import com.cubingclub.ranking.DTO.AccountResponseDTO;
 import com.cubingclub.ranking.Entity.Account;
@@ -26,14 +27,14 @@ public class AuthController {
     private final TokenProvider tokenProvider;
     private final MailSendService mailSendService;
     @PostMapping("/login")
-    public ResponseEntity<?> Login(@Valid @RequestBody AccountDTO accountDTO){
-        if(accountDTO.getEmail()==null){
+    public ResponseEntity<?> Login(@Valid @RequestBody AccountJoinDTO accountJoinDTO){
+        if(accountJoinDTO.getEmail()==null){
             throw new RuntimeException("Invalid email value");
         }
-        if(accountDTO.getPassword()==null){
+        if(accountJoinDTO.getPassword()==null){
             throw new RuntimeException("Invalid password value");
         }
-        final AccountRequest accountRequest=new AccountRequest(accountDTO.getEmail(), accountDTO.getPassword());
+        final AccountRequest accountRequest=new AccountRequest(accountJoinDTO.getEmail(), accountJoinDTO.getPassword());
         Account account=accountService.login(accountRequest);
         if(account!=null) {
             final String token = tokenProvider.create(account);
@@ -45,21 +46,21 @@ public class AuthController {
         }
     }
     @PostMapping("/join")
-    public ResponseEntity<?> AddJoin(@Valid @RequestBody AccountDTO accountDTO){
+    public ResponseEntity<?> AddJoin(@Valid @RequestBody AccountJoinDTO accountJoinDTO){
         try {
-            if (accountService.checkEmailDuplicate(accountDTO.getEmail())) {
+            if (accountService.checkEmailDuplicate(accountJoinDTO.getEmail())) {
                 return ResponseEntity.status(HttpStatus.CONFLICT).body("Email duplicate");
             }
-            if (accountDTO.getPassword().length() < 8 || accountDTO.getPassword().length() > 16) {
+            if (accountJoinDTO.getPassword().length() < 8 || accountJoinDTO.getPassword().length() > 16) {
                 return ResponseEntity.badRequest().body("Password size should be in 8~16");
             }
-            if (!accountDTO.getPassword().equals(accountDTO.getPasswordCheck())){
+            if (!accountJoinDTO.getPassword().equals(accountJoinDTO.getPasswordCheck())){
                 return ResponseEntity.badRequest().body("Password check incorrect");
             }
-            if (!mailSendService.CheckAuthNum(accountDTO.getEmail(), accountDTO.getAuthNum())){
+            if (!mailSendService.CheckAuthNum(accountJoinDTO.getEmail(), accountJoinDTO.getAuthNum())){
                 return ResponseEntity.badRequest().body("Mail authenticate incorrect");
             }
-            Account account=accountService.join(accountDTO);
+            Account account=accountService.join(accountJoinDTO);
             return ResponseEntity.ok().body(account);
         }
         catch(Exception e){
@@ -78,7 +79,29 @@ public class AuthController {
         }
     }
     @PostMapping("/edit")
-    public ResponseEntity<?> Edit(@RequestBody AccountDTO accountDTO){
-        return null;
+    public ResponseEntity<?> Edit(@RequestBody AccountEditDTO accountEditDTO){
+        try {
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            accountEditDTO.setEmail(authentication.getName());
+            if(accountService.updateUser(accountEditDTO)==0) {
+                return ResponseEntity.ok().build();
+            }
+            else{
+                return ResponseEntity.badRequest().build();
+            }
+        }
+        catch(Exception e){
+            return ResponseEntity.badRequest().body(e);
+        }
+    }
+    @GetMapping("/info")
+    public ResponseEntity<?> Info(){
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        try{
+            return ResponseEntity.ok(accountService.getAccountInfo(authentication.getName()));
+        }
+        catch(Exception e){
+            return ResponseEntity.badRequest().body(e);
+        }
     }
 }
