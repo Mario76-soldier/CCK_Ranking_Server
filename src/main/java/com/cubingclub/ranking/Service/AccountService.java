@@ -39,7 +39,12 @@ public class AccountService {
         return account1;
     }
     public String getUserName(String email){
-        return accountRepository.findByEmail(email).get().getName();
+        if(accountRepository.findByEmail(email).isPresent()) {
+            return accountRepository.findByEmail(email).get().getName();
+        }
+        else{
+            return null;
+        }
     }
     public UserRole getUserRole(String email){
         return accountRepository.findByEmail(email).get().getPosition();
@@ -68,5 +73,13 @@ public class AccountService {
     }
     public AccountDTO getAccountInfo(String email){
         return new AccountDTO(accountRepository.findByEmail(email).get());
+    }
+
+    public boolean updatePassword(String email, String password){
+        if(accountRepository.existsByEmail(email)){
+            accountRepository.updateAccountPassword(encoder.encode(password), email);
+            return true;
+        }
+        return false;
     }
 }
