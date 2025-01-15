@@ -29,11 +29,10 @@ public class AdminController {
         Authentication authentication= SecurityContextHolder.getContext().getAuthentication();
         UserRole myPosition=accountService.getUserRole(authentication.getName());
         UserRole targetPosition=accountService.getUserRole(roleUpdateDTO.getEmail());
-        if (myPosition == UserRole.ROLE_CUSTOMER || roleUpdateDTO.getPosition() == UserRole.ROLE_ROOT) {
+        if (myPosition == UserRole.ROLE_CUSTOMER || myPosition == UserRole.ROLE_ADMIN || roleUpdateDTO.getPosition() == UserRole.ROLE_ROOT) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         } else if (targetPosition == roleUpdateDTO.getPosition() ||
-                (myPosition == UserRole.ROLE_ADMIN && targetPosition == UserRole.ROLE_ROOT) ||
-                (myPosition == UserRole.ROLE_ROOT && targetPosition == UserRole.ROLE_ROOT)) {
+                (targetPosition == UserRole.ROLE_ROOT)) {
             return ResponseEntity.badRequest().build();
         }
         return ResponseEntity.ok(adminService.updatePosition(roleUpdateDTO));
