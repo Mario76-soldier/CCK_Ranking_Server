@@ -1,10 +1,9 @@
 package com.cubingclub.ranking.Controller;
 
 import com.cubingclub.ranking.DTO.*;
-import com.cubingclub.ranking.Service.AccountService;
-import com.cubingclub.ranking.Service.CompetitionService;
-import com.cubingclub.ranking.Service.ParticipateService;
-import com.cubingclub.ranking.Service.RoundService;
+import com.cubingclub.ranking.Entity.CubeEvent;
+import com.cubingclub.ranking.Entity.Participate;
+import com.cubingclub.ranking.Service.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -25,6 +24,7 @@ public class ListController {
     private final RoundService roundService;
     private final ParticipateService participateService;
     private final AccountService accountService;
+    private final PersonalService personalService;
     @GetMapping("/comp/{time}")
     public ResponseEntity<List<CompetitionDTO>> CompList(@PathVariable(value="time")String time){
         LocalDate now=LocalDate.now();
@@ -110,12 +110,16 @@ public class ListController {
     public ResponseEntity<?> UpdateRecord(@RequestBody Records records, @PathVariable(value="roundIdx")Integer roundIdx , @PathVariable(value="idx")Integer idx){
         Authentication authentication=SecurityContextHolder.getContext().getAuthentication();
         String checkerName=accountService.getUserName(authentication.getName());
-        String avgType=roundService.getOne(roundIdx).getCubeEvent().getAvgCalc();
+        CubeEvent cubeEvent=roundService.getOne(roundIdx).getCubeEvent();
+        String eventName=cubeEvent.getEventName();
+        String avgType=cubeEvent.getAvgCalc();
         participateService.updateRecord(records.getFirst(), records.getSecond(), records.getThird(), records.getFourth(), records.getFifth(), checkerName, idx,avgType);
+        ParticipateDTO participateDTO=participateService.getOne(idx);
         List<Integer> list=participateService.getRank(roundIdx);
         for(int i=0; i<list.size(); i++) {
             participateService.updateRanking(i+1,list.get(i));
         }
+        personalService.updateBest(authentication.getName(), eventName, participateDTO.getSingle(),participateDTO.getAverage());
         return ResponseEntity.ok().build();
     }
     @DeleteMapping("/record/{idx}")

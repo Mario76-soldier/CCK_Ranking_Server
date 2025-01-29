@@ -200,8 +200,8 @@ public class ParticipateService {
     public void updateChecker(String checker, Integer idx) {
         participateRepository.updateChecker2(checker, idx);
     }
-
     public void updateRanking(Integer ranking, Integer idx) {
         participateRepository.updateRanking(ranking, idx);
     }
+
 }

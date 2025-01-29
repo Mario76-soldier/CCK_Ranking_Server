@@ -12,9 +12,12 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/personal")
 public class PersonalController {
     private final PersonalService personalService;
-
     @GetMapping("/list/{email}")
     public ResponseEntity<?> PersonalRecordList(@PathVariable(name = "email")String email){
         return ResponseEntity.ok(personalService.getPersonalRecord(email));
+    }
+    @GetMapping("/best/{email}")
+    public ResponseEntity<?> BestRecordList(@PathVariable(name="email")String email){
+        return ResponseEntity.ok(personalService.getBestRecord(email));
     }
 }
