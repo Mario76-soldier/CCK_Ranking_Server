@@ -33,28 +33,40 @@ public class Participate {
     private BigDecimal first;
     @Column(length=30)
     private String firstJudge;
+    @Column(length=30)
+    private String firstScrambler;
     @Column(columnDefinition = "DECIMAL(10,2) DEFAULT 0")
     private BigDecimal second;
     @Column(length=30)
     private String secondJudge;
+    @Column(length=30)
+    private String secondScrambler;
     @Column(columnDefinition = "DECIMAL(10,2) DEFAULT 0")
     private BigDecimal third;
     @Column(length=30)
     private String thirdJudge;
+    @Column(length=30)
+    private String thirdScrambler;
     @Column(columnDefinition = "DECIMAL(10,2) DEFAULT 0")
     private BigDecimal fourth;
     @Column(length=30)
     private String fourthJudge;
+    @Column(length=30)
+    private String fourthScrambler;
     @Column(columnDefinition = "DECIMAL(10,2) DEFAULT 0")
     private BigDecimal fifth;
     @Column(length=30)
     private String fifthJudge;
+    @Column(length=30)
+    private String fifthScrambler;
     @Column(columnDefinition = "DECIMAL(10,2) DEFAULT 0")
     private BigDecimal single;
     @Column(columnDefinition = "DECIMAL(10,2) DEFAULT 0")
     private BigDecimal average;
     @Column
     private Integer ranking;
+    @Column
+    private Integer stateRanking;
     @Column(length=20)
     private String checker1;
     @Column(length=20)
@@ -62,8 +74,8 @@ public class Participate {
 
     @Builder
     public Participate(Integer Idx, String UserName, String enUserName, Integer Pdx, String Email, Round Round, BigDecimal first,
-                       String firstJudge, BigDecimal second, String secondJudge,
-                       BigDecimal third, String thirdJudge, BigDecimal fourth, String fourthJudge,BigDecimal fifth, String fifthJudge){
+                       String firstJudge, String firstScrambler, BigDecimal second, String secondJudge, String secondScrambler,
+                       BigDecimal third, String thirdJudge, String thirdScrambler, BigDecimal fourth, String fourthJudge, String fourthScrambler, BigDecimal fifth, String fifthJudge, String fifthScrambler){
         this.idx=Idx;
         this.userName=UserName;
         this.enUserName=enUserName;
@@ -72,17 +84,22 @@ public class Participate {
         this.round=Round;
         this.first=first;
         this.firstJudge=firstJudge;
+        this.firstScrambler=firstScrambler;
         this.second=second;
         this.secondJudge=secondJudge;
+        this.secondScrambler=secondScrambler;
         this.third=third;
         this.thirdJudge=thirdJudge;
+        this.thirdScrambler=thirdScrambler;
         this.fourth=fourth;
         this.fourthJudge=fourthJudge;
+        this.fourthScrambler=fourthScrambler;
         this.fifth=fifth;
         this.fifthJudge=fifthJudge;
+        this.fifthScrambler=fifthScrambler;
     }
 
-    public Participate update(BigDecimal First, BigDecimal Second, BigDecimal Third, BigDecimal Fourth, BigDecimal Fifth, BigDecimal Single, BigDecimal Average, Integer Ranking, String Checker1){
+    public Participate update(BigDecimal First, BigDecimal Second, BigDecimal Third, BigDecimal Fourth, BigDecimal Fifth, BigDecimal Single, BigDecimal Average, Integer Ranking, Integer StateRanking, String Checker1){
         this.first=First;
         this.second=Second;
         this.third=Third;
@@ -91,6 +108,7 @@ public class Participate {
         this.single=Single;
         this.average=Average;
         this.ranking=Ranking;
+        this.stateRanking=StateRanking;
         this.checker1=Checker1;
         return this;
     }

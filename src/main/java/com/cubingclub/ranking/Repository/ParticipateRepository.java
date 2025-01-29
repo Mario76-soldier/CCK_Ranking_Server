@@ -8,6 +8,7 @@ import org.springframework.data.repository.query.Param;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Map;
 
 public interface ParticipateRepository extends JpaRepository<Participate, Integer> {
     @Query("select p.idx from Participate p where p.round.idx=:roundIdx order by " +
@@ -57,4 +58,9 @@ public interface ParticipateRepository extends JpaRepository<Participate, Intege
     @Modifying
     @Query("update Participate p set p.checker2=:checker2 where p.idx=:idx")
     void updateChecker2(@Param(value="checker2")String checker2, @Param(value="idx")Integer idx);
+
+    @Query("SELECT r.idx, COUNT(p) FROM Participate p JOIN p.round r GROUP BY r.idx")
+    Map<Integer, Long> findAllRoundParticipantCounts();
+    //@Query("select count(p.idx) from Participate p join fetch Round r where p.round.idx=:roundIdx and p.email.")
+    //Integer countParticipateByRoundState(@Param(value="roundIdx")Integer roundIdx);
 }

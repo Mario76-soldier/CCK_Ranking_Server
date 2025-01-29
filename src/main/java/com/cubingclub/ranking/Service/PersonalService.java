@@ -1,6 +1,6 @@
 package com.cubingclub.ranking.Service;
 
-import com.cubingclub.ranking.DTO.ParticipateDTO;
+import com.cubingclub.ranking.DTO.PersonalRecordDTO;
 import com.cubingclub.ranking.Entity.Participate;
 import com.cubingclub.ranking.Repository.ParticipateRepository;
 import jakarta.transaction.Transactional;
@@ -16,11 +16,16 @@ import java.util.stream.Collectors;
 @Transactional
 public class PersonalService {
     private final ParticipateRepository participateRepository;
-
-    public Map<String, List<ParticipateDTO>> getPersonalRecord(String email){
+    public Map<String, List<PersonalRecordDTO>> getPersonalRecord(String email){
         List<Participate> participates=participateRepository.findByEmailOrderByRound_CubeEvent_EventName(email);
+        Map<Integer, Long> roundParticipantCounts = participateRepository.findAllRoundParticipantCounts();
         return participates.stream()
-                .map(ParticipateDTO::new)
-                .collect(Collectors.groupingBy(participateDTO -> participateDTO.getRound().getCubeEvent().getEventName()));
+                .map(PersonalRecordDTO::new)
+                .peek(personalRecordDTO ->
+                        personalRecordDTO.setRankingAll(
+                                Math.toIntExact(roundParticipantCounts.get(personalRecordDTO.getRound().getIdx()))
+                        )
+                )
+                .collect(Collectors.groupingBy(personalRecordDTO -> personalRecordDTO.getRound().getCubeEvent().getEventName()));
     }
 }

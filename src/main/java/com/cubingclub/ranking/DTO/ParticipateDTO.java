@@ -21,17 +21,23 @@ public class ParticipateDTO {
     private Round round;
     private BigDecimal first;
     private String firstJudge;
+    private String firstScrambler;
     private BigDecimal second;
     private String secondJudge;
+    private String secondScrambler;
     private BigDecimal third;
     private String thirdJudge;
+    private String thirdScrambler;
     private BigDecimal fourth;
     private String fourthJudge;
+    private String fourthScrambler;
     private BigDecimal fifth;
     private String fifthJudge;
+    private String fifthScrambler;
     private BigDecimal single;
     private BigDecimal average;
     private Integer ranking;
+    private Integer stateRanking;
     private String checker1;
     private String checker2;
     public ParticipateDTO(Participate entity){
@@ -46,9 +52,20 @@ public class ParticipateDTO {
         this.third=entity.getThird();
         this.fourth=entity.getFourth();
         this.fifth=entity.getFifth();
+        this.firstJudge=entity.getFirstJudge();
+        this.secondJudge=entity.getSecondJudge();
+        this.thirdJudge=entity.getThirdJudge();
+        this.fourthJudge=entity.getFourthJudge();
+        this.fifthJudge=entity.getFifthJudge();
+        this.firstScrambler=entity.getFirstScrambler();
+        this.secondScrambler=entity.getSecondScrambler();
+        this.thirdScrambler=entity.getThirdScrambler();
+        this.fourthScrambler=entity.getFourthScrambler();
+        this.fifthScrambler=entity.getFifthScrambler();
         this.single=entity.getSingle();
         this.average=entity.getAverage();
         this.ranking=entity.getRanking();
+        this.stateRanking=entity.getStateRanking();
         this.checker1=entity.getChecker1();
         this.checker2=entity.getChecker2();
     }

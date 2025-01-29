@@ -30,9 +30,11 @@ public class Round {
     private LocalDateTime eventEnd;
     @Column
     private Integer advance;
+    @Column
+    private Integer total;
 
     @Builder
-    public Round(Integer Idx, Competition Comp, CubeEvent cubeEvent, String RoundName, LocalDateTime EventStart, LocalDateTime EventEnd, Integer Advance){
+    public Round(Integer Idx, Competition Comp, CubeEvent cubeEvent, String RoundName, LocalDateTime EventStart, LocalDateTime EventEnd, Integer Advance, Integer Total){
         this.idx=Idx;
         this.comp=Comp;
         this.cubeEvent=cubeEvent;
@@ -40,5 +42,6 @@ public class Round {
         this.eventStart=EventStart;
         this.eventEnd=EventEnd;
         this.advance=Advance;
+        this.total=Total;
     }
 }
