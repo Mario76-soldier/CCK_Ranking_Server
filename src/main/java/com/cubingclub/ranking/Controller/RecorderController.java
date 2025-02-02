@@ -5,6 +5,7 @@ import com.cubingclub.ranking.DTO.RecorderDTO;
 import com.cubingclub.ranking.DTO.RecorderResponseDTO;
 import com.cubingclub.ranking.Service.CompetitionService;
 import com.cubingclub.ranking.Service.ParticipateService;
+import com.cubingclub.ranking.Service.PersonalService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -21,6 +22,7 @@ import java.util.List;
 public class RecorderController {
     private final CompetitionService competitionService;
     private final ParticipateService participateService;
+    private final PersonalService personalService;
     @GetMapping("/comp")
     public ResponseEntity<?> CompIdx(){
         return ResponseEntity.ok(competitionService.getListToday(LocalDate.now()));
@@ -42,6 +44,7 @@ public class RecorderController {
         for(int i=0; i<list.size(); i++) {
             participateService.updateRanking(i+1,list.get(i));
         }
+        personalService.updateBest(participateDTO.getIdx(), participateDTO.getEmail(), participateDTO.getUserName(), participateDTO.getEnUserName(),participateDTO.getRound().getCubeEvent().getEventName(), participateDTO.getSingle(),participateDTO.getAverage());
         return ResponseEntity.ok(idx);
     }
 }

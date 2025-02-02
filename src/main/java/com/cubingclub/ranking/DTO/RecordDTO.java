@@ -15,7 +15,10 @@ import java.math.BigDecimal;
 @NoArgsConstructor
 public class RecordDTO {
     private Integer idx;
-    private Account account;
+    private Integer partIdx;
+    private String userName;
+    private String enUserName;
+    private String email;
     private CubeEvent cubeEvent;
     private BigDecimal single;
     private BigDecimal average;
@@ -25,7 +28,10 @@ public class RecordDTO {
     private Long stateAverageRanking;
     public RecordDTO(Record entity){
         this.idx=entity.getIdx();
-        this.account=entity.getAccount();
+        this.partIdx=entity.getPartIdx();
+        this.userName=entity.getUserName();
+        this.enUserName=entity.getEnUserName();
+        this.email=entity.getEmail();
         this.cubeEvent=entity.getCubeEvent();
         this.single=entity.getSingle();
         this.average=entity.getAverage();
@@ -37,7 +43,10 @@ public class RecordDTO {
     public Record toEntity(){
         return Record.builder()
                 .idx(idx)
-                .account(account)
+                .partIdx(partIdx)
+                .userName(userName)
+                .enUserName(enUserName)
+                .email(email)
                 .cubeEvent(cubeEvent)
                 .single(single)
                 .average(average)
