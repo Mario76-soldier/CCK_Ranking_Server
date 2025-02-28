@@ -13,11 +13,6 @@ import java.math.BigDecimal;
 @Setter
 @NoArgsConstructor
 public class PersonalRecordDTO {
-    private Integer idx;
-    private Integer pdx;
-    private String userName;
-    private String enUserName;
-    private String email;
     private Round round;
     private BigDecimal first;
     private BigDecimal second;
@@ -31,11 +26,6 @@ public class PersonalRecordDTO {
     private Integer stateRanking;
     private Integer stateRankingAll;
     public PersonalRecordDTO(Participate entity){
-        this.idx=entity.getIdx();
-        this.pdx=entity.getPdx();
-        this.userName=entity.getUserName();
-        this.enUserName=entity.getEnUserName();
-        this.email=entity.getEmail();
         this.round=entity.getRound();
         this.first=entity.getFirst();
         this.second=entity.getSecond();
@@ -46,12 +36,5 @@ public class PersonalRecordDTO {
         this.average=entity.getAverage();
         this.ranking=entity.getRanking();
         this.stateRanking=entity.getStateRanking();
-    }
-    public PersonalRecordDTO(String userName, String enUserName, Integer pdx, String email, Round round) {
-        this.userName=userName;
-        this.enUserName=enUserName;
-        this.pdx=pdx;
-        this.email=email;
-        this.round=round;
     }
 }

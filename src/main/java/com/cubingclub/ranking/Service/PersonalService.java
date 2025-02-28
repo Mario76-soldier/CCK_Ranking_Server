@@ -1,9 +1,6 @@
 package com.cubingclub.ranking.Service;
 
-import com.cubingclub.ranking.DTO.BestRecordDTO;
-import com.cubingclub.ranking.DTO.BestRecordListDTO;
-import com.cubingclub.ranking.DTO.EachBestRecordDTO;
-import com.cubingclub.ranking.DTO.PersonalRecordDTO;
+import com.cubingclub.ranking.DTO.*;
 import com.cubingclub.ranking.Entity.BestRecord;
 import com.cubingclub.ranking.Entity.Participate;
 import com.cubingclub.ranking.Repository.AccountRepository;
@@ -49,11 +46,37 @@ public class PersonalService {
     }
     public BestRecordListDTO getBestRecord(String email){
         BestRecordListDTO bestRecordListDTO =new BestRecordListDTO();
-        bestRecordListDTO.setAccount(accountRepository.findByEmail(email).get());
+        bestRecordListDTO.setAccount(new MaskedAccountDTO(accountRepository.findByEmail(email).get()));
         List<EachBestRecordDTO> eachRecordList=new ArrayList<>();
         List<BestRecord> records= bestRecordRepository.findByEmailOrderByRound_CubeEvent_EventName(email);
+
+        Map<String, Long> totalParticipantsMap = new HashMap<>();
+        List<Object[]> totalParticipants = bestRecordRepository.findTotalParticipantsByEvent();
+        for (Object[] row : totalParticipants) {
+            totalParticipantsMap.put((String) row[0], (Long) row[1]);
+        }
+
+        // 지역별 참가자 수 (eventName + state -> 참가자 수)
+        Map<String, Long> stateParticipantsMap = new HashMap<>();
+        List<Object[]> stateParticipants = bestRecordRepository.findTotalParticipantsByEventAndState();
+        for (Object[] row : stateParticipants) {
+            String key = row[0] + ":" + row[1];  // eventName:state 형식으로 키 생성
+            stateParticipantsMap.put(key, (Long) row[2]);
+        }
+
         for(BestRecord record:records){
-            eachRecordList.add(new EachBestRecordDTO(record));
+            EachBestRecordDTO dto = new EachBestRecordDTO(record);
+
+            String eventName = record.getCubeEvent().getEventName();
+            String state = record.getAccount().getState();
+
+            // 전체 참가자 수 설정
+            dto.setAllPart(totalParticipantsMap.getOrDefault(eventName, 0L));
+
+            // 지역별 참가자 수 설정
+            dto.setStateAllPart(stateParticipantsMap.getOrDefault(eventName + ":" + state, 0L));
+
+            eachRecordList.add(dto);
         }
         bestRecordListDTO.setEachRecordList(eachRecordList);
         return bestRecordListDTO;
@@ -115,7 +138,7 @@ public class PersonalService {
         if (!updatedSingle && !updatedAverage) {
             return; // 업데이트가 필요하지 않으면 빠르게 종료
         }
-        log.info(bestRecordRepository.save(bestRecordDTO.toEntity()).getAccount().getEmail()); // 변경된 값 저장
+        bestRecordRepository.save(bestRecordDTO.toEntity()); // 변경된 값 저장
         // 순위 갱신
         updateRanking(bestRecordDTO.getAccount().getState(), eventName, updatedSingle, updatedAverage);
     }

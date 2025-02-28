@@ -17,8 +17,10 @@ public class EachBestRecordDTO {
     private BigDecimal average;
     private Long singleRanking;
     private Long averageRanking;
+    private Long allPart;
     private Long stateSingleRanking;
     private Long stateAverageRanking;
+    private Long stateAllPart;
     public EachBestRecordDTO(BestRecord entity){
         this.cubeEvent=entity.getCubeEvent();
         this.single=entity.getSingle();

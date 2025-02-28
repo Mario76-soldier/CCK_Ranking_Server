@@ -27,4 +27,14 @@ public interface BestRecordRepository extends JpaRepository<BestRecord, Integer>
     List<BestRecord> findByEventNameOrderByAverage(@Param(value="eventName")String eventName);
     @Query("select r from BestRecord r join fetch r.cubeEvent ce join fetch r.account ac where ce.eventName=:eventName and ac.state=:state order by r.average asc")
     List<BestRecord> findByEventNameAndStateOrderByAverage(@Param(value="eventName")String eventName, @Param(value="state")String state);
+    @Query("SELECT ce.eventName, COUNT(*) " +
+            "FROM BestRecord r join r.cubeEvent ce " +
+            "group by ce.eventName")
+    List<Object[]> findTotalParticipantsByEvent();
+    @Query("SELECT ce.eventName, ac.state, COUNT(*) " +
+            "FROM BestRecord r join r.account ac join r.cubeEvent ce " +
+            "GROUP BY ce.eventName, ac.state")
+    List<Object[]> findTotalParticipantsByEventAndState();
+
+
 }

@@ -11,6 +11,6 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 public class BestRecordListDTO {
-    private Account account;
+    private MaskedAccountDTO account;
     private List<EachBestRecordDTO> eachRecordList;
 }
