@@ -1,24 +1,20 @@
 package com.cubingclub.ranking.DTO;
 
 import com.cubingclub.ranking.Entity.Account;
+import com.cubingclub.ranking.Entity.BestRecord;
 import com.cubingclub.ranking.Entity.CubeEvent;
-import com.cubingclub.ranking.Entity.Record;
-import jakarta.persistence.Column;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.math.BigDecimal;
 
 @Getter
 @Setter
 @NoArgsConstructor
-public class RecordDTO {
+public class BestRecordDTO {
     private Integer idx;
-    private Integer partIdx;
-    private String userName;
-    private String enUserName;
-    private String email;
+    private Account account;
+    private Integer partSingle;
+    private Integer partAverage;
     private CubeEvent cubeEvent;
     private BigDecimal single;
     private BigDecimal average;
@@ -26,12 +22,20 @@ public class RecordDTO {
     private Long averageRanking;
     private Long stateSingleRanking;
     private Long stateAverageRanking;
-    public RecordDTO(Record entity){
+
+    public BestRecordDTO(Account account, Integer partSingle, Integer partAverage, CubeEvent cubeEvent, BigDecimal single, BigDecimal average) {
+        this.account=account;
+        this.partSingle=partSingle;
+        this.partAverage=partAverage;
+        this.cubeEvent=cubeEvent;
+        this.single=single;
+        this.average=average;
+    }
+    public BestRecordDTO(BestRecord entity){
         this.idx=entity.getIdx();
-        this.partIdx=entity.getPartIdx();
-        this.userName=entity.getUserName();
-        this.enUserName=entity.getEnUserName();
-        this.email=entity.getEmail();
+        this.account=entity.getAccount();
+        this.partSingle=entity.getPartSingle();
+        this.partAverage=entity.getPartAverage();
         this.cubeEvent=entity.getCubeEvent();
         this.single=entity.getSingle();
         this.average=entity.getAverage();
@@ -40,13 +44,12 @@ public class RecordDTO {
         this.stateSingleRanking=entity.getStateSingleRanking();
         this.stateAverageRanking=entity.getStateAverageRanking();
     }
-    public Record toEntity(){
-        return Record.builder()
+    public BestRecord toEntity(){
+        return BestRecord.builder()
                 .idx(idx)
-                .partIdx(partIdx)
-                .userName(userName)
-                .enUserName(enUserName)
-                .email(email)
+                .account(account)
+                .partSingle(partSingle)
+                .partAverage(partAverage)
                 .cubeEvent(cubeEvent)
                 .single(single)
                 .average(average)
@@ -55,5 +58,6 @@ public class RecordDTO {
                 .stateSingleRanking(stateSingleRanking)
                 .stateAverageRanking(stateAverageRanking)
                 .build();
+
     }
 }

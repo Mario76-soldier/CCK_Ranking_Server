@@ -119,7 +119,7 @@ public class ListController {
         for(int i=0; i<list.size(); i++) {
             participateService.updateRanking(i+1,list.get(i));
         }
-        personalService.updateBest(participateDTO.getIdx(), participateDTO.getEmail(), participateDTO.getUserName(), participateDTO.getEnUserName(), eventName, participateDTO.getSingle(),participateDTO.getAverage());
+        personalService.updateBest(idx, participateDTO.getEmail(), eventName, participateDTO.getSingle(),participateDTO.getAverage());
         return ResponseEntity.ok().build();
     }
     @DeleteMapping("/record/{idx}")

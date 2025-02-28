@@ -1,15 +1,18 @@
 package com.cubingclub.ranking.Service;
 
+import com.cubingclub.ranking.DTO.BestRecordDTO;
+import com.cubingclub.ranking.DTO.BestRecordListDTO;
+import com.cubingclub.ranking.DTO.EachBestRecordDTO;
 import com.cubingclub.ranking.DTO.PersonalRecordDTO;
-import com.cubingclub.ranking.DTO.RecordDTO;
+import com.cubingclub.ranking.Entity.BestRecord;
 import com.cubingclub.ranking.Entity.Participate;
-import com.cubingclub.ranking.Entity.Record;
 import com.cubingclub.ranking.Repository.AccountRepository;
+import com.cubingclub.ranking.Repository.BestRecordRepository;
 import com.cubingclub.ranking.Repository.EventRepository;
 import com.cubingclub.ranking.Repository.ParticipateRepository;
-import com.cubingclub.ranking.Repository.RecordRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -17,13 +20,14 @@ import java.math.BigInteger;
 import java.util.*;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 @Transactional
 public class PersonalService {
     private final AccountRepository accountRepository;
     private final ParticipateRepository participateRepository;
-    private final RecordRepository recordRepository;
+    private final BestRecordRepository bestRecordRepository;
     private final EventRepository eventRepository;
     public Map<String, List<PersonalRecordDTO>> getPersonalRecord(String email){
         List<Participate> participates=participateRepository.findByEmailOrderByRound_CubeEvent_EventName(email);
@@ -43,10 +47,16 @@ public class PersonalService {
                 )
                 .collect(Collectors.groupingBy(personalRecordDTO -> personalRecordDTO.getRound().getCubeEvent().getEventName()));
     }
-    public Map<String, List<RecordDTO>> getBestRecord(String email){
-        return recordRepository.findByEmailOrderByRound_CubeEvent_EventName(email).stream()
-                .map(RecordDTO::new)
-                .collect(Collectors.groupingBy(recordDTO -> recordDTO.getCubeEvent().getEventName()));
+    public BestRecordListDTO getBestRecord(String email){
+        BestRecordListDTO bestRecordListDTO =new BestRecordListDTO();
+        bestRecordListDTO.setAccount(accountRepository.findByEmail(email).get());
+        List<EachBestRecordDTO> eachRecordList=new ArrayList<>();
+        List<BestRecord> records= bestRecordRepository.findByEmailOrderByRound_CubeEvent_EventName(email);
+        for(BestRecord record:records){
+            eachRecordList.add(new EachBestRecordDTO(record));
+        }
+        bestRecordListDTO.setEachRecordList(eachRecordList);
+        return bestRecordListDTO;
     }
     private boolean shouldUpdate(BigDecimal current, BigDecimal newValue) {
         if(current.compareTo(BigDecimal.ZERO) < 0){
@@ -66,124 +76,87 @@ public class PersonalService {
     }
 
     @Transactional
-    public void updateBest(Integer partIdx, String email, String userName, String enUserName, String eventName, BigDecimal single, BigDecimal average) {
-        Optional<Record> optionalRecord = recordRepository.findByEmailAndEventName(email, eventName);
-        RecordDTO recordDTO;
+    public void updateBest(Integer partIdx, String email, String eventName, BigDecimal single, BigDecimal average) {
+        boolean updatedSingle = false;
+        boolean updatedAverage = false;
+        Optional<BestRecord> optionalRecord = bestRecordRepository.findByEmailAndEventName(email, eventName);
         if (single==null || single.compareTo(new BigDecimal(BigInteger.ZERO))==0 || average==null || average.compareTo(new BigDecimal(BigInteger.ZERO))==0 ) {
             return;
         }
+        BestRecordDTO bestRecordDTO;
         if(optionalRecord.isEmpty()){
-            recordDTO=new RecordDTO();
-            recordDTO.setPartIdx(partIdx);
-            recordDTO.setUserName(userName);
-            recordDTO.setEnUserName(enUserName);
-            recordDTO.setEmail(email);
-            recordDTO.setCubeEvent(eventRepository.findByEventName(eventName));
-            recordDTO.setSingle(single);
-            recordDTO.setAverage(average);
+            bestRecordDTO=new BestRecordDTO(accountRepository.findByEmail(email).orElseThrow(() -> new RuntimeException("Account not found")), partIdx, partIdx, eventRepository.findByEventName(eventName), single, average);
+            updatedSingle = true;
+            updatedAverage = true;
         }
         else {
-            recordDTO = new RecordDTO(optionalRecord.get());
-            if(recordDTO.getPartIdx().equals(partIdx)){
-                recordDTO.setSingle(single);
-                recordDTO.setAverage(average);
+            bestRecordDTO = new BestRecordDTO(optionalRecord.get());
+            if(bestRecordDTO.getPartSingle().equals(partIdx)){
+                bestRecordDTO.setSingle(single);
+                updatedSingle = true;
+            }
+            if(bestRecordDTO.getPartAverage().equals(partIdx)){
+                bestRecordDTO.setAverage(average);
+                updatedAverage = true;
             }
         }
-
-        boolean updatedSingle = false;
-        boolean updatedAverage = false;
-
-        if (shouldUpdate(recordDTO.getSingle(), single)) {
-            recordDTO.setSingle(single);
+        if (shouldUpdate(bestRecordDTO.getSingle(), single)) {
+            bestRecordDTO.setSingle(single);
+            bestRecordDTO.setPartSingle(partIdx);
             updatedSingle = true;
         }
 
-        if (shouldUpdate(recordDTO.getAverage(), average)) {
-            recordDTO.setAverage(average);
+        if (shouldUpdate(bestRecordDTO.getAverage(), average)) {
+            bestRecordDTO.setAverage(average);
+            bestRecordDTO.setPartAverage(partIdx);
             updatedAverage = true;
         }
 
         if (!updatedSingle && !updatedAverage) {
             return; // 업데이트가 필요하지 않으면 빠르게 종료
         }
-        recordDTO.setPartIdx(partIdx);
-        recordRepository.save(recordDTO.toEntity()); // 변경된 값 저장
+        log.info(bestRecordRepository.save(bestRecordDTO.toEntity()).getAccount().getEmail()); // 변경된 값 저장
         // 순위 갱신
-        updateRanking(eventName, updatedSingle, updatedAverage);
+        updateRanking(bestRecordDTO.getAccount().getState(), eventName, updatedSingle, updatedAverage);
     }
 
-    private void updateRanking(String eventName, boolean updatedSingle, boolean updatedAverage) {
+    private void updateRanking(String state, String eventName, boolean updatedSingle, boolean updatedAverage) {
         if(updatedSingle){
-            List<Record> singleRecords = recordRepository.findByEventNameOrderBySingle(eventName);
-            //List<Record> stateSingleRecords = recordRepository.findByEventNameAndStateOrderBySingle(eventName, state);
-            updateRankings(singleRecords, true);
-            //updateRankings(stateSingleRecords, true);
+            List<BestRecord> singleRecords = bestRecordRepository.findByEventNameOrderBySingle(eventName);
+            List<BestRecord> stateSingleRecords = bestRecordRepository.findByEventNameAndStateOrderBySingle(eventName, state);
+            updateRankings(singleRecords, true, false);
+            updateRankings(stateSingleRecords, true, true);
         }
         if(updatedAverage) {
-            List<Record> averageRecords = recordRepository.findByEventNameOrderByAverage(eventName);
-            //List<Record> stateAverageRecords = recordRepository.findByEventNameAndStateOrderByAverage(eventName, state);
-            updateRankings(averageRecords, false);
-            //updateRankings(stateAverageRecords, false);
+            List<BestRecord> averageRecords = bestRecordRepository.findByEventNameOrderByAverage(eventName);
+            List<BestRecord> stateAverageRecords = bestRecordRepository.findByEventNameAndStateOrderByAverage(eventName, state);
+            updateRankings(averageRecords, false, false);
+            updateRankings(stateAverageRecords, false, true);
         }
     }
 
-    private void updateRankings(List<Record> records, boolean isSingle) {
-        List<Record> updatedRecords = new ArrayList<>();
+    private void updateRankings(List<BestRecord> records, boolean isSingle, boolean isState) {
+        List<BestRecord> updatedRecords = new ArrayList<>();
         long ranking = 1L;
-
-        for (Record record : records) {
-            RecordDTO recordDTO = new RecordDTO(record);
-            if (isSingle) {
-                recordDTO.setSingleRanking(ranking++);
-            } else {
-                recordDTO.setAverageRanking(ranking++);
+        for (BestRecord record : records) {
+            BestRecordDTO bestRecordDTO = new BestRecordDTO(record);
+            if(!isState) {
+                if (isSingle) {
+                    bestRecordDTO.setSingleRanking(ranking++);
+                } else {
+                    bestRecordDTO.setAverageRanking(ranking++);
+                }
             }
-            updatedRecords.add(recordDTO.toEntity());
+            else{
+                if (isSingle) {
+                    bestRecordDTO.setStateSingleRanking(ranking++);
+                } else {
+                    bestRecordDTO.setStateAverageRanking(ranking++);
+                }
+            }
+            updatedRecords.add(bestRecordDTO.toEntity());
         }
 
-        recordRepository.saveAll(updatedRecords); // 한 번에 저장
+        bestRecordRepository.saveAll(updatedRecords); // 한 번에 저장
     }
-
-    /*
-    public void updateBest(String email, String eventName, BigDecimal single, BigDecimal average){
-        if(recordRepository.findByEmailAndEventName(email, eventName).isPresent()) {
-            RecordDTO record = new RecordDTO(recordRepository.findByEmailAndEventName(email, eventName).get());
-            String state=accountRepository.findByEmail(email).get().getState();
-            if(record.getSingle().compareTo(single)>0){
-                record.setSingle(single);
-                long ranking=1L;
-                List<Record> records=recordRepository.findByEventNameOrderBySingle(eventName);
-                for(Record record1:records){
-                    RecordDTO recordDTO=new RecordDTO(record1);
-                    recordDTO.setSingleRanking(ranking++);
-                    recordRepository.save(recordDTO.toEntity());
-                }
-                ranking=1L;
-                records=recordRepository.findByEventNameAndStateOrderBySingle(eventName, state);
-                for(Record record1:records){
-                    RecordDTO recordDTO=new RecordDTO(record1);
-                    recordDTO.setSingleRanking(ranking++);
-                    recordRepository.save(recordDTO.toEntity());
-                }
-            }
-            if(record.getAverage().compareTo(average)>0){
-                record.setAverage(average);
-                long ranking=1L;
-                List<Record> records=recordRepository.findByEventNameOrderByAverage(eventName);
-                for(Record record1:records){
-                    RecordDTO recordDTO=new RecordDTO(record1);
-                    recordDTO.setSingleRanking(ranking++);
-                    recordRepository.save(recordDTO.toEntity());
-                }
-                ranking=1L;
-                records=recordRepository.findByEventNameAndStateOrderByAverage(eventName, state);
-                for(Record record1:records){
-                    RecordDTO recordDTO=new RecordDTO(record1);
-                    recordDTO.setSingleRanking(ranking++);
-                    recordRepository.save(recordDTO.toEntity());
-                }
-            }
-        }
-    }
-    */
 }

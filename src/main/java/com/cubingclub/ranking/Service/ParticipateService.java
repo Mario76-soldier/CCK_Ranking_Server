@@ -92,8 +92,6 @@ public class ParticipateService {
                         .orElse(BigDecimal.ZERO));
         int dnfCount = (int) Arrays.stream(record).filter(t -> t.compareTo(DNF_TIME) == 0).count();
         int dnsCount = (int) Arrays.stream(record).filter(t -> t.compareTo(DNS_TIME) == 0).count();
-        System.out.println(dnsCount);
-        System.out.println(dnfCount);
         BigDecimal average;
 
         if (("mo3".equalsIgnoreCase(calcType) || "ao5".equalsIgnoreCase(calcType)) && dnfCount + dnsCount < 1) {
