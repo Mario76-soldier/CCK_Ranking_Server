@@ -35,7 +35,6 @@ public class RecorderController {
         }
         return ResponseEntity.ok(recorderResponseDTO);
     }
-
     @PostMapping("/record")
     public ResponseEntity<?> Record(@RequestBody RecorderDTO recordDTO){
         Integer idx=participateService.updateRecordOne(recordDTO.getIdx(), recordDTO.getSeq(), recordDTO.getRecord(), recordDTO.getJudgeEmail());
@@ -44,7 +43,7 @@ public class RecorderController {
         for(int i=0; i<list.size(); i++) {
             participateService.updateRanking(i+1,list.get(i));
         }
-        personalService.updateBest(idx, participateDTO.getEmail(), participateDTO.getRound().getCubeEvent().getEventName(), participateDTO.getSingle(),participateDTO.getAverage());
+        personalService.updateBest(idx, participateDTO.getAccount().getEmail(), participateDTO.getRound().getCubeEvent().getEventName(), participateDTO.getSingle(),participateDTO.getAverage());
         return ResponseEntity.ok(idx);
     }
 }

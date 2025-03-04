@@ -19,16 +19,16 @@ public interface ParticipateRepository extends JpaRepository<Participate, Intege
             "(case when p.average=-1 then 1 else 0 end) asc, " +
             "p.average asc, p.single asc")
     List<Integer> findByRoundOrder(@Param(value="roundIdx")Integer roundIdx);
-    @Query("select p.idx from Participate p where p.round.idx=:roundIdx order by " +
+    @Query("select p.idx from Participate p where p.round.idx=:roundIdx and p.account.state=:state order by " +
             "(case when p.average=0 then 1 else 0 end) asc, " +
             "(case when p.single=-2 then 1 else 0 end) asc," +
             "(case when p.single=-1 then 1 else 0 end) asc, " +
             "(case when p.average=-2 then 1 else 0 end) asc, " +
             "(case when p.average=-1 then 1 else 0 end) asc, " +
             "p.average asc, p.single asc")
-    List<Integer> findByRoundAndStateOrder(@Param(value="roundIdx")Integer roundIdx);
-    List<Participate> findByEmailAndRound_Comp_Idx(String email, Integer compIdx);
-    @Query("select p from Participate p join fetch p.round r join fetch r.cubeEvent ce join fetch r.comp c where p.email=:email order by ce.eventName")
+    List<Integer> findByRoundAndStateOrder(@Param(value="roundIdx")Integer roundIdx, @Param(value="state")String state);
+    List<Participate> findByAccount_EmailAndRound_Comp_Idx(String email, Integer compIdx);
+    @Query("select p from Participate p join fetch p.round r join fetch r.cubeEvent ce join fetch r.comp c where p.account.email=:email order by ce.eventName")
     List<Participate> findByEmailOrderByRound_CubeEvent_EventName(String email);
     Participate findByIdx(Integer idx);
     @Query("select p from Participate p where p.round.idx=:roundIdx order by (case when p.ranking is null or p.ranking=0 then 1 else 0 end) asc, p.ranking asc")

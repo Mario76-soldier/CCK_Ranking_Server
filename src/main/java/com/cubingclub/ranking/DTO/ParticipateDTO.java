@@ -1,7 +1,9 @@
 package com.cubingclub.ranking.DTO;
 
+import com.cubingclub.ranking.Entity.Account;
 import com.cubingclub.ranking.Entity.Participate;
 import com.cubingclub.ranking.Entity.Round;
+import com.cubingclub.ranking.Repository.AccountRepository;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -15,9 +17,7 @@ import java.math.BigDecimal;
 public class ParticipateDTO {
     private Integer idx;
     private Integer pdx;
-    private String userName;
-    private String enUserName;
-    private String email;
+    private AccountDTO account;
     private Round round;
     private BigDecimal first;
     private String firstJudge;
@@ -43,9 +43,7 @@ public class ParticipateDTO {
     public ParticipateDTO(Participate entity){
         this.idx=entity.getIdx();
         this.pdx=entity.getPdx();
-        this.userName=entity.getUserName();
-        this.enUserName=entity.getEnUserName();
-        this.email=entity.getEmail();
+        this.account=new AccountDTO(entity.getAccount());
         this.round=entity.getRound();
         this.first=entity.getFirst();
         this.second=entity.getSecond();
@@ -69,29 +67,23 @@ public class ParticipateDTO {
         this.checker1=entity.getChecker1();
         this.checker2=entity.getChecker2();
     }
-    public ParticipateDTO(String userName, String enUserName, Integer pdx, String email, Round round) {
-        this.userName=userName;
-        this.enUserName=enUserName;
+    public ParticipateDTO(Account account, Integer pdx, Round round) {
+        this.account=new AccountDTO(account);
         this.pdx=pdx;
-        this.email=email;
         this.round=round;
     }
-    public Participate toEntity(){
+    public Participate toEntity(AccountRepository accountRepository){
         return Participate.builder()
-                .UserName(userName)
-                .enUserName(enUserName)
                 .Pdx(pdx)
-                .Email(email)
+                .account(accountRepository.findByEmail(account.getEmail()).orElse(null))
                 .Round(round)
                 .build();
     }
-    public Participate toEntityFull(){
+    public Participate toEntityFull(AccountRepository accountRepository){
         return Participate.builder()
                 .Idx(idx)
-                .UserName(userName)
-                .enUserName(enUserName)
                 .Pdx(pdx)
-                .Email(email)
+                .account(accountRepository.findByEmail(account.getEmail()).orElse(null))
                 .Round(round)
                 .first(first)
                 .firstJudge(firstJudge)

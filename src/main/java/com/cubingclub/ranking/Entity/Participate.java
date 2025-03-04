@@ -20,15 +20,12 @@ public class Participate {
     private Integer idx;
     @Column
     private Integer pdx;
+    @ManyToOne
+    @JoinColumn
+    private Account account;
     @ManyToOne(fetch=FetchType.EAGER)
     @JoinColumn
     private Round round;
-    @Column(length=40)
-    private String userName;
-    @Column(length=40)
-    private String enUserName;
-    @Column(length=30)
-    private String email;
     @Column(columnDefinition = "DECIMAL(10,2) DEFAULT 0")
     private BigDecimal first;
     @Column(length=30)
@@ -73,14 +70,12 @@ public class Participate {
     private String checker2;
 
     @Builder
-    public Participate(Integer Idx, String UserName, String enUserName, Integer Pdx, String Email, Round Round, BigDecimal first,
+    public Participate(Integer Idx, Integer Pdx, Account account, Round Round, BigDecimal first,
                        String firstJudge, String firstScrambler, BigDecimal second, String secondJudge, String secondScrambler,
                        BigDecimal third, String thirdJudge, String thirdScrambler, BigDecimal fourth, String fourthJudge, String fourthScrambler, BigDecimal fifth, String fifthJudge, String fifthScrambler){
         this.idx=Idx;
-        this.userName=UserName;
-        this.enUserName=enUserName;
         this.pdx=Pdx;
-        this.email=Email;
+        this.account=account;
         this.round=Round;
         this.first=first;
         this.firstJudge=firstJudge;

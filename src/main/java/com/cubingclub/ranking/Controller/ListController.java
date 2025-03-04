@@ -119,7 +119,7 @@ public class ListController {
         for(int i=0; i<list.size(); i++) {
             participateService.updateRanking(i+1,list.get(i));
         }
-        personalService.updateBest(idx, participateDTO.getEmail(), eventName, participateDTO.getSingle(),participateDTO.getAverage());
+        personalService.updateBest(idx, participateDTO.getAccount().getEmail(), eventName, participateDTO.getSingle(),participateDTO.getAverage());
         return ResponseEntity.ok().build();
     }
     @DeleteMapping("/record/{idx}")
@@ -139,7 +139,7 @@ public class ListController {
         List<Integer> numList=new ArrayList<>();
         for(int i=0; i<past.getAdvance(); i++){
             ParticipateDTO p=list.get(i);
-            ParticipateRequestDTO advance=new ParticipateRequestDTO(p.getUserName(), p.getEnUserName(), p.getPdx(), p.getEmail(), advanceRoundIdx);
+            ParticipateRequestDTO advance=new ParticipateRequestDTO(p.getPdx(), p.getAccount().getEmail(), advanceRoundIdx);
             numList.add(participateService.addParticipate(advance));
         }
         return ResponseEntity.ok(numList);

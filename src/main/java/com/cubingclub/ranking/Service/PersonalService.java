@@ -46,7 +46,7 @@ public class PersonalService {
     }
     public BestRecordListDTO getBestRecord(String email){
         BestRecordListDTO bestRecordListDTO =new BestRecordListDTO();
-        bestRecordListDTO.setAccount(new MaskedAccountDTO(accountRepository.findByEmail(email).get()));
+        bestRecordListDTO.setAccount(new MaskedAccountDTO(accountRepository.findByEmail(email).orElseThrow()));
         List<EachBestRecordDTO> eachRecordList=new ArrayList<>();
         List<BestRecord> records= bestRecordRepository.findByEmailOrderByRound_CubeEvent_EventName(email);
 
@@ -179,7 +179,6 @@ public class PersonalService {
             }
             updatedRecords.add(bestRecordDTO.toEntity());
         }
-
         bestRecordRepository.saveAll(updatedRecords); // 한 번에 저장
     }
 }

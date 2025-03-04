@@ -8,8 +8,6 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 public class ParticipateRequestDTO {
-    private String userName;
-    private String enUserName;
     private Integer pdx;
     private String email;
     private Integer round;
