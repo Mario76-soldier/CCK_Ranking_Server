@@ -1,9 +1,6 @@
 package com.cubingclub.ranking.Service;
 
-import com.cubingclub.ranking.DTO.AccountDTO;
-import com.cubingclub.ranking.DTO.AccountJoinDTO;
-import com.cubingclub.ranking.DTO.AccountEditDTO;
-import com.cubingclub.ranking.DTO.AccountRequest;
+import com.cubingclub.ranking.DTO.*;
 import com.cubingclub.ranking.Entity.Account;
 import com.cubingclub.ranking.Entity.UserRole;
 import com.cubingclub.ranking.Repository.AccountRepository;
@@ -12,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -81,5 +79,9 @@ public class AccountService {
             return true;
         }
         return false;
+    }
+
+    public List<AccountListDTO> findBySearchTerm(String searchTerm){
+        return accountRepository.findByName(searchTerm);
     }
 }

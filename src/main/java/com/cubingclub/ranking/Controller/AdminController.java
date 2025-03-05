@@ -24,6 +24,10 @@ public class AdminController {
     public ResponseEntity<?> UserList(){
         return ResponseEntity.ok(adminService.findAllList());
     }
+    @GetMapping("/search/{searchTerm}")
+    public ResponseEntity<?> ParticipateList(@PathVariable(value = "searchTerm")String searchTerm){
+        return ResponseEntity.ok(accountService.findBySearchTerm(searchTerm));
+    }
     @PostMapping("/role")
     public ResponseEntity<?> ChangeRole(@RequestBody RoleUpdateDTO roleUpdateDTO){
         Authentication authentication= SecurityContextHolder.getContext().getAuthentication();
