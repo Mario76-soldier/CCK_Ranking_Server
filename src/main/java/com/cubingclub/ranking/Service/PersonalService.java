@@ -102,36 +102,35 @@ public class PersonalService {
     public void updateBest(Integer partIdx, String email, String eventName, BigDecimal single, BigDecimal average) {
         boolean updatedSingle = false;
         boolean updatedAverage = false;
+        Participate participate=participateRepository.findByIdx(partIdx);
         Optional<BestRecord> optionalRecord = bestRecordRepository.findByEmailAndEventName(email, eventName);
         if (single==null || single.compareTo(new BigDecimal(BigInteger.ZERO))==0 || average==null || average.compareTo(new BigDecimal(BigInteger.ZERO))==0 ) {
             return;
         }
         BestRecordDTO bestRecordDTO;
         if(optionalRecord.isEmpty()){
-            bestRecordDTO=new BestRecordDTO(accountRepository.findByEmail(email).orElseThrow(() -> new RuntimeException("Account not found")), partIdx, partIdx, eventRepository.findByEventName(eventName), single, average);
+            bestRecordDTO=new BestRecordDTO(accountRepository.findByEmail(email).orElseThrow(() -> new RuntimeException("Account not found")), participate, participate, eventRepository.findByEventName(eventName));
             updatedSingle = true;
             updatedAverage = true;
         }
         else {
             bestRecordDTO = new BestRecordDTO(optionalRecord.get());
-            if(bestRecordDTO.getPartSingle().equals(partIdx)){
-                bestRecordDTO.setSingle(single);
+            if(bestRecordDTO.getSingle().equals(participate)){
+                bestRecordDTO.setSingle(participate);
                 updatedSingle = true;
             }
-            if(bestRecordDTO.getPartAverage().equals(partIdx)){
-                bestRecordDTO.setAverage(average);
+            if(bestRecordDTO.getAverage().equals(participate)){
+                bestRecordDTO.setAverage(participate);
                 updatedAverage = true;
             }
         }
-        if (shouldUpdate(bestRecordDTO.getSingle(), single)) {
-            bestRecordDTO.setSingle(single);
-            bestRecordDTO.setPartSingle(partIdx);
+        if (shouldUpdate(bestRecordDTO.getSingle().getSingle(), single)) {
+            bestRecordDTO.setSingle(participate);
             updatedSingle = true;
         }
 
-        if (shouldUpdate(bestRecordDTO.getAverage(), average)) {
-            bestRecordDTO.setAverage(average);
-            bestRecordDTO.setPartAverage(partIdx);
+        if (shouldUpdate(bestRecordDTO.getAverage().getAverage(), average)) {
+            bestRecordDTO.setAverage(participate);
             updatedAverage = true;
         }
 
@@ -180,5 +179,22 @@ public class PersonalService {
             updatedRecords.add(bestRecordDTO.toEntity());
         }
         bestRecordRepository.saveAll(updatedRecords); // 한 번에 저장
+    }
+
+    public void findPreviousBest(String email, String eventName){
+        Participate single=participateRepository.findSingleBest(email, eventName).orElse(null);
+        Participate average=participateRepository.findAverageBest(email, eventName).orElse(null);
+        BestRecord bestRecord=bestRecordRepository.findByEmailAndEventName(email, eventName).orElseThrow();
+        if(single!=null && average!=null) {
+            BestRecordDTO bestRecordDTO = new BestRecordDTO(bestRecord);
+            bestRecordDTO.setSingle(single);
+            bestRecordDTO.setAverage(average);
+            bestRecordRepository.save(bestRecordDTO.toEntity());
+            updateRanking(bestRecordDTO.getAccount().getState(), eventName, true, true);
+        }
+        else{
+            bestRecordRepository.delete(bestRecord);
+            updateRanking(bestRecord.getAccount().getState(), eventName, true, true);
+        }
     }
 }

@@ -20,7 +20,7 @@ public class Round {
     @ManyToOne(fetch = FetchType.EAGER)
     private Competition comp;
     @ManyToOne(fetch=FetchType.EAGER)
-    @JoinColumn(name="eventName")
+    @JoinColumn
     private CubeEvent cubeEvent;
     @Column(length=30)
     private String roundName;

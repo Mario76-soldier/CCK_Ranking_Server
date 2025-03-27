@@ -2,6 +2,7 @@ package com.cubingclub.ranking.DTO;
 
 import com.cubingclub.ranking.Entity.BestRecord;
 import com.cubingclub.ranking.Entity.CubeEvent;
+import com.cubingclub.ranking.Entity.Participate;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -13,8 +14,8 @@ import java.math.BigDecimal;
 @NoArgsConstructor
 public class EachBestRecordDTO {
     private CubeEvent cubeEvent;
-    private BigDecimal single;
-    private BigDecimal average;
+    private Participate single;
+    private Participate average;
     private Long singleRanking;
     private Long averageRanking;
     private Long allPart;

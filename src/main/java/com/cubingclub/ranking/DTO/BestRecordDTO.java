@@ -3,6 +3,7 @@ package com.cubingclub.ranking.DTO;
 import com.cubingclub.ranking.Entity.Account;
 import com.cubingclub.ranking.Entity.BestRecord;
 import com.cubingclub.ranking.Entity.CubeEvent;
+import com.cubingclub.ranking.Entity.Participate;
 import lombok.*;
 
 import java.math.BigDecimal;
@@ -13,20 +14,16 @@ import java.math.BigDecimal;
 public class BestRecordDTO {
     private Integer idx;
     private Account account;
-    private Integer partSingle;
-    private Integer partAverage;
     private CubeEvent cubeEvent;
-    private BigDecimal single;
-    private BigDecimal average;
+    private Participate single;
+    private Participate average;
     private Long singleRanking;
     private Long averageRanking;
     private Long stateSingleRanking;
     private Long stateAverageRanking;
 
-    public BestRecordDTO(Account account, Integer partSingle, Integer partAverage, CubeEvent cubeEvent, BigDecimal single, BigDecimal average) {
+    public BestRecordDTO(Account account, Participate single, Participate average, CubeEvent cubeEvent) {
         this.account=account;
-        this.partSingle=partSingle;
-        this.partAverage=partAverage;
         this.cubeEvent=cubeEvent;
         this.single=single;
         this.average=average;
@@ -34,8 +31,6 @@ public class BestRecordDTO {
     public BestRecordDTO(BestRecord entity){
         this.idx=entity.getIdx();
         this.account=entity.getAccount();
-        this.partSingle=entity.getPartSingle();
-        this.partAverage=entity.getPartAverage();
         this.cubeEvent=entity.getCubeEvent();
         this.single=entity.getSingle();
         this.average=entity.getAverage();
@@ -48,8 +43,6 @@ public class BestRecordDTO {
         return BestRecord.builder()
                 .idx(idx)
                 .account(account)
-                .partSingle(partSingle)
-                .partAverage(partAverage)
                 .cubeEvent(cubeEvent)
                 .single(single)
                 .average(average)

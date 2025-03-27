@@ -124,12 +124,14 @@ public class ListController {
     }
     @DeleteMapping("/record/{idx}")
     public ResponseEntity<?> DeleteRecord(@PathVariable(value="idx")Integer idx){
-        Integer roundIdx=participateService.getOne(idx).getRound().getIdx();
+        ParticipateDTO participate=participateService.getOne(idx);
+        Integer roundIdx=participate.getRound().getIdx();
         participateService.deleteParticipate(idx);
         List<Integer> list=participateService.getRank(roundIdx);
         for(int i=0; i<list.size(); i++) {
             participateService.updateRanking(i+1,list.get(i));
         }
+        personalService.findPreviousBest(participate.getAccount().getEmail(), participate.getRound().getCubeEvent().getEventName());
         return ResponseEntity.ok().build();
     }
     @PostMapping("/advance/{pastRoundIdx}/{advanceRoundIdx}")//기록에서 어드밴스 인원 다음 라운드로 넘기는 콜

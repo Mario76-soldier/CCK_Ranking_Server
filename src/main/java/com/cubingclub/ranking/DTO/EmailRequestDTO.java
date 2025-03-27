@@ -8,6 +8,6 @@ import lombok.Setter;
 @Setter
 public class EmailRequestDTO {
     @Email
-    @NotEmpty(message = "이메일을 입력해 주세요")
+    @NotEmpty
     private String email;
 }

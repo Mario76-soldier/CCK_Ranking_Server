@@ -23,17 +23,15 @@ public class BestRecord {
     @ManyToOne
     @JoinColumn
     private Account account;
-    @Column
-    private Integer partSingle;
-    @Column
-    private Integer partAverage;
-    @ManyToOne(fetch=FetchType.EAGER)
+    @ManyToOne
     @JoinColumn
     private CubeEvent cubeEvent;
-    @Column(columnDefinition = "DECIMAL(10,2) DEFAULT 0")
-    private BigDecimal single;
-    @Column(columnDefinition = "DECIMAL(10,2) DEFAULT 0")
-    private BigDecimal average;
+    @OneToOne
+    @JoinColumn
+    private Participate single;
+    @OneToOne
+    @JoinColumn
+    private Participate average;
     @Column
     private Long singleRanking;
     @Column

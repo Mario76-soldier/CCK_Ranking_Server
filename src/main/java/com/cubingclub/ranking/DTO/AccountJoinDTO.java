@@ -1,6 +1,7 @@
 package com.cubingclub.ranking.DTO;
 
 import com.cubingclub.ranking.Entity.Account;
+import com.cubingclub.ranking.Entity.Gender;
 import com.cubingclub.ranking.Entity.UserRole;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
@@ -24,7 +25,7 @@ public class AccountJoinDTO {
     @DateTimeFormat(pattern="yyyy-MM-dd")
     private LocalDate birthDate;
     private String state;
-    private String sex;
+    private Gender gender;
     private String phoneNum;
     private String authNum;
     public Account toEntity(String encodedPassword){
@@ -36,7 +37,7 @@ public class AccountJoinDTO {
                 .position(UserRole.ROLE_CUSTOMER)
                 .birthDate(this.birthDate)
                 .state(this.state)
-                .sex(this.sex)
+                .gender(this.gender)
                 .phoneNum(this.phoneNum)
                 .build();
     }

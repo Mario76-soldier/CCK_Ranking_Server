@@ -56,6 +56,14 @@ public class Participate {
     private String fifthJudge;
     @Column(length=30)
     private String fifthScrambler;
+    @Column
+    private Integer extra1;
+    @Column
+    private String extra1Reason;
+    @Column
+    private Integer extra2;
+    @Column
+    private String extra2Reason;
     @Column(columnDefinition = "DECIMAL(10,2) DEFAULT 0")
     private BigDecimal single;
     @Column(columnDefinition = "DECIMAL(10,2) DEFAULT 0")
@@ -64,6 +72,10 @@ public class Participate {
     private Integer ranking;
     @Column
     private Integer stateRanking;
+    @Column
+    private BestType singleBestType;
+    @Column
+    private BestType averageBestType;
     @Column(length=20)
     private String checker1;
     @Column(length=20)
@@ -94,7 +106,7 @@ public class Participate {
         this.fifthScrambler=fifthScrambler;
     }
 
-    public Participate update(BigDecimal First, BigDecimal Second, BigDecimal Third, BigDecimal Fourth, BigDecimal Fifth, BigDecimal Single, BigDecimal Average, Integer Ranking, Integer StateRanking, String Checker1){
+    public Participate update(BigDecimal First, BigDecimal Second, BigDecimal Third, BigDecimal Fourth, BigDecimal Fifth, BigDecimal Single, BigDecimal Average, Integer Ranking, Integer StateRanking, BestType singleBestType, BestType averageBestType, String Checker1){
         this.first=First;
         this.second=Second;
         this.third=Third;
@@ -105,6 +117,8 @@ public class Participate {
         this.ranking=Ranking;
         this.stateRanking=StateRanking;
         this.checker1=Checker1;
+        this.singleBestType=singleBestType;
+        this.averageBestType=averageBestType;
         return this;
     }
 

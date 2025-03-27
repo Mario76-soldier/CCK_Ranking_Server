@@ -14,9 +14,9 @@ import java.util.Optional;
 public interface AccountRepository extends JpaRepository<Account, Integer> {
     Boolean existsByEmail(String email);
     Optional<Account> findByEmail(String email);
-    @Query("SELECT a.email as email, a.name as name, a.enName as enName, a.birthDate as birthDate, a.state as state, a.sex as sex, a.phoneNum as phoneNum, a.position as position FROM Account a")
+    @Query("SELECT a.email as email, a.name as name, a.enName as enName, a.birthDate as birthDate, a.state as state, a.gender as gender, a.phoneNum as phoneNum, a.position as position FROM Account a")
     List<AccountListDTO> findAllList();
-    @Query("SELECT a.email as email, a.name as name, a.enName as enName, a.birthDate as birthDate, a.state as state, a.sex as sex, a.phoneNum as phoneNum, a.position as position FROM Account a " +
+    @Query("SELECT a.email as email, a.name as name, a.enName as enName, a.birthDate as birthDate, a.state as state, a.gender as gender, a.phoneNum as phoneNum, a.position as position FROM Account a " +
             "where a.name like %:searchTerm% or a.enName like %:searchTerm% or a.email like %:searchTerm%")
     List<AccountListDTO> findByName(@Param(value="searchTerm")String searchTerm);
     @Modifying

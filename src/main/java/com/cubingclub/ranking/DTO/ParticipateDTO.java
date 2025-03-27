@@ -1,9 +1,11 @@
 package com.cubingclub.ranking.DTO;
 
 import com.cubingclub.ranking.Entity.Account;
+import com.cubingclub.ranking.Entity.BestType;
 import com.cubingclub.ranking.Entity.Participate;
 import com.cubingclub.ranking.Entity.Round;
 import com.cubingclub.ranking.Repository.AccountRepository;
+import jakarta.persistence.Column;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -34,10 +36,16 @@ public class ParticipateDTO {
     private BigDecimal fifth;
     private String fifthJudge;
     private String fifthScrambler;
+    private Integer extra1;
+    private String extra1Reason;
+    private Integer extra2;
+    private String extra2Reason;
     private BigDecimal single;
     private BigDecimal average;
     private Integer ranking;
     private Integer stateRanking;
+    private BestType singleBestType;
+    private BestType averageBestType;
     private String checker1;
     private String checker2;
     public ParticipateDTO(Participate entity){

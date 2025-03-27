@@ -111,6 +111,7 @@ public class ParticipateService {
         if(Arrays.stream(record).anyMatch(r -> r.compareTo(BigDecimal.ZERO) == 0)) {
             average=BigDecimal.ZERO;
             single=BigDecimal.ZERO;
+            participateRepository.updateRanking(0, idx);
         }
         if (validateSeconds(record)) {
             participateRepository.updateRecord(

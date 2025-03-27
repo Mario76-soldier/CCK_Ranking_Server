@@ -35,7 +35,7 @@ public class Account {
     @Column(length=15)
     private String state;
     @Column(length=10)
-    private String sex;
+    private Gender gender;
     @Column(length=20)
     private String phoneNum;
 

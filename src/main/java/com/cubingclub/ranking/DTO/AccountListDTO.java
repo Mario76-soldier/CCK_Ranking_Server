@@ -9,7 +9,7 @@ public interface AccountListDTO {
     String getEnName();
     LocalDate getBirthDate();
     String getState();
-    String getSex();
+    String getGender();
     String getPhoneNum();
     UserRole getPosition();
 }

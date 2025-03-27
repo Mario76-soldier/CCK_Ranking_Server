@@ -12,5 +12,4 @@ public class RecorderResponseDTO {
     Integer seq;
     String name;
     String roundName;
-
 }

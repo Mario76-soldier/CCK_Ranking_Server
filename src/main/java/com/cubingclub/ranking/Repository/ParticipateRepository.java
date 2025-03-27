@@ -9,6 +9,7 @@ import org.springframework.data.repository.query.Param;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 public interface ParticipateRepository extends JpaRepository<Participate, Integer> {
     @Query("select p.idx from Participate p where p.round.idx=:roundIdx order by " +
@@ -30,6 +31,10 @@ public interface ParticipateRepository extends JpaRepository<Participate, Intege
     List<Participate> findByAccount_EmailAndRound_Comp_Idx(String email, Integer compIdx);
     @Query("select p from Participate p join fetch p.round r join fetch r.cubeEvent ce join fetch r.comp c where p.account.email=:email order by ce.eventName")
     List<Participate> findByEmailOrderByRound_CubeEvent_EventName(String email);
+    @Query("select p from Participate p join fetch p.round r join fetch r.cubeEvent ce join fetch r.comp c where p.account.email=:email and ce.eventName=:eventName order by p.average limit 1")
+    Optional<Participate> findAverageBest(String email, String eventName);
+    @Query("select p from Participate p join fetch p.round r join fetch r.cubeEvent ce join fetch r.comp c where p.account.email=:email and ce.eventName=:eventName order by p.single limit 1")
+    Optional<Participate> findSingleBest(String email, String eventName);
     Participate findByIdx(Integer idx);
     @Query("select p from Participate p where p.round.idx=:roundIdx order by (case when p.ranking is null or p.ranking=0 then 1 else 0 end) asc, p.ranking asc")
     List<Participate> findByRound(@Param(value="roundIdx")Integer roundIdx);
