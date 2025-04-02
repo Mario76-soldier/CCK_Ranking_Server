@@ -132,6 +132,7 @@ public class ListController {
             participateService.updateRanking(i+1,list.get(i));
         }
         personalService.findPreviousBest(participate.getAccount().getEmail(), participate.getRound().getCubeEvent().getEventName());
+        personalService.updateRanking(participate.getAccount().getState(), participate.getRound().getCubeEvent().getEventName(), true, true);
         return ResponseEntity.ok().build();
     }
     @PostMapping("/advance/{pastRoundIdx}/{advanceRoundIdx}")//기록에서 어드밴스 인원 다음 라운드로 넘기는 콜

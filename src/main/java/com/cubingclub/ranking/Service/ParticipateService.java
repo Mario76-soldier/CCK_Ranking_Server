@@ -1,9 +1,13 @@
 package com.cubingclub.ranking.Service;
 
+import com.cubingclub.ranking.DTO.BestRecordDTO;
 import com.cubingclub.ranking.DTO.ParticipateDTO;
 import com.cubingclub.ranking.DTO.ParticipateRequestDTO;
 import com.cubingclub.ranking.DTO.RecorderResponseDTO;
+import com.cubingclub.ranking.Entity.BestRecord;
+import com.cubingclub.ranking.Entity.BestType;
 import com.cubingclub.ranking.Repository.AccountRepository;
+import com.cubingclub.ranking.Repository.BestRecordRepository;
 import com.cubingclub.ranking.Repository.ParticipateRepository;
 import com.cubingclub.ranking.Entity.Participate;
 import com.cubingclub.ranking.Repository.RoundRepository;
@@ -21,7 +25,9 @@ import java.util.*;
 public class ParticipateService {
     private final RoundRepository roundRepository;
     private final ParticipateRepository participateRepository;
+    private final BestRecordRepository bestRecordRepository;
     private final AccountRepository accountRepository;
+    private final PersonalService personalService;
 
     private static final BigDecimal DNF_TIME = BigDecimal.valueOf(-1);
     private static final BigDecimal DNS_TIME = BigDecimal.valueOf(-2);
@@ -113,6 +119,7 @@ public class ParticipateService {
             single=BigDecimal.ZERO;
             participateRepository.updateRanking(0, idx);
         }
+        BestRecord bestRecord=bestRecordRepository.findBy
         if (validateSeconds(record)) {
             participateRepository.updateRecord(
                     record[0],
@@ -127,7 +134,7 @@ public class ParticipateService {
         return -1;
     }
 
-    public Integer updateRecord(BigDecimal first, BigDecimal second, BigDecimal third, BigDecimal fourth, BigDecimal fifth, String checkerName, Integer idx, String calcType) {
+    public void updateRecord(BigDecimal first, BigDecimal second, BigDecimal third, BigDecimal fourth, BigDecimal fifth, String checkerName, Integer idx, String calcType) {
         BigDecimal[] record = switch (calcType.toLowerCase()) {
             case "single" -> new BigDecimal[]{first};
             case "mo3" -> new BigDecimal[]{first, second, third};
@@ -135,9 +142,9 @@ public class ParticipateService {
             default -> null;
         };
         if (record == null) {
-            return -1;
+            return;
         }
-        int result = updateSinAvg(record, calcType, idx);
+        updateSinAvg(record, calcType, idx);
         if(Arrays.stream(record).allMatch(r -> r.compareTo(BigDecimal.ZERO) != 0)) {
             participateRepository.updateChecker(checkerName, idx);
             participateRepository.updateChecker2(null, idx);
@@ -146,7 +153,6 @@ public class ParticipateService {
             participateRepository.updateChecker(null, idx);
             participateRepository.updateChecker2(null, idx);
         }
-        return result;
     }
 
     public Integer updateRecordOne(Integer idx, Integer seq, BigDecimal record, String judgeEmail) {
@@ -190,7 +196,16 @@ public class ParticipateService {
     }
 
     public void deleteByRoundIdx(Integer roundIdx) {
+        List<Participate> participateList = participateRepository.findByRound(roundIdx);
         participateRepository.deleteByRound_Idx(roundIdx);
+        if (!participateList.isEmpty()) {
+            String eventName=participateList.get(0).getRound().getCubeEvent().getEventName();
+            String state=participateList.get(0).getAccount().getState();
+            for (Participate participate : participateList) {
+                personalService.findPreviousBest(participate.getAccount().getEmail(), participate.getRound().getCubeEvent().getEventName());
+            }
+            personalService.updateRanking(state, eventName, true, true);
+        }
     }
 
     public Integer addParticipate(ParticipateRequestDTO participate) {
@@ -202,7 +217,67 @@ public class ParticipateService {
         participateRepository.updateChecker2(checker, idx);
     }
     public void updateRanking(Integer ranking, Integer idx) {
+        isNewRecord(idx);
         participateRepository.updateRanking(ranking, idx);
     }
-
+    public void isNewRecord(Integer idx){
+        Participate participate=participateRepository.findByIdx(idx);
+        ParticipateDTO participateDTO=new ParticipateDTO(participate);
+        BestRecordDTO bestRecord=personalService.getBestRecordByEvent(participate.getAccount().getEmail(), participate.getRound().getCubeEvent().getEventName());
+        if(bestRecord!=null){
+            if(!(bestRecord.getSingle()==participate)) {
+                    if (bestRecord.getSingle().getSingle().compareTo(participateDTO.getSingle()) > 0) {
+                        participateDTO.setSingleBestType(BestType.PR);
+                        BestRecord stateSingleBest = bestRecordRepository.findBestSingleState(participate.getRound().getCubeEvent().getEventName(), participate.getAccount().getState()).orElse(null);
+                        if (stateSingleBest == null || stateSingleBest.getSingle().getSingle().compareTo(participateDTO.getSingle()) > 0) {
+                            participateDTO.setSingleBestType(BestType.SR);
+                            BestRecord singleBest = bestRecordRepository.findBestSingle(participate.getRound().getCubeEvent().getEventName()).orElse(null);
+                            if (singleBest == null || singleBest.getSingle().getSingle().compareTo(participateDTO.getSingle()) > 0) {
+                                participateDTO.setSingleBestType(BestType.CCR);
+                            }
+                        }
+                    } else {
+                        participateDTO.setSingleBestType(null);
+                    }
+            }
+            if(!(bestRecord.getAverage()==participate && bestRecord.getAverage().getAverage().compareTo(participateDTO.getAverage()) == 0)) {
+                if (bestRecord.getAverage().getAverage().compareTo(participateDTO.getAverage()) > 0) {
+                    participateDTO.setAverageBestType(BestType.PR);
+                    BestRecord stateAverageBest = bestRecordRepository.findBestAverageState(participate.getRound().getCubeEvent().getEventName(), participate.getAccount().getState()).orElse(null);
+                    if (stateAverageBest == null || stateAverageBest.getAverage().getAverage().compareTo(participateDTO.getAverage()) > 0) {
+                        participateDTO.setAverageBestType(BestType.SR);
+                        BestRecord averageBest = bestRecordRepository.findBestAverage(participate.getRound().getCubeEvent().getEventName()).orElse(null);
+                        if (averageBest == null || averageBest.getAverage().getAverage().compareTo(participateDTO.getAverage()) > 0) {
+                            participateDTO.setAverageBestType(BestType.CCR);
+                        }
+                    }
+                }
+                else{
+                    participateDTO.setAverageBestType(null);
+                }
+            }
+            participateRepository.save(participateDTO.toEntity(accountRepository));
+        }
+        else{
+            participateDTO.setSingleBestType(BestType.PR);
+            BestRecord stateSingleBest=bestRecordRepository.findBestSingleState(participate.getRound().getCubeEvent().getEventName(), participate.getAccount().getState()).orElse(null);
+            if(stateSingleBest==null || stateSingleBest.getSingle().getSingle().compareTo(participateDTO.getSingle())>0){
+                participateDTO.setSingleBestType(BestType.SR);
+                BestRecord singleBest=bestRecordRepository.findBestSingle(participate.getRound().getCubeEvent().getEventName()).orElse(null);
+                if(singleBest==null || singleBest.getSingle().getSingle().compareTo(participateDTO.getSingle())>0){
+                    participateDTO.setSingleBestType(BestType.CCR);
+                }
+            }
+            participateDTO.setAverageBestType(BestType.PR);
+            BestRecord stateAverageBest=bestRecordRepository.findBestAverageState(participate.getRound().getCubeEvent().getEventName(), participate.getAccount().getState()).orElse(null);
+            if(stateAverageBest==null || stateAverageBest.getAverage().getAverage().compareTo(participateDTO.getAverage())>0){
+                participateDTO.setAverageBestType(BestType.SR);
+                BestRecord averageBest=bestRecordRepository.findBestAverage(participate.getRound().getCubeEvent().getEventName()).orElse(null);
+                if(averageBest==null || averageBest.getAverage().getAverage().compareTo(participateDTO.getAverage())>0){
+                    participateDTO.setAverageBestType(BestType.CCR);
+                }
+            }
+            participateRepository.save(participateDTO.toEntity(accountRepository));
+        }
+    }
 }

@@ -81,6 +81,13 @@ public class PersonalService {
         bestRecordListDTO.setEachRecordList(eachRecordList);
         return bestRecordListDTO;
     }
+    public BestRecordDTO getBestRecordByEvent(String email, String eventName){
+        BestRecord bestRecord=bestRecordRepository.findByEmailAndEventName(email, eventName).orElse(null);
+        if(bestRecord!=null){
+            return new BestRecordDTO(bestRecord);
+        }
+        return null;
+    }
     private boolean shouldUpdate(BigDecimal current, BigDecimal newValue) {
         if(current.compareTo(BigDecimal.ZERO) < 0){
             // current가 -2이면, 가장 큰 값 선택
@@ -142,7 +149,7 @@ public class PersonalService {
         updateRanking(bestRecordDTO.getAccount().getState(), eventName, updatedSingle, updatedAverage);
     }
 
-    private void updateRanking(String state, String eventName, boolean updatedSingle, boolean updatedAverage) {
+    public void updateRanking(String state, String eventName, boolean updatedSingle, boolean updatedAverage) {
         if(updatedSingle){
             List<BestRecord> singleRecords = bestRecordRepository.findByEventNameOrderBySingle(eventName);
             List<BestRecord> stateSingleRecords = bestRecordRepository.findByEventNameAndStateOrderBySingle(eventName, state);
@@ -190,11 +197,9 @@ public class PersonalService {
             bestRecordDTO.setSingle(single);
             bestRecordDTO.setAverage(average);
             bestRecordRepository.save(bestRecordDTO.toEntity());
-            updateRanking(bestRecordDTO.getAccount().getState(), eventName, true, true);
         }
         else{
             bestRecordRepository.delete(bestRecord);
-            updateRanking(bestRecord.getAccount().getState(), eventName, true, true);
         }
     }
 }

@@ -41,4 +41,12 @@ public interface BestRecordRepository extends JpaRepository<BestRecord, Integer>
             "FROM BestRecord r join r.account ac join r.cubeEvent ce " +
             "GROUP BY ce.eventName, ac.state")
     List<Object[]> findTotalParticipantsByEventAndState();
+    @Query("select r from BestRecord r join fetch r.cubeEvent ce join fetch r.account ac join fetch r.single si join fetch r.average av where ce.eventName=:eventName order by si.single asc limit 1")
+    Optional<BestRecord> findBestSingle(@Param(value="eventName")String eventName);
+    @Query("select r from BestRecord r join fetch r.cubeEvent ce join fetch r.account ac join fetch r.single si join fetch r.average av where ce.eventName=:eventName order by av.average asc limit 1")
+    Optional<BestRecord> findBestAverage(@Param(value="eventName")String eventName);
+    @Query("select r from BestRecord r join fetch r.cubeEvent ce join fetch r.account ac join fetch r.single si join fetch r.average av where ac.state=:state and ce.eventName=:eventName order by si.single asc limit 1")
+    Optional<BestRecord> findBestSingleState(@Param(value="eventName")String eventName, @Param(value="state")String state);
+    @Query("select r from BestRecord r join fetch r.cubeEvent ce join fetch r.account ac join fetch r.single si join fetch r.average av where ac.state=:state and ce.eventName=:eventName order by av.average asc limit 1")
+    Optional<BestRecord> findBestAverageState(@Param(value="eventName")String eventName, @Param(value="state")String state);
 }

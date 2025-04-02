@@ -68,10 +68,16 @@ public class ParticipateDTO {
         this.thirdScrambler=entity.getThirdScrambler();
         this.fourthScrambler=entity.getFourthScrambler();
         this.fifthScrambler=entity.getFifthScrambler();
+        this.extra1=entity.getExtra1();
+        this.extra1Reason=entity.getExtra1Reason();
+        this.extra2=entity.getExtra2();
+        this.extra2Reason=entity.getExtra2Reason();
         this.single=entity.getSingle();
         this.average=entity.getAverage();
         this.ranking=entity.getRanking();
         this.stateRanking=entity.getStateRanking();
+        this.singleBestType=entity.getSingleBestType();
+        this.averageBestType=entity.getAverageBestType();
         this.checker1=entity.getChecker1();
         this.checker2=entity.getChecker2();
     }
