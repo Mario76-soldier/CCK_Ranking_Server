@@ -1,6 +1,6 @@
 package com.cubingclub.ranking.Config;
 
-import com.cubingclub.ranking.Entity.Account;
+import com.cubingclub.ranking.Account.Entity.Account;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;

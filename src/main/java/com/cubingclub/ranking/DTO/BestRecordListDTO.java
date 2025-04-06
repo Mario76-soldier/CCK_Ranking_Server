@@ -1,6 +1,6 @@
 package com.cubingclub.ranking.DTO;
 
-import com.cubingclub.ranking.Entity.Account;
+import com.cubingclub.ranking.Account.DTO.MaskedAccountDTO;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;

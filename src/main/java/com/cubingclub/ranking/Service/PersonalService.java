@@ -1,12 +1,14 @@
 package com.cubingclub.ranking.Service;
 
+import com.cubingclub.ranking.Account.DTO.MaskedAccountDTO;
 import com.cubingclub.ranking.DTO.*;
 import com.cubingclub.ranking.Entity.BestRecord;
-import com.cubingclub.ranking.Entity.Participate;
-import com.cubingclub.ranking.Repository.AccountRepository;
+import com.cubingclub.ranking.Participate.DTO.PersonalRecordDTO;
+import com.cubingclub.ranking.Participate.Entity.Participate;
+import com.cubingclub.ranking.Account.Repository.AccountRepository;
 import com.cubingclub.ranking.Repository.BestRecordRepository;
-import com.cubingclub.ranking.Repository.EventRepository;
-import com.cubingclub.ranking.Repository.ParticipateRepository;
+import com.cubingclub.ranking.CubeEvent.Repository.CubeEventRepository;
+import com.cubingclub.ranking.Participate.Repository.ParticipateRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -25,7 +27,7 @@ public class PersonalService {
     private final AccountRepository accountRepository;
     private final ParticipateRepository participateRepository;
     private final BestRecordRepository bestRecordRepository;
-    private final EventRepository eventRepository;
+    private final CubeEventRepository cubeEventRepository;
     public Map<String, List<PersonalRecordDTO>> getPersonalRecord(String email){
         List<Participate> participates=participateRepository.findByEmailOrderByRound_CubeEvent_EventName(email);
         List<Object[]> roundParticipantCountsList = participateRepository.findAllRoundParticipantCounts();
@@ -116,7 +118,7 @@ public class PersonalService {
         }
         BestRecordDTO bestRecordDTO;
         if(optionalRecord.isEmpty()){
-            bestRecordDTO=new BestRecordDTO(accountRepository.findByEmail(email).orElseThrow(() -> new RuntimeException("Account not found")), participate, participate, eventRepository.findByEventName(eventName));
+            bestRecordDTO=new BestRecordDTO(accountRepository.findByEmail(email).orElseThrow(() -> new RuntimeException("Account not found")), participate, participate, cubeEventRepository.findByEventName(eventName));
             updatedSingle = true;
             updatedAverage = true;
         }

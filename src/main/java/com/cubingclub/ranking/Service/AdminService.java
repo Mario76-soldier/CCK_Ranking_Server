@@ -1,8 +1,8 @@
 package com.cubingclub.ranking.Service;
 
-import com.cubingclub.ranking.DTO.AccountListDTO;
-import com.cubingclub.ranking.DTO.RoleUpdateDTO;
-import com.cubingclub.ranking.Repository.AccountRepository;
+import com.cubingclub.ranking.Account.DTO.AccountListDTO;
+import com.cubingclub.ranking.Account.DTO.RoleUpdateDTO;
+import com.cubingclub.ranking.Account.Repository.AccountRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;

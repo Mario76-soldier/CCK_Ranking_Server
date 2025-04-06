@@ -1,13 +1,13 @@
 package com.cubingclub.ranking.Entity;
 
+import com.cubingclub.ranking.Account.Entity.Account;
+import com.cubingclub.ranking.CubeEvent.Entity.CubeEvent;
+import com.cubingclub.ranking.Participate.Entity.Participate;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.DynamicInsert;
-
-import java.math.BigDecimal;
 
 @Entity
 @Builder

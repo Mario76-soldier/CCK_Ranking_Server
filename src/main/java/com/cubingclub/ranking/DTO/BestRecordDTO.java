@@ -1,12 +1,10 @@
 package com.cubingclub.ranking.DTO;
 
-import com.cubingclub.ranking.Entity.Account;
+import com.cubingclub.ranking.Account.Entity.Account;
 import com.cubingclub.ranking.Entity.BestRecord;
-import com.cubingclub.ranking.Entity.CubeEvent;
-import com.cubingclub.ranking.Entity.Participate;
+import com.cubingclub.ranking.CubeEvent.Entity.CubeEvent;
+import com.cubingclub.ranking.Participate.Entity.Participate;
 import lombok.*;
-
-import java.math.BigDecimal;
 
 @Getter
 @Setter
