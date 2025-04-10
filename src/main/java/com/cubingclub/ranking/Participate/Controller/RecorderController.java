@@ -5,6 +5,7 @@ import com.cubingclub.ranking.Participate.DTO.RecorderDTO;
 import com.cubingclub.ranking.Participate.DTO.RecorderResponseDTO;
 import com.cubingclub.ranking.Competition.Service.CompetitionService;
 import com.cubingclub.ranking.Participate.Service.ParticipateService;
+import com.cubingclub.ranking.RFID.Service.RFIDService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -21,13 +22,14 @@ import java.util.List;
 public class RecorderController {
     private final CompetitionService competitionService;
     private final ParticipateService participateService;
+    private final RFIDService rfidService;
     @GetMapping("/comp")
     public ResponseEntity<List<CompetitionDTO>> CompIdx(){
         return ResponseEntity.ok(competitionService.getCompListToday(LocalDate.now()));
     }
-    @GetMapping("/record/{email}/{compIdx}")
-    public ResponseEntity<RecorderResponseDTO> CurrentRecord(@PathVariable String email, @PathVariable Integer compIdx){
-        RecorderResponseDTO recorderResponseDTO=participateService.getForRecorder(email,compIdx);
+    @GetMapping("/record/{uid}/{compIdx}")
+    public ResponseEntity<RecorderResponseDTO> CurrentRecord(@PathVariable String uid, @PathVariable Integer compIdx){
+        RecorderResponseDTO recorderResponseDTO=participateService.getForRecorder(uid, compIdx);
         if(recorderResponseDTO==null){
             return ResponseEntity.noContent().build();
         }

@@ -8,6 +8,7 @@ import com.cubingclub.ranking.Participate.Entity.BestType;
 import com.cubingclub.ranking.Account.Repository.AccountRepository;
 import com.cubingclub.ranking.Participate.Repository.ParticipateRepository;
 import com.cubingclub.ranking.Participate.Entity.Participate;
+import com.cubingclub.ranking.RFID.Repository.RFIDRepository;
 import com.cubingclub.ranking.Round.Entity.Round;
 import com.cubingclub.ranking.Round.Repository.RoundRepository;
 import jakarta.transaction.Transactional;
@@ -24,6 +25,7 @@ import java.util.*;
 public class ParticipateService {
     private final RoundRepository roundRepository;
     private final ParticipateRepository participateRepository;
+    private final RFIDRepository rfidRepository;
     private final AccountRepository accountRepository;
 
     private static final BigDecimal DNF = BigDecimal.valueOf(-1);
@@ -36,22 +38,25 @@ public class ParticipateService {
         return listDTO;
     }
 
-    public RecorderResponseDTO getForRecorder(String email, Integer compIdx) {
-        List<Participate> list = participateRepository.findByAccount_EmailAndRound_Comp_Idx(email, compIdx);
+    public RecorderResponseDTO getForRecorder(String uid, Integer compIdx) {
+        String email;
+        if((email=rfidRepository.findEmailByUid(uid))!=null) {
+            List<Participate> list = participateRepository.findByAccount_EmailAndRound_Comp_Idx(email, compIdx);
 
-        for (Participate p : list) {
-            String name = p.getAccount().getEnName();
-            String roundName = p.getRound().getCubeEvent().getEventName() + " " + p.getRound().getRoundName();
-            String type = p.getRound().getCubeEvent().getAvgCalc();
+            for (Participate p : list) {
+                String name = p.getAccount().getEnName();
+                String roundName = p.getRound().getCubeEvent().getEventName() + " " + p.getRound().getRoundName();
+                String type = p.getRound().getCubeEvent().getAvgCalc();
 
-            if (isEmpty(p.getFirst())) return new RecorderResponseDTO(p.getIdx(), 1, name, roundName);
-            if (!"single".equals(type)) {
-                if (isEmpty(p.getSecond())) return new RecorderResponseDTO(p.getIdx(), 2, name, roundName);
-                if (isEmpty(p.getThird())) return new RecorderResponseDTO(p.getIdx(), 3, name, roundName);
-            }
-            if ("ao5".equals(type)) {
-                if (isEmpty(p.getFourth())) return new RecorderResponseDTO(p.getIdx(), 4, name, roundName);
-                if (isEmpty(p.getFifth())) return new RecorderResponseDTO(p.getIdx(), 5, name, roundName);
+                if (isEmpty(p.getFirst())) return new RecorderResponseDTO(p.getIdx(), 1, name, roundName);
+                if (!"single".equals(type)) {
+                    if (isEmpty(p.getSecond())) return new RecorderResponseDTO(p.getIdx(), 2, name, roundName);
+                    if (isEmpty(p.getThird())) return new RecorderResponseDTO(p.getIdx(), 3, name, roundName);
+                }
+                if ("ao5".equals(type)) {
+                    if (isEmpty(p.getFourth())) return new RecorderResponseDTO(p.getIdx(), 4, name, roundName);
+                    if (isEmpty(p.getFifth())) return new RecorderResponseDTO(p.getIdx(), 5, name, roundName);
+                }
             }
         }
         return null;
