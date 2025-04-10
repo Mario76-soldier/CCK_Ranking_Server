@@ -1,6 +1,6 @@
-package com.cubingclub.ranking.Repository;
+package com.cubingclub.ranking.BestRecord.Repository;
 
-import com.cubingclub.ranking.Entity.BestRecord;
+import com.cubingclub.ranking.BestRecord.Entity.BestRecord;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;

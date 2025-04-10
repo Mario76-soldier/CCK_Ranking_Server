@@ -1,4 +1,4 @@
-package com.cubingclub.ranking.Entity;
+package com.cubingclub.ranking.Competition.Entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

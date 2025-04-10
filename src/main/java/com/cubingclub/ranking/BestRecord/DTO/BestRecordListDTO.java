@@ -1,4 +1,4 @@
-package com.cubingclub.ranking.DTO;
+package com.cubingclub.ranking.BestRecord.DTO;
 
 import com.cubingclub.ranking.Account.DTO.MaskedAccountDTO;
 import lombok.Getter;

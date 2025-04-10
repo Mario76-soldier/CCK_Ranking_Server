@@ -1,9 +1,9 @@
-package com.cubingclub.ranking.Controller;
+package com.cubingclub.ranking.Account.Controller;
 
 import com.cubingclub.ranking.Account.DTO.RoleUpdateDTO;
 import com.cubingclub.ranking.Account.Entity.UserRole;
 import com.cubingclub.ranking.Account.Service.AccountService;
-import com.cubingclub.ranking.Service.AdminService;
+import com.cubingclub.ranking.Account.Service.AdminService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;

@@ -1,7 +1,7 @@
-package com.cubingclub.ranking.DTO;
+package com.cubingclub.ranking.BestRecord.DTO;
 
 import com.cubingclub.ranking.Account.Entity.Account;
-import com.cubingclub.ranking.Entity.BestRecord;
+import com.cubingclub.ranking.BestRecord.Entity.BestRecord;
 import com.cubingclub.ranking.CubeEvent.Entity.CubeEvent;
 import com.cubingclub.ranking.Participate.Entity.Participate;
 import lombok.*;

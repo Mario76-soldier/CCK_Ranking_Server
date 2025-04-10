@@ -1,6 +1,6 @@
-package com.cubingclub.ranking.Controller;
+package com.cubingclub.ranking.BestRecord.Controller;
 
-import com.cubingclub.ranking.Service.PersonalService;
+import com.cubingclub.ranking.BestRecord.Service.PersonalService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;

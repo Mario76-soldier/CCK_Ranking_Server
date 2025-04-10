@@ -1,12 +1,14 @@
-package com.cubingclub.ranking.Service;
+package com.cubingclub.ranking.BestRecord.Service;
 
 import com.cubingclub.ranking.Account.DTO.MaskedAccountDTO;
-import com.cubingclub.ranking.DTO.*;
-import com.cubingclub.ranking.Entity.BestRecord;
+import com.cubingclub.ranking.BestRecord.DTO.BestRecordDTO;
+import com.cubingclub.ranking.BestRecord.DTO.BestRecordListDTO;
+import com.cubingclub.ranking.BestRecord.DTO.EachBestRecordDTO;
+import com.cubingclub.ranking.BestRecord.Entity.BestRecord;
 import com.cubingclub.ranking.Participate.DTO.PersonalRecordDTO;
 import com.cubingclub.ranking.Participate.Entity.Participate;
 import com.cubingclub.ranking.Account.Repository.AccountRepository;
-import com.cubingclub.ranking.Repository.BestRecordRepository;
+import com.cubingclub.ranking.BestRecord.Repository.BestRecordRepository;
 import com.cubingclub.ranking.CubeEvent.Repository.CubeEventRepository;
 import com.cubingclub.ranking.Participate.Repository.ParticipateRepository;
 import jakarta.transaction.Transactional;

@@ -1,4 +1,4 @@
-package com.cubingclub.ranking.Entity;
+package com.cubingclub.ranking.BestRecord.Entity;
 
 import com.cubingclub.ranking.Account.Entity.Account;
 import com.cubingclub.ranking.CubeEvent.Entity.CubeEvent;

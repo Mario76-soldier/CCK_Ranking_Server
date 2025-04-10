@@ -1,4 +1,4 @@
-package com.cubingclub.ranking.Entity;
+package com.cubingclub.ranking.Account.Entity;
 
 import jakarta.persistence.*;
 import lombok.*;

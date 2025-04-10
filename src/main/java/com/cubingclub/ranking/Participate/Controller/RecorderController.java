@@ -25,9 +25,9 @@ public class RecorderController {
     public ResponseEntity<List<CompetitionDTO>> CompIdx(){
         return ResponseEntity.ok(competitionService.getCompListToday(LocalDate.now()));
     }
-    @GetMapping("/record/{email}/{idx}")
-    public ResponseEntity<RecorderResponseDTO> CurrentRecord(@PathVariable String email, @PathVariable Integer idx){
-        RecorderResponseDTO recorderResponseDTO=participateService.getForRecorder(email,idx);
+    @GetMapping("/record/{email}/{compIdx}")
+    public ResponseEntity<RecorderResponseDTO> CurrentRecord(@PathVariable String email, @PathVariable Integer compIdx){
+        RecorderResponseDTO recorderResponseDTO=participateService.getForRecorder(email,compIdx);
         if(recorderResponseDTO==null){
             return ResponseEntity.noContent().build();
         }

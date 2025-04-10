@@ -1,4 +1,4 @@
-package com.cubingclub.ranking.Service;
+package com.cubingclub.ranking.Account.Service;
 
 import com.cubingclub.ranking.Account.DTO.AccountListDTO;
 import com.cubingclub.ranking.Account.DTO.RoleUpdateDTO;

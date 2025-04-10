@@ -1,6 +1,6 @@
 package com.cubingclub.ranking.Account.Repository;
 
-import com.cubingclub.ranking.Entity.Token;
+import com.cubingclub.ranking.Account.Entity.Token;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;

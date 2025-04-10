@@ -5,7 +5,7 @@ import com.cubingclub.ranking.Participate.DTO.ParticipateRecordDTO;
 import com.cubingclub.ranking.Participate.DTO.ParticipateRequestDTO;
 import com.cubingclub.ranking.Participate.Service.ParticipateService;
 import com.cubingclub.ranking.Account.Service.AccountService;
-import com.cubingclub.ranking.Service.PersonalService;
+import com.cubingclub.ranking.BestRecord.Service.PersonalService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
