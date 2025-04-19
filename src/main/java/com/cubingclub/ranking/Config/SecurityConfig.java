@@ -37,7 +37,7 @@ public class SecurityConfig{
                 .authorizeHttpRequests(request -> request
                         .requestMatchers("/api/recorder/**").hasRole("ROOT")
                         .requestMatchers(HttpMethod.GET,"/api/admin/**").hasAnyRole("ROOT","ADMIN")
-                        .requestMatchers(HttpMethod.POST,"/api/comp/","/api/round","/api/advance/**","/api/record/**","/api/admin/**").hasAnyRole("ROOT","ADMIN")
+                        .requestMatchers(HttpMethod.POST,"/api/comp/**","/api/round","/api/advance/**","/api/record/**","/api/admin/**").hasAnyRole("ROOT","ADMIN")
                         .requestMatchers(HttpMethod.DELETE,"/api/comp/**","/api/round/**","/api/record/**").hasAnyRole("ROOT","ADMIN")
                         .requestMatchers(HttpMethod.PUT,"/api/advance/**","/api/checker/**").hasAnyRole("ROOT","ADMIN")
                         .requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll()

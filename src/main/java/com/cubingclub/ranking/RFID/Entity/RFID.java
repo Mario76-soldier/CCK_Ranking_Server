@@ -14,10 +14,10 @@ import lombok.NoArgsConstructor;
 @Builder
 @Table
 public class RFID {
-    @Id
     @ManyToOne
     @JoinColumn
     private Account account;
+    @Id
     @Column
     private String uid;
 }

@@ -23,7 +23,7 @@ public class CreateRoundDTO {
     public Round toEntity(CompetitionRepository competitionRepository, CubeEventRepository cubeEventRepository){
         return Round.builder()
                 .Idx(idx)
-                .Comp(competitionRepository.findByIdx(idx))
+                .Comp(competitionRepository.findByIdx(comp))
                 .cubeEvent(cubeEventRepository.findByEventName(cubeEvent))
                 .RoundName(roundName)
                 .EventStart(eventStart)
@@ -33,7 +33,7 @@ public class CreateRoundDTO {
     }
     public Round toEntityNoIdx(CompetitionRepository competitionRepository, CubeEventRepository cubeEventRepository){
         return Round.builder()
-                .Comp(competitionRepository.findByIdx(idx))
+                .Comp(competitionRepository.findByIdx(comp))
                 .cubeEvent(cubeEventRepository.findByEventName(cubeEvent))
                 .RoundName(roundName)
                 .EventStart(eventStart)

@@ -18,10 +18,6 @@ import java.time.LocalDate;
 public class RFIDCreateDTO {
     private String email;
     private String uid;
-    public RFIDCreateDTO(RFID entity){
-        this.email=entity.getAccount().getEmail();
-        this.uid=entity.getUid();
-    }
     public RFID toEntity(AccountRepository accountRepository){
         return RFID
                 .builder()
