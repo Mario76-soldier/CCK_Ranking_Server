@@ -22,7 +22,6 @@ import java.util.List;
 public class RecorderController {
     private final CompetitionService competitionService;
     private final ParticipateService participateService;
-    private final RFIDService rfidService;
     @GetMapping("/comp")
     public ResponseEntity<List<CompetitionDTO>> CompIdx(){
         return ResponseEntity.ok(competitionService.getCompListToday(LocalDate.now()));

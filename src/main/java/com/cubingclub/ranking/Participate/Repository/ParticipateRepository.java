@@ -1,5 +1,6 @@
 package com.cubingclub.ranking.Participate.Repository;
 
+import com.cubingclub.ranking.Participate.DTO.ParticipateUserDTO;
 import com.cubingclub.ranking.Participate.Entity.Participate;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -13,9 +14,9 @@ import java.util.Optional;
 public interface ParticipateRepository extends JpaRepository<Participate, Integer> {
     void deleteByRound_Comp_Idx(Integer compIdx);
     @Query("select new com.cubingclub.ranking.Participate.DTO.ParticipateUserDTO(p.idx, p.pdx, a.email, a.name, a.enName, a.state, " +
-            "p.first, p.second, p.third, p.fourth, p.fifth, p.single, p.average, p.ranking, p.stateRanking, p.singleBestType, p.averageBestType) " +
-            "from Participate p join Account a join Round r where r.idx=:roundIdx order by (case when p.ranking is null or p.ranking=0 then 1 else 0 end) asc, p.ranking asc")
-    List<Participate> findByRound_IdxForUser(@Param(value="roundIdx")Integer roundIdx);
+            "p.first, p.second, p.third, p.fourth, p.fifth, p.extra1, p.extra1Reason, p.extra2, p.extra2Reason, p.single, p.average, p.ranking, p.stateRanking, p.singleBestType, p.averageBestType) " +
+            "from Participate p join Account a on (p.account.email=a.email) join Round r on (p.round.idx=r.idx) where r.idx=:roundIdx order by (case when p.ranking is null or p.ranking=0 then 1 else 0 end) asc, p.ranking asc")
+    List<ParticipateUserDTO> findByRound_IdxForUser(@Param(value="roundIdx")Integer roundIdx);
     @Modifying
     @Query(value = "update Participate p JOIN (" +
             "SELECT idx, RANK() OVER (ORDER BY (case when average = -2 then 2 when average = -1 then 1 else 0 end), average) AS new_rank FROM Participate where round_idx =:roundIdx and average is not null and average!=0) " +

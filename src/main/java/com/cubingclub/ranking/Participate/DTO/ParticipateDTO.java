@@ -22,20 +22,20 @@ public class ParticipateDTO {
     private AccountDTO account;
     private Round round;
     private BigDecimal first;
-    private String firstJudge;
-    private String firstScrambler;
+    private AccountDTO firstJudge;
+    private AccountDTO firstScrambler;
     private BigDecimal second;
-    private String secondJudge;
-    private String secondScrambler;
+    private AccountDTO secondJudge;
+    private AccountDTO secondScrambler;
     private BigDecimal third;
-    private String thirdJudge;
-    private String thirdScrambler;
+    private AccountDTO thirdJudge;
+    private AccountDTO thirdScrambler;
     private BigDecimal fourth;
-    private String fourthJudge;
-    private String fourthScrambler;
+    private AccountDTO fourthJudge;
+    private AccountDTO fourthScrambler;
     private BigDecimal fifth;
-    private String fifthJudge;
-    private String fifthScrambler;
+    private AccountDTO fifthJudge;
+    private AccountDTO fifthScrambler;
     private Integer extra1;
     private String extra1Reason;
     private Integer extra2;
@@ -46,8 +46,6 @@ public class ParticipateDTO {
     private Integer stateRanking;
     private BestType singleBestType;
     private BestType averageBestType;
-    private String checker1;
-    private String checker2;
     public ParticipateDTO(Participate entity){
         this.idx=entity.getIdx();
         this.pdx=entity.getPdx();
@@ -58,16 +56,16 @@ public class ParticipateDTO {
         this.third=entity.getThird();
         this.fourth=entity.getFourth();
         this.fifth=entity.getFifth();
-        this.firstJudge=entity.getFirstJudge();
-        this.secondJudge=entity.getSecondJudge();
-        this.thirdJudge=entity.getThirdJudge();
-        this.fourthJudge=entity.getFourthJudge();
-        this.fifthJudge=entity.getFifthJudge();
-        this.firstScrambler=entity.getFirstScrambler();
-        this.secondScrambler=entity.getSecondScrambler();
-        this.thirdScrambler=entity.getThirdScrambler();
-        this.fourthScrambler=entity.getFourthScrambler();
-        this.fifthScrambler=entity.getFifthScrambler();
+        this.firstJudge = AccountDTO.from(entity.getFirstJudge()); // 변경
+        this.secondJudge = AccountDTO.from(entity.getSecondJudge()); // 변경
+        this.thirdJudge = AccountDTO.from(entity.getThirdJudge()); // 변경
+        this.fourthJudge = AccountDTO.from(entity.getFourthJudge()); // 변경
+        this.fifthJudge = AccountDTO.from(entity.getFifthJudge()); // 변경
+        this.firstScrambler = AccountDTO.from(entity.getFirstScrambler()); // 변경
+        this.secondScrambler = AccountDTO.from(entity.getSecondScrambler()); // 변경
+        this.thirdScrambler = AccountDTO.from(entity.getThirdScrambler()); // 변경
+        this.fourthScrambler = AccountDTO.from(entity.getFourthScrambler()); // 변경
+        this.fifthScrambler = AccountDTO.from(entity.getFifthScrambler()); // 변경
         this.extra1=entity.getExtra1();
         this.extra1Reason=entity.getExtra1Reason();
         this.extra2=entity.getExtra2();
@@ -78,8 +76,6 @@ public class ParticipateDTO {
         this.stateRanking=entity.getStateRanking();
         this.singleBestType=entity.getSingleBestType();
         this.averageBestType=entity.getAverageBestType();
-        this.checker1=entity.getChecker1();
-        this.checker2=entity.getChecker2();
     }
     public ParticipateDTO(Account account, Integer pdx, Round round) {
         this.account=new AccountDTO(account);
@@ -114,20 +110,20 @@ public class ParticipateDTO {
                 .account(accountRepository.findByEmail(account.getEmail()).orElse(null))
                 .round(round)
                 .first(first != null ? first : BigDecimal.ZERO)
-                .firstJudge(firstJudge)
-                .firstScrambler(firstScrambler)
+                .firstJudge(firstJudge != null ? accountRepository.findByEmail(firstJudge.getEmail()).orElse(null) : null)
+                .firstScrambler(firstScrambler != null ? accountRepository.findByEmail(firstScrambler.getEmail()).orElse(null) : null)
                 .second(second != null ? second : BigDecimal.ZERO)
-                .secondJudge(secondJudge)
-                .secondScrambler(secondScrambler)
+                .secondJudge(secondJudge != null ? accountRepository.findByEmail(secondJudge.getEmail()).orElse(null) : null)
+                .secondScrambler(secondScrambler != null ? accountRepository.findByEmail(secondScrambler.getEmail()).orElse(null) : null)
                 .third(third != null ? third : BigDecimal.ZERO)
-                .thirdJudge(thirdJudge)
-                .thirdScrambler(thirdScrambler)
+                .thirdJudge(thirdJudge != null ? accountRepository.findByEmail(thirdJudge.getEmail()).orElse(null) : null)
+                .thirdScrambler(thirdScrambler != null ? accountRepository.findByEmail(thirdScrambler.getEmail()).orElse(null) : null)
                 .fourth(fourth != null ? fourth : BigDecimal.ZERO)
-                .fourthJudge(fourthJudge)
-                .fourthScrambler(fourthScrambler)
+                .fourthJudge(fourthJudge != null ? accountRepository.findByEmail(fourthJudge.getEmail()).orElse(null) : null)
+                .fourthScrambler(fourthScrambler != null ? accountRepository.findByEmail(fourthScrambler.getEmail()).orElse(null) : null)
                 .fifth(fifth != null ? fifth : BigDecimal.ZERO)
-                .fifthJudge(fifthJudge)
-                .fifthScrambler(fifthScrambler)
+                .fifthJudge(fifthJudge != null ? accountRepository.findByEmail(fifthJudge.getEmail()).orElse(null) : null)
+                .fifthScrambler(fifthScrambler != null ? accountRepository.findByEmail(fifthScrambler.getEmail()).orElse(null) : null)
                 .extra1(extra1)
                 .extra1Reason(extra1Reason)
                 .extra2(extra2)
@@ -138,8 +134,7 @@ public class ParticipateDTO {
                 .stateRanking(stateRanking)
                 .singleBestType(singleBestType)
                 .averageBestType(averageBestType)
-                .checker1(checker1)
-                .checker2(checker2)
                 .build();
     }
+
 }

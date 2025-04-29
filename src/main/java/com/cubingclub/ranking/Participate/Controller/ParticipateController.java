@@ -3,6 +3,7 @@ package com.cubingclub.ranking.Participate.Controller;
 import com.cubingclub.ranking.Participate.DTO.ParticipateDTO;
 import com.cubingclub.ranking.Participate.DTO.ParticipateRecordDTO;
 import com.cubingclub.ranking.Participate.DTO.ParticipateRequestDTO;
+import com.cubingclub.ranking.Participate.DTO.ParticipateUserDTO;
 import com.cubingclub.ranking.Participate.Service.ParticipateService;
 import com.cubingclub.ranking.Account.Service.AccountService;
 import com.cubingclub.ranking.BestRecord.Service.PersonalService;
@@ -25,14 +26,12 @@ public class ParticipateController {
     private final PersonalService personalService;
 
     @GetMapping("/records/{roundIdx}")
-    public ResponseEntity<List<ParticipateDTO>> RecordList(@PathVariable(value="roundIdx") Integer roundIdx){
+    public ResponseEntity<List<ParticipateUserDTO>> RecordList(@PathVariable(value="roundIdx") Integer roundIdx){
         return ResponseEntity.ok(participateService.getParticipateForUser(roundIdx));
     }
     @PostMapping("/record")
     public ResponseEntity<?> UpdateRecord(@RequestBody ParticipateRecordDTO participateRecordDTO){
-        Authentication authentication= SecurityContextHolder.getContext().getAuthentication();
-        String checkerName=accountService.getUserName(authentication.getName());
-        participateService.updateRecord(participateRecordDTO, checkerName);
+        participateService.updateRecord(participateRecordDTO);
         return ResponseEntity.ok().build();
     }
     @DeleteMapping("/record/{idx}")
@@ -40,22 +39,13 @@ public class ParticipateController {
         participateService.deleteParticipate(idx);
         return ResponseEntity.ok().build();
     }
-    @PostMapping("/advance/{pastRoundIdx}/{advanceRoundIdx}")//기록에서 어드밴스 인원 다음 라운드로 넘기는 콜
+    /**@PostMapping("/advance/{pastRoundIdx}/{advanceRoundIdx}")//기록에서 어드밴스 인원 다음 라운드로 넘기는 콜
     public ResponseEntity<Integer> Advance(@PathVariable(value="pastRoundIdx")Integer pastRoundIdx, @PathVariable(value="advanceRoundIdx")Integer advanceRoundIdx){
         return ResponseEntity.ok(participateService.addAdvance(pastRoundIdx, advanceRoundIdx));
-    }
+    }**/
 
     @PostMapping("/participate")//선수 추가 콜
     public ResponseEntity<Integer> AddParticipate(@RequestBody List<ParticipateRequestDTO> participates){
         return ResponseEntity.ok(participateService.addParticipate(participates));
     }
-
-    @PutMapping("/checker/{idx}")//checker 갱신 콜
-    public ResponseEntity<?> UpdateChecker(@PathVariable(value="idx")Integer idx){
-        Authentication authentication= SecurityContextHolder.getContext().getAuthentication();
-        String checkerName=accountService.getUserName(authentication.getName());
-        participateService.updateChecker(checkerName, idx);
-        return ResponseEntity.ok().build();
-    }
-
 }

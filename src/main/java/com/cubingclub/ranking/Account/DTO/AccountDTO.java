@@ -32,4 +32,10 @@ public class AccountDTO {
         this.gender=entity.getGender();
         this.phoneNum=entity.getPhoneNum();
     }
+    public static AccountDTO from(Account entity) {
+        if (entity == null) {
+            return null;
+        }
+        return new AccountDTO(entity);
+    }
 }
