@@ -82,18 +82,21 @@ public class ParticipateDTO {
         this.pdx=pdx;
         this.round=round;
     }
+    private boolean isNonZero(BigDecimal value) {
+        return value != null && value.compareTo(BigDecimal.ZERO) != 0;
+    }
     public boolean allNonZero() {
         String avgCalc = round.getCubeEvent().getAvgCalc();
         return switch (avgCalc) {
-            case "single" -> !first.equals(BigDecimal.ZERO);
-            case "mo3" -> !first.equals(BigDecimal.ZERO)
-                    && !second.equals(BigDecimal.ZERO)
-                    && !third.equals(BigDecimal.ZERO);
-            default -> !first.equals(BigDecimal.ZERO)
-                    && !second.equals(BigDecimal.ZERO)
-                    && !third.equals(BigDecimal.ZERO)
-                    && !fourth.equals(BigDecimal.ZERO)
-                    && !fifth.equals(BigDecimal.ZERO);
+            case "single" -> isNonZero(first);
+            case "mo3" -> isNonZero(first)
+                    && isNonZero(second)
+                    && isNonZero(third);
+            default -> isNonZero(first)
+                    && isNonZero(second)
+                    && isNonZero(third)
+                    && isNonZero(fourth)
+                    && isNonZero(fifth);
         };
     }
     public Participate toEntity(AccountRepository accountRepository){

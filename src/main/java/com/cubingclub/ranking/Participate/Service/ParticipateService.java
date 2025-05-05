@@ -12,6 +12,7 @@ import com.cubingclub.ranking.Round.Repository.RoundRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.antlr.v4.runtime.misc.Pair;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -44,15 +45,16 @@ public class ParticipateService {
                 String name = p.getAccount().getEnName();
                 String roundName = p.getRound().getCubeEvent().getEventName() + " " + p.getRound().getRoundName();
                 String type = p.getRound().getCubeEvent().getAvgCalc();
+                String state=p.getAccount().getState();
 
-                if (isEmpty(p.getFirst())) return new RecorderResponseDTO(p.getIdx(), 1, name, roundName);
+                if (isEmpty(p.getFirst())) return new RecorderResponseDTO(p.getIdx(), 1, name, roundName, state);
                 if (!"single".equals(type)) {
-                    if (isEmpty(p.getSecond())) return new RecorderResponseDTO(p.getIdx(), 2, name, roundName);
-                    if (isEmpty(p.getThird())) return new RecorderResponseDTO(p.getIdx(), 3, name, roundName);
+                    if (isEmpty(p.getSecond())) return new RecorderResponseDTO(p.getIdx(), 2, name, roundName, state);
+                    if (isEmpty(p.getThird())) return new RecorderResponseDTO(p.getIdx(), 3, name, roundName, state);
                 }
                 if ("ao5".equals(type)) {
-                    if (isEmpty(p.getFourth())) return new RecorderResponseDTO(p.getIdx(), 4, name, roundName);
-                    if (isEmpty(p.getFifth())) return new RecorderResponseDTO(p.getIdx(), 5, name, roundName);
+                    if (isEmpty(p.getFourth())) return new RecorderResponseDTO(p.getIdx(), 4, name, roundName, state);
+                    if (isEmpty(p.getFifth())) return new RecorderResponseDTO(p.getIdx(), 5, name, roundName, state);
                 }
             }
         }
@@ -119,22 +121,29 @@ public class ParticipateService {
         } else {
             participateDTO.setAverage(BigDecimal.ZERO);
             participateDTO.setSingle(BigDecimal.ZERO);
-            participateDTO.setRanking(0);
+            participateDTO.setRanking(null);
         }
-
-        Map<String, BestType> bestTypeMap = calculateBestType(
-                participateDTO.getAccount().getEmail(),
-                participateDTO.getAccount().getState(),
-                participateDTO.getRound().getCubeEvent().getEventName(),
-                participateDTO.getSingle(),
-                participateDTO.getAverage()
-        );
-
-        participateDTO.setSingleBestType(bestTypeMap.get("single"));
-        participateDTO.setAverageBestType(bestTypeMap.get("average"));
 
         participateRepository.save(participateDTO.toEntityFull(accountRepository));
         participateRepository.setRankOnRound(participateDTO.getRound().getIdx());
+        List<Participate> participateList=participateRepository.findByRound_IdxForBestType(participateDTO.getRound().getIdx());
+        for(Participate participate: participateList) {
+            if(!participate.getIdx().equals(participateDTO.getIdx()) && (participate.getSingleBestType()==null || participate.getSingleBestType()==BestType.PR) && (participate.getAverageBestType()==null || participate.getAverageBestType()==BestType.PR)){
+                continue;
+            }
+            ParticipateDTO eachParticipateDTO=new ParticipateDTO(participate);
+            Map<String, BestType> bestTypeMap = calculateBestType(
+                    participate.getIdx(),
+                    participate.getAccount().getEmail(),
+                    participate.getAccount().getState(),
+                    participate.getRound().getCubeEvent().getEventName(),
+                    participate.getSingle(),
+                    participate.getAverage()
+            );
+            eachParticipateDTO.setSingleBestType(bestTypeMap.get("single"));
+            eachParticipateDTO.setAverageBestType(bestTypeMap.get("average"));
+            participateRepository.save(eachParticipateDTO.toEntityFull(accountRepository));
+        }
     }
 
 
@@ -206,14 +215,14 @@ public class ParticipateService {
     }
 
 
-    private Map<String, BestType> calculateBestType(String email, String state, String eventName, BigDecimal single, BigDecimal average){
+    private Map<String, BestType> calculateBestType(Integer idx, String email, String state, String eventName, BigDecimal single, BigDecimal average){
         Map<String, BestType> best=new HashMap<>();
-        BigDecimal personalSingleBest=participateRepository.findPersonalSingleBest(email, eventName);
-        if(personalSingleBest==null || personalSingleBest.compareTo(single)>0){
-            BigDecimal stateSingleBest=participateRepository.findStateSingleBest(state, eventName);
-            if(stateSingleBest==null || stateSingleBest.compareTo(single)>0 ){
-                BigDecimal allSingleBest=participateRepository.findAllSingleBest(eventName);
-                if(allSingleBest==null || allSingleBest.compareTo(single)>0){
+        BestResult personalSingleBest=participateRepository.findPersonalSingleBest(email, eventName);
+        if(personalSingleBest==null || personalSingleBest.getBest().compareTo(single)>0 || (personalSingleBest.getIdx().equals(idx) && personalSingleBest.getBest().compareTo(single)>=0)){
+            BestResult stateSingleBest=participateRepository.findStateSingleBest(state, eventName);
+            if(stateSingleBest==null || stateSingleBest.getBest().compareTo(single)>0 || (stateSingleBest.getIdx().equals(idx) && stateSingleBest.getBest().compareTo(single)>=0)){
+                BestResult allSingleBest=participateRepository.findAllSingleBest(eventName);
+                if(allSingleBest==null || allSingleBest.getBest().compareTo(single)>0 || (allSingleBest.getIdx().equals(idx) && allSingleBest.getBest().compareTo(single)>=0)){
                     best.put("single", BestType.CCR);
                 }
                 else{
@@ -227,12 +236,12 @@ public class ParticipateService {
         else{
             best.put("single",null);
         }
-        BigDecimal personalAverageBest=participateRepository.findPersonalAverageBest(email, eventName);
-        if(personalAverageBest==null || personalAverageBest.compareTo(average)>0){
-            BigDecimal stateAverageBest=participateRepository.findStateAverageBest(state, eventName);
-            if(stateAverageBest==null || stateAverageBest.compareTo(average)>0){
-                BigDecimal allAverageBest=participateRepository.findAllAverageBest(eventName);
-                if(allAverageBest==null || allAverageBest.compareTo(average)>0){
+        BestResult personalAverageBest=participateRepository.findPersonalAverageBest(email, eventName);
+        if(personalAverageBest==null || personalAverageBest.getBest().compareTo(average)>0 || (personalAverageBest.getIdx().equals(idx) && personalAverageBest.getBest().compareTo(single)>=0)){
+            BestResult stateAverageBest=participateRepository.findStateAverageBest(state, eventName);
+            if(stateAverageBest==null || stateAverageBest.getBest().compareTo(average)>0 || (stateAverageBest.getIdx().equals(idx) && stateAverageBest.getBest().compareTo(single)>=0)){
+                BestResult allAverageBest=participateRepository.findAllAverageBest(eventName);
+                if(allAverageBest==null || allAverageBest.getBest().compareTo(average)>0 || (allAverageBest.getIdx().equals(idx) && allAverageBest.getBest().compareTo(single)>=0)){
                     best.put("average", BestType.CCR);
                 }
                 else{

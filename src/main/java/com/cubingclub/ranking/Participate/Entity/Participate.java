@@ -32,7 +32,7 @@ public class Participate {
     @JoinColumn
     private Round round;
     @Column(precision = 10, scale=2)
-    private BigDecimal first=BigDecimal.ZERO;
+    private BigDecimal first;
     @ManyToOne(fetch=FetchType.LAZY)
     @JoinColumn
     private Account firstJudge;
@@ -40,7 +40,7 @@ public class Participate {
     @JoinColumn
     private Account firstScrambler;
     @Column(precision = 10, scale=2)
-    private BigDecimal second=BigDecimal.ZERO;
+    private BigDecimal second;
     @ManyToOne(fetch=FetchType.LAZY)
     @JoinColumn
     private Account secondJudge;
@@ -48,7 +48,7 @@ public class Participate {
     @JoinColumn
     private Account secondScrambler;
     @Column(precision = 10, scale=2)
-    private BigDecimal third=BigDecimal.ZERO;
+    private BigDecimal third;
     @ManyToOne(fetch=FetchType.LAZY)
     @JoinColumn
     private Account thirdJudge;
@@ -56,7 +56,7 @@ public class Participate {
     @JoinColumn
     private Account thirdScrambler;
     @Column(precision = 10, scale=2)
-    private BigDecimal fourth=BigDecimal.ZERO;
+    private BigDecimal fourth;
     @ManyToOne(fetch=FetchType.LAZY)
     @JoinColumn
     private Account fourthJudge;
@@ -64,7 +64,7 @@ public class Participate {
     @JoinColumn
     private Account fourthScrambler;
     @Column(precision = 10, scale=2)
-    private BigDecimal fifth=BigDecimal.ZERO;
+    private BigDecimal fifth;
     @ManyToOne(fetch=FetchType.LAZY)
     @JoinColumn
     private Account fifthJudge;
@@ -80,9 +80,9 @@ public class Participate {
     @Column
     private String extra2Reason;
     @Column(precision = 10, scale=2)
-    private BigDecimal single=BigDecimal.ZERO;
+    private BigDecimal single;
     @Column(precision = 10, scale=2)
-    private BigDecimal average=BigDecimal.ZERO;
+    private BigDecimal average;
     @Column
     private Integer ranking;
     @Column

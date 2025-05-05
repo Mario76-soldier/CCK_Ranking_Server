@@ -54,4 +54,14 @@ public class AdminController {
             return ResponseEntity.badRequest().body(e);
         }
     }
+    @DeleteMapping("/rfid/{email}")
+    public ResponseEntity<?> DeleteRFID(@PathVariable(name = "email")String email){
+        try{
+            rfidService.deleteRFID(email);
+            return ResponseEntity.ok().build();
+        }
+        catch(Exception e){
+            return ResponseEntity.badRequest().body(e);
+        }
+    }
 }

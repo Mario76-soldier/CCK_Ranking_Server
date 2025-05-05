@@ -10,7 +10,7 @@ import java.util.List;
 public interface CompetitionRepository extends JpaRepository<Competition, Integer> {
     Competition findByIdx(Integer idx);
     List<Competition> findAllByOrderByCompDateStartDesc();
-    List<Competition> findByCompDateStartBeforeAndCompDateEndAfter(LocalDate date1, LocalDate date2);
+    List<Competition> findByCompDateStartLessThanEqualAndCompDateEndGreaterThanEqual(LocalDate date1, LocalDate date2);
     List<Competition> findByJoinDateEndAfterAndJoinDateStartBefore(LocalDateTime date1, LocalDateTime date2);
     void deleteByIdx(Integer idx);
 }
