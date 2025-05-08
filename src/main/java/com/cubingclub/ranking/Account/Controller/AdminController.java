@@ -1,9 +1,13 @@
 package com.cubingclub.ranking.Account.Controller;
 
+import com.cubingclub.ranking.Account.DTO.AccountDTO;
 import com.cubingclub.ranking.Account.DTO.RoleUpdateDTO;
 import com.cubingclub.ranking.Account.Entity.UserRole;
 import com.cubingclub.ranking.Account.Service.AccountService;
 import com.cubingclub.ranking.Account.Service.AdminService;
+import com.cubingclub.ranking.Participate.DTO.ExtraDTO;
+import com.cubingclub.ranking.Participate.DTO.ParticipateDTO;
+import com.cubingclub.ranking.Participate.Service.ParticipateService;
 import com.cubingclub.ranking.RFID.DTO.RFIDCreateDTO;
 import com.cubingclub.ranking.RFID.Service.RFIDService;
 import lombok.RequiredArgsConstructor;
@@ -22,6 +26,7 @@ public class AdminController {
     private final AccountService accountService;
     private final AdminService adminService;
     private final RFIDService rfidService;
+    private final ParticipateService participateService;
 
     @GetMapping("/list")
     public ResponseEntity<?> UserList(){

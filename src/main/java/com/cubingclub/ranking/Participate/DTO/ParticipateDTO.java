@@ -38,8 +38,10 @@ public class ParticipateDTO {
     private AccountDTO fifthScrambler;
     private Integer extra1;
     private String extra1Reason;
+    private AccountDTO extra1Delegate;
     private Integer extra2;
     private String extra2Reason;
+    private AccountDTO extra2Delegate;
     private BigDecimal single;
     private BigDecimal average;
     private Integer ranking;
@@ -68,8 +70,10 @@ public class ParticipateDTO {
         this.fifthScrambler = AccountDTO.from(entity.getFifthScrambler()); // 변경
         this.extra1=entity.getExtra1();
         this.extra1Reason=entity.getExtra1Reason();
+        this.extra1Delegate=AccountDTO.from(entity.getExtra1Delegate());
         this.extra2=entity.getExtra2();
         this.extra2Reason=entity.getExtra2Reason();
+        this.extra2Delegate=AccountDTO.from(entity.getExtra2Delegate());
         this.single=entity.getSingle();
         this.average=entity.getAverage();
         this.ranking=entity.getRanking();
@@ -129,8 +133,10 @@ public class ParticipateDTO {
                 .fifthScrambler(fifthScrambler != null ? accountRepository.findByEmail(fifthScrambler.getEmail()).orElse(null) : null)
                 .extra1(extra1)
                 .extra1Reason(extra1Reason)
+                .extra1Delegate(extra1Delegate != null ? accountRepository.findByEmail(extra1Delegate.getEmail()).orElse(null) : null)
                 .extra2(extra2)
                 .extra2Reason(extra2Reason)
+                .extra2Delegate(extra2Delegate != null ? accountRepository.findByEmail(extra2Delegate.getEmail()).orElse(null) : null)
                 .single(single != null ? single : BigDecimal.ZERO)
                 .average(average != null ? average : BigDecimal.ZERO)
                 .ranking(ranking)

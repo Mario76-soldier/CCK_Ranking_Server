@@ -75,10 +75,16 @@ public class Participate {
     private Integer extra1;
     @Column
     private String extra1Reason;
+    @ManyToOne(fetch=FetchType.LAZY)
+    @JoinColumn
+    private Account extra1Delegate;
     @Column
     private Integer extra2;
     @Column
     private String extra2Reason;
+    @ManyToOne(fetch=FetchType.LAZY)
+    @JoinColumn
+    private Account extra2Delegate;
     @Column(precision = 10, scale=2)
     private BigDecimal single;
     @Column(precision = 10, scale=2)

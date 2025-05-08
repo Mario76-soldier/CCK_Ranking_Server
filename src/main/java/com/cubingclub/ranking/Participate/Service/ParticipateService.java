@@ -1,6 +1,7 @@
 package com.cubingclub.ranking.Participate.Service;
 
 import com.cubingclub.ranking.Account.DTO.AccountDTO;
+import com.cubingclub.ranking.Account.Entity.Account;
 import com.cubingclub.ranking.Participate.DTO.*;
 import com.cubingclub.ranking.Participate.Entity.BestType;
 import com.cubingclub.ranking.Account.Repository.AccountRepository;
@@ -34,6 +35,18 @@ public class ParticipateService {
 
     public List<ParticipateUserDTO> getParticipateForUser(Integer roundIdx) {
         return participateRepository.findByRound_IdxForUser(roundIdx);
+    }
+    public ParticipateDTO getParticipateOne(Integer idx) {
+        return new ParticipateDTO(participateRepository.findByIdx(idx));
+    }
+
+    public List<ParticipateDTO> getParticipateForAdmin(Integer roundIdx) {
+        List<Participate> participateList=participateRepository.findByRound_Idx(roundIdx);
+        List<ParticipateDTO> participateDTOList=new ArrayList<>();
+        for(Participate participate:participateList){
+            participateDTOList.add(new ParticipateDTO(participate));
+        }
+        return participateDTOList;
     }
 
     public RecorderResponseDTO getForRecorder(String uid, Integer compIdx) {
@@ -99,6 +112,64 @@ public class ParticipateService {
         applyRecordUpdate(participateDTO); // 1차 체크 없음
     }
 
+    public void addExtra(ExtraDTO extraDTO, AccountDTO delegate){
+
+        ParticipateDTO participateDTO=new ParticipateDTO(participateRepository.findByIdx(extraDTO.getPartIdx()));
+        switch (extraDTO.getExtraNum()){
+            case 1->{
+                participateDTO.setExtra1Delegate(delegate);
+                participateDTO.setExtra1(extraDTO.getExtraTry());
+                participateDTO.setExtra1Reason(extraDTO.getExtraReason());
+            }
+            case 2->{
+                participateDTO.setExtra2Delegate(delegate);
+                participateDTO.setExtra2(extraDTO.getExtraTry());
+                participateDTO.setExtra2Reason(extraDTO.getExtraReason());
+            }
+        };
+        participateRepository.save(participateDTO.toEntityFull(accountRepository));
+    }
+    public void deleteExtra(Integer partIdx, Integer extraNum){
+
+        ParticipateDTO participateDTO=new ParticipateDTO(participateRepository.findByIdx(partIdx));
+        switch (extraNum){
+            case 1->{
+                participateDTO.setExtra1Delegate(null);
+                participateDTO.setExtra1(null);
+                participateDTO.setExtra1Reason(null);
+            }
+            case 2->{
+                participateDTO.setExtra2Delegate(null);
+                participateDTO.setExtra2(null);
+                participateDTO.setExtra2Reason(null);
+            }
+        };
+        participateRepository.save(participateDTO.toEntityFull(accountRepository));
+    }
+
+    public ExpectedBestWorstDTO calculateExpectation(Integer idx){
+        Participate participate=participateRepository.findByIdx(idx);
+        if(!participate.getRound().getCubeEvent().getAvgCalc().equals("ao5")){
+            return null;
+        }
+        ParticipateDTO participateDTO=new ParticipateDTO(participate);
+        if(participateDTO.getThird()!=null && !participateDTO.getThird().equals(BigDecimal.ZERO)){
+            List<BigDecimal> best = Arrays.asList(
+                    participateDTO.getFirst(), participateDTO.getSecond(), participateDTO.getThird(),
+                    participateDTO.getFourth(), BigDecimal.valueOf(0.01)
+            );
+            List<BigDecimal> worst = Arrays.asList(
+                    participateDTO.getFirst(), participateDTO.getSecond(), participateDTO.getThird(),
+                    participateDTO.getFourth(), BigDecimal.valueOf(-1)
+            );
+            ExpectedBestWorstDTO expectedBestWorstDTO=new ExpectedBestWorstDTO();
+            expectedBestWorstDTO.setBestAverage(calculateAo5Average(best));
+            expectedBestWorstDTO.setWorstAverage(calculateAo5Average(worst));
+            return expectedBestWorstDTO;
+        }
+        return null;
+    }
+
     private void applyRecordUpdate(ParticipateDTO participateDTO) {
         String calcType = participateDTO.getRound().getCubeEvent().getAvgCalc();
 
@@ -151,6 +222,12 @@ public class ParticipateService {
         Integer roundIdx=participateRepository.findByIdx(idx).getRound().getIdx();
         participateRepository.deleteByIdx(idx);
         participateRepository.setRankOnRound(roundIdx);
+    }
+
+    public void quitParticipate(List<Integer> partList) {
+        for(Integer part:partList){
+            participateRepository.deleteByIdx(part);
+        }
     }
 
     /**public Integer addAdvance(Integer pastRoundIdx, Integer advanceRoundIdx){

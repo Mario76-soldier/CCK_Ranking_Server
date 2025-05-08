@@ -20,6 +20,9 @@ public interface ParticipateRepository extends JpaRepository<Participate, Intege
     @Query("select p from Participate p join fetch p.account a join fetch p.round r join fetch r.cubeEvent ce join fetch r.comp c where r.idx=:roundIdx and p.single is not null and p.average is not null and p.single!=0 " +
             "and p.average!=0 order by (case when p.ranking is null or p.ranking=0 then 1 else 0 end) asc, p.ranking asc")
     List<Participate> findByRound_IdxForBestType(@Param(value="roundIdx")Integer roundIdx);
+    @Query("select p from Participate p join fetch p.account a join fetch p.round r join fetch r.cubeEvent ce join fetch r.comp c where r.idx=:roundIdx " +
+            "order by (case when p.ranking is null or p.ranking=0 then 1 else 0 end) asc, p.ranking asc")
+    List<Participate> findByRound_Idx(@Param(value="roundIdx")Integer roundIdx);
     @Modifying
     @Query(value = "update Participate p JOIN (" +
             "SELECT idx, RANK() OVER (ORDER BY (case when average = -2 then 2 when average = -1 then 1 else 0 end), average) AS new_rank FROM Participate where round_idx =:roundIdx and average is not null and average!=0) " +
