@@ -10,6 +10,6 @@ import java.math.BigDecimal;
 @Setter
 @NoArgsConstructor
 public class SingleAverageDTO {
-    BigDecimal single;
-    BigDecimal average;
+    String single;
+    String average;
 }

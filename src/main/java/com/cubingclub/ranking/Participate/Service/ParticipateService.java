@@ -49,9 +49,8 @@ public class ParticipateService {
         return participateDTOList;
     }
 
-    public RecorderResponseDTO getForRecorder(String uid, Integer compIdx) {
-        String email;
-        if((email=rfidRepository.findEmailByUid(uid))!=null) {
+    public RecorderResponseDTO getForRecorder(String email, Integer compIdx) {
+        if(accountRepository.findByEmail(email).isPresent()) {
             List<Participate> list = participateRepository.findByAccount_EmailAndRound_Comp_Idx(email, compIdx);
 
             for (Participate p : list) {
@@ -60,14 +59,14 @@ public class ParticipateService {
                 String type = p.getRound().getCubeEvent().getAvgCalc();
                 String state=p.getAccount().getState();
 
-                if (isEmpty(p.getFirst())) return new RecorderResponseDTO(p.getIdx(), 1, name, roundName, state);
+                if (isEmpty(p.getFirst())) return new RecorderResponseDTO(p.getIdx(), 1, name, state, roundName);
                 if (!"single".equals(type)) {
-                    if (isEmpty(p.getSecond())) return new RecorderResponseDTO(p.getIdx(), 2, name, roundName, state);
-                    if (isEmpty(p.getThird())) return new RecorderResponseDTO(p.getIdx(), 3, name, roundName, state);
+                    if (isEmpty(p.getSecond())) return new RecorderResponseDTO(p.getIdx(), 2, name, state, roundName);
+                    if (isEmpty(p.getThird())) return new RecorderResponseDTO(p.getIdx(), 3, name, state, roundName);
                 }
                 if ("ao5".equals(type)) {
-                    if (isEmpty(p.getFourth())) return new RecorderResponseDTO(p.getIdx(), 4, name, roundName, state);
-                    if (isEmpty(p.getFifth())) return new RecorderResponseDTO(p.getIdx(), 5, name, roundName, state);
+                    if (isEmpty(p.getFourth())) return new RecorderResponseDTO(p.getIdx(), 4, name, state, roundName);
+                    if (isEmpty(p.getFifth())) return new RecorderResponseDTO(p.getIdx(), 5, name, state, roundName);
                 }
             }
         }
@@ -147,7 +146,7 @@ public class ParticipateService {
         participateRepository.save(participateDTO.toEntityFull(accountRepository));
     }
 
-    public ExpectedBestWorstDTO calculateExpectation(Integer idx){
+    public SingleAverageDTO calculateExpectation(Integer idx){
         Participate participate=participateRepository.findByIdx(idx);
         if(!participate.getRound().getCubeEvent().getAvgCalc().equals("ao5")){
             return null;
@@ -162,14 +161,28 @@ public class ParticipateService {
                     participateDTO.getFirst(), participateDTO.getSecond(), participateDTO.getThird(),
                     participateDTO.getFourth(), BigDecimal.valueOf(-1)
             );
-            ExpectedBestWorstDTO expectedBestWorstDTO=new ExpectedBestWorstDTO();
-            expectedBestWorstDTO.setBestAverage(calculateAo5Average(best));
-            expectedBestWorstDTO.setWorstAverage(calculateAo5Average(worst));
+            SingleAverageDTO expectedBestWorstDTO=new SingleAverageDTO();
+            expectedBestWorstDTO.setSingle(formatSeconds(calculateAo5Average(best)));
+            expectedBestWorstDTO.setAverage(formatSeconds(calculateAo5Average(worst)));
             return expectedBestWorstDTO;
         }
         return null;
     }
+    public String formatSeconds(BigDecimal seconds) {
+        if(seconds.equals(BigDecimal.valueOf(-1))){
+            return "DNF";
+        }
+        else if(seconds.equals(BigDecimal.valueOf(-2))){
+            return "DNS";
+        }
+        int totalMillis = seconds.multiply(BigDecimal.valueOf(100)).intValue();
 
+        int minutes = totalMillis / 6000;
+        int secs = (totalMillis % 6000) / 100;
+        int millis = totalMillis % 100;
+
+        return String.format("%d:%02d.%02d", minutes, secs, millis);
+    }
     private void applyRecordUpdate(ParticipateDTO participateDTO) {
         String calcType = participateDTO.getRound().getCubeEvent().getAvgCalc();
 
