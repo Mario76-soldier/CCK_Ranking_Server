@@ -15,7 +15,7 @@ public interface ParticipateRepository extends JpaRepository<Participate, Intege
     void deleteByRound_Comp_Idx(Integer compIdx);
     @Query("select new com.cubingclub.ranking.Participate.DTO.ParticipateUserDTO(p.idx, p.pdx, a.email, a.name, a.enName, a.state, " +
             "p.first, p.second, p.third, p.fourth, p.fifth, p.extra1, p.extra1Reason, p.extra2, p.extra2Reason, p.single, p.average, p.ranking, p.stateRanking, p.singleBestType, p.averageBestType) " +
-            "from Participate p join Account a on (p.account.email=a.email) join Round r on (p.round.idx=r.idx) where r.idx=:roundIdx order by (case when p.ranking is null or p.ranking=0 then 1 else 0 end) asc, p.ranking asc")
+            "from Participate p join Account a on (p.account.email=a.email) join Scrambler r on (p.round.idx=r.idx) where r.idx=:roundIdx order by (case when p.ranking is null or p.ranking=0 then 1 else 0 end) asc, p.ranking asc")
     List<ParticipateUserDTO> findByRound_IdxForUser(@Param(value="roundIdx")Integer roundIdx);
     @Query("select p from Participate p join fetch p.account a join fetch p.round r join fetch r.cubeEvent ce join fetch r.comp c where r.idx=:roundIdx and p.single is not null and p.average is not null and p.single!=0 " +
             "and p.average!=0 order by (case when p.ranking is null or p.ranking=0 then 1 else 0 end) asc, p.ranking asc")
@@ -66,6 +66,6 @@ public interface ParticipateRepository extends JpaRepository<Participate, Intege
     void deleteByRound_Idx(Integer idx);
     @Query("SELECT r.idx, COUNT(*) FROM Participate p JOIN p.round r GROUP BY r.idx")
     List<Object[]> findAllRoundParticipantCounts();
-    //@Query("select count(p.idx) from Participate p join fetch Round r where p.round.idx=:roundIdx and p.email.")
+    //@Query("select count(p.idx) from Participate p join fetch Scrambler r where p.round.idx=:roundIdx and p.email.")
     //Integer countParticipateByRoundState(@Param(value="roundIdx")Integer roundIdx);
 }

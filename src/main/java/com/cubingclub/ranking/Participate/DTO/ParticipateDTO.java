@@ -21,6 +21,7 @@ public class ParticipateDTO {
     private Integer pdx;
     private AccountDTO account;
     private Round round;
+    private String roundGroup;
     private BigDecimal first;
     private AccountDTO firstJudge;
     private AccountDTO firstScrambler;
@@ -53,6 +54,7 @@ public class ParticipateDTO {
         this.pdx=entity.getPdx();
         this.account=new AccountDTO(entity.getAccount());
         this.round=entity.getRound();
+        this.roundGroup=entity.getRoundGroup();
         this.first=entity.getFirst();
         this.second=entity.getSecond();
         this.third=entity.getThird();
@@ -81,10 +83,11 @@ public class ParticipateDTO {
         this.singleBestType=entity.getSingleBestType();
         this.averageBestType=entity.getAverageBestType();
     }
-    public ParticipateDTO(Account account, Integer pdx, Round round) {
+    public ParticipateDTO(Account account, Integer pdx, Round round, String roundGroup) {
         this.account=new AccountDTO(account);
         this.pdx=pdx;
         this.round=round;
+        this.roundGroup=roundGroup;
     }
     private boolean isNonZero(BigDecimal value) {
         return value != null && value.compareTo(BigDecimal.ZERO) != 0;
@@ -108,6 +111,7 @@ public class ParticipateDTO {
                 .pdx(pdx)
                 .account(accountRepository.findByEmail(account.getEmail()).orElse(null))
                 .round(round)
+                .roundGroup(roundGroup)
                 .build();
     }
     public Participate toEntityFull(AccountRepository accountRepository) {
@@ -116,6 +120,7 @@ public class ParticipateDTO {
                 .pdx(pdx)
                 .account(accountRepository.findByEmail(account.getEmail()).orElse(null))
                 .round(round)
+                .roundGroup(roundGroup)
                 .first(first != null ? first : BigDecimal.ZERO)
                 .firstJudge(firstJudge != null ? accountRepository.findByEmail(firstJudge.getEmail()).orElse(null) : null)
                 .firstScrambler(firstScrambler != null ? accountRepository.findByEmail(firstScrambler.getEmail()).orElse(null) : null)

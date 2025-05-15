@@ -31,6 +31,8 @@ public class Participate {
     @ManyToOne(fetch=FetchType.LAZY)
     @JoinColumn
     private Round round;
+    @Column
+    private String roundGroup;
     @Column(precision = 10, scale=2)
     private BigDecimal first;
     @ManyToOne(fetch=FetchType.LAZY)

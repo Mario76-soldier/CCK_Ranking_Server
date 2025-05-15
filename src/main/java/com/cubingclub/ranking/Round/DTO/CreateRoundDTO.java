@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Getter
 @Setter
@@ -19,6 +20,7 @@ public class CreateRoundDTO {
     private String roundName;
     private LocalDateTime eventStart;
     private LocalDateTime eventEnd;
+    private List<String> groupList;
     private Integer advance;
     public Round toEntity(CompetitionRepository competitionRepository, CubeEventRepository cubeEventRepository){
         return Round.builder()

@@ -244,7 +244,7 @@ public class ParticipateService {
     }
 
     /**public Integer addAdvance(Integer pastRoundIdx, Integer advanceRoundIdx){
-        Round pastRound=roundRepository.findByIdx(pastRoundIdx);
+        Scrambler pastRound=roundRepository.findByIdx(pastRoundIdx);
         List<ParticipateUserDTO> participateList=getParticipateForUser(pastRoundIdx);
         List<Participate> advanceList=new ArrayList<>();
         for(int i=0; i<pastRound.getAdvance(); i++){
