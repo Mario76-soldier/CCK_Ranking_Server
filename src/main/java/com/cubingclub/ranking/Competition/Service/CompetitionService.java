@@ -57,7 +57,7 @@ public class CompetitionService {
         return result;
     }
     public List<CompetitionDTO> getCompListToday(LocalDate date){
-        List<Competition> list=competitionRepository.findByCompDateStartBeforeAndCompDateEndAfter(date, date);
+        List<Competition> list=competitionRepository.findByCompDateStartLessThanEqualAndCompDateEndGreaterThanEqual(date, date);
         List<CompetitionDTO> listDTO=new ArrayList<>();
         for(Competition c : list){
             listDTO.add(new CompetitionDTO(c));

@@ -24,6 +24,10 @@ public class ParticipateUserDTO {
     private BigDecimal third;
     private BigDecimal fourth;
     private BigDecimal fifth;
+    private Integer extra1;
+    private String extra1Reason;
+    private Integer extra2;
+    private String extra2Reason;
     private BigDecimal single;
     private BigDecimal average;
     private Integer ranking;

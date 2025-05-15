@@ -1,70 +1,85 @@
 package com.cubingclub.ranking.Participate.Service;
 
-import com.cubingclub.ranking.Participate.DTO.ParticipateDTO;
-import com.cubingclub.ranking.Participate.DTO.ParticipateRecordDTO;
-import com.cubingclub.ranking.Participate.DTO.ParticipateRequestDTO;
-import com.cubingclub.ranking.Participate.DTO.RecorderResponseDTO;
+import com.cubingclub.ranking.Account.DTO.AccountDTO;
+import com.cubingclub.ranking.Account.Entity.Account;
+import com.cubingclub.ranking.Participate.DTO.*;
 import com.cubingclub.ranking.Participate.Entity.BestType;
 import com.cubingclub.ranking.Account.Repository.AccountRepository;
 import com.cubingclub.ranking.Participate.Repository.ParticipateRepository;
 import com.cubingclub.ranking.Participate.Entity.Participate;
+import com.cubingclub.ranking.RFID.Repository.RFIDRepository;
 import com.cubingclub.ranking.Round.Entity.Round;
 import com.cubingclub.ranking.Round.Repository.RoundRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.antlr.v4.runtime.misc.Pair;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.*;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 @Transactional
 public class ParticipateService {
     private final RoundRepository roundRepository;
     private final ParticipateRepository participateRepository;
+    private final RFIDRepository rfidRepository;
     private final AccountRepository accountRepository;
 
     private static final BigDecimal DNF = BigDecimal.valueOf(-1);
     private static final BigDecimal DNS = BigDecimal.valueOf(-2);
 
-    public List<ParticipateDTO> getParticipateForUser(Integer roundIdx) {
-        List<Participate> list = participateRepository.findByRound_IdxForUser(roundIdx);
-        List<ParticipateDTO> listDTO = new ArrayList<>(list.size());
-        list.forEach(participate -> listDTO.add(new ParticipateDTO(participate)));
-        return listDTO;
+    public List<ParticipateUserDTO> getParticipateForUser(Integer roundIdx) {
+        return participateRepository.findByRound_IdxForUser(roundIdx);
+    }
+    public ParticipateDTO getParticipateOne(Integer idx) {
+        return new ParticipateDTO(participateRepository.findByIdx(idx));
+    }
+
+    public List<ParticipateDTO> getParticipateForAdmin(Integer roundIdx) {
+        List<Participate> participateList=participateRepository.findByRound_Idx(roundIdx);
+        List<ParticipateDTO> participateDTOList=new ArrayList<>();
+        for(Participate participate:participateList){
+            participateDTOList.add(new ParticipateDTO(participate));
+        }
+        return participateDTOList;
     }
 
     public RecorderResponseDTO getForRecorder(String email, Integer compIdx) {
-        List<Participate> list = participateRepository.findByAccount_EmailAndRound_Comp_Idx(email, compIdx);
+        if(accountRepository.findByEmail(email).isPresent()) {
+            List<Participate> list = participateRepository.findByAccount_EmailAndRound_Comp_Idx(email, compIdx);
 
-        for (Participate p : list) {
-            String name = p.getAccount().getEnName();
-            String roundName = p.getRound().getCubeEvent().getEventName() + " " + p.getRound().getRoundName();
-            String type = p.getRound().getCubeEvent().getAvgCalc();
+            for (Participate p : list) {
+                String name = p.getAccount().getEnName();
+                String roundName = p.getRound().getCubeEvent().getEventName() + " " + p.getRound().getRoundName();
+                String type = p.getRound().getCubeEvent().getAvgCalc();
+                String state=p.getAccount().getState();
 
-            if (isEmpty(p.getFirst())) return new RecorderResponseDTO(p.getIdx(), 1, name, roundName);
-            if (!"single".equals(type)) {
-                if (isEmpty(p.getSecond())) return new RecorderResponseDTO(p.getIdx(), 2, name, roundName);
-                if (isEmpty(p.getThird())) return new RecorderResponseDTO(p.getIdx(), 3, name, roundName);
-            }
-            if ("ao5".equals(type)) {
-                if (isEmpty(p.getFourth())) return new RecorderResponseDTO(p.getIdx(), 4, name, roundName);
-                if (isEmpty(p.getFifth())) return new RecorderResponseDTO(p.getIdx(), 5, name, roundName);
+                if (isEmpty(p.getFirst())) return new RecorderResponseDTO(p.getIdx(), 1, name, state, roundName);
+                if (!"single".equals(type)) {
+                    if (isEmpty(p.getSecond())) return new RecorderResponseDTO(p.getIdx(), 2, name, state, roundName);
+                    if (isEmpty(p.getThird())) return new RecorderResponseDTO(p.getIdx(), 3, name, state, roundName);
+                }
+                if ("ao5".equals(type)) {
+                    if (isEmpty(p.getFourth())) return new RecorderResponseDTO(p.getIdx(), 4, name, state, roundName);
+                    if (isEmpty(p.getFifth())) return new RecorderResponseDTO(p.getIdx(), 5, name, state, roundName);
+                }
             }
         }
         return null;
     }
-    public void updateRecord(ParticipateRecordDTO p, String checkerName) {
+    public void updateRecord(ParticipateRecordDTO p) {
         ParticipateDTO participateDTO = new ParticipateDTO(participateRepository.findByIdx(p.getIdx()));
         participateDTO.setFirst(p.getFirst());
         participateDTO.setSecond(p.getSecond());
         participateDTO.setThird(p.getThird());
         participateDTO.setFourth(p.getFourth());
         participateDTO.setFifth(p.getFifth());
-
-        applyRecordUpdate(participateDTO, checkerName);
+        applyRecordUpdate(participateDTO);
     }
 
     public void updateRecordOne(Integer idx, Integer seq, BigDecimal record, String judgeEmail) {
@@ -74,75 +89,145 @@ public class ParticipateService {
         switch (seq) {
             case 1 -> {
                 participateDTO.setFirst(record);
-                participateDTO.setFirstJudge(judgeEmail);
+                participateDTO.setFirstJudge(new AccountDTO(accountRepository.findByEmail(judgeEmail).orElseThrow()));
             }
             case 2 -> {
                 participateDTO.setSecond(record);
-                participateDTO.setSecondJudge(judgeEmail);
+                participateDTO.setSecondJudge(new AccountDTO(accountRepository.findByEmail(judgeEmail).orElseThrow()));
             }
             case 3 -> {
                 participateDTO.setThird(record);
-                participateDTO.setThirdJudge(judgeEmail);
+                participateDTO.setThirdJudge(new AccountDTO(accountRepository.findByEmail(judgeEmail).orElseThrow()));
             }
             case 4 -> {
                 participateDTO.setFourth(record);
-                participateDTO.setFourthJudge(judgeEmail);
+                participateDTO.setFourthJudge(new AccountDTO(accountRepository.findByEmail(judgeEmail).orElseThrow()));
             }
             case 5 -> {
                 participateDTO.setFifth(record);
-                participateDTO.setFifthJudge(judgeEmail);
+                participateDTO.setFifthJudge(new AccountDTO(accountRepository.findByEmail(judgeEmail).orElseThrow()));
             }
         }
-
-        applyRecordUpdate(participateDTO, null); // 1차 체크 없음
+        applyRecordUpdate(participateDTO); // 1차 체크 없음
     }
 
-    private void applyRecordUpdate(ParticipateDTO participateDTO, String checker1Name) {
+    public void addExtra(ExtraDTO extraDTO, AccountDTO delegate){
+
+        ParticipateDTO participateDTO=new ParticipateDTO(participateRepository.findByIdx(extraDTO.getPartIdx()));
+        switch (extraDTO.getExtraNum()){
+            case 1->{
+                participateDTO.setExtra1Delegate(delegate);
+                participateDTO.setExtra1(extraDTO.getExtraTry());
+                participateDTO.setExtra1Reason(extraDTO.getExtraReason());
+            }
+            case 2->{
+                participateDTO.setExtra2Delegate(delegate);
+                participateDTO.setExtra2(extraDTO.getExtraTry());
+                participateDTO.setExtra2Reason(extraDTO.getExtraReason());
+            }
+        };
+        participateRepository.save(participateDTO.toEntityFull(accountRepository));
+    }
+    public void deleteExtra(Integer partIdx, Integer extraNum){
+
+        ParticipateDTO participateDTO=new ParticipateDTO(participateRepository.findByIdx(partIdx));
+        switch (extraNum){
+            case 1->{
+                participateDTO.setExtra1Delegate(null);
+                participateDTO.setExtra1(null);
+                participateDTO.setExtra1Reason(null);
+            }
+            case 2->{
+                participateDTO.setExtra2Delegate(null);
+                participateDTO.setExtra2(null);
+                participateDTO.setExtra2Reason(null);
+            }
+        };
+        participateRepository.save(participateDTO.toEntityFull(accountRepository));
+    }
+
+    public SingleAverageDTO calculateExpectation(Integer idx){
+        Participate participate=participateRepository.findByIdx(idx);
+        if(!participate.getRound().getCubeEvent().getAvgCalc().equals("ao5")){
+            return null;
+        }
+        ParticipateDTO participateDTO=new ParticipateDTO(participate);
+        if(participateDTO.getThird()!=null && !participateDTO.getThird().equals(BigDecimal.ZERO)){
+            List<BigDecimal> best = Arrays.asList(
+                    participateDTO.getFirst(), participateDTO.getSecond(), participateDTO.getThird(),
+                    participateDTO.getFourth(), BigDecimal.valueOf(0.01)
+            );
+            List<BigDecimal> worst = Arrays.asList(
+                    participateDTO.getFirst(), participateDTO.getSecond(), participateDTO.getThird(),
+                    participateDTO.getFourth(), BigDecimal.valueOf(-1)
+            );
+            SingleAverageDTO expectedBestWorstDTO=new SingleAverageDTO();
+            expectedBestWorstDTO.setSingle(formatSeconds(calculateAo5Average(best)));
+            expectedBestWorstDTO.setAverage(formatSeconds(calculateAo5Average(worst)));
+            return expectedBestWorstDTO;
+        }
+        return null;
+    }
+    public String formatSeconds(BigDecimal seconds) {
+        if(seconds.equals(BigDecimal.valueOf(-1))){
+            return "DNF";
+        }
+        else if(seconds.equals(BigDecimal.valueOf(-2))){
+            return "DNS";
+        }
+        int totalMillis = seconds.multiply(BigDecimal.valueOf(100)).intValue();
+
+        int minutes = totalMillis / 6000;
+        int secs = (totalMillis % 6000) / 100;
+        int millis = totalMillis % 100;
+
+        return String.format("%d:%02d.%02d", minutes, secs, millis);
+    }
+    private void applyRecordUpdate(ParticipateDTO participateDTO) {
         String calcType = participateDTO.getRound().getCubeEvent().getAvgCalc();
 
         List<BigDecimal> times = Arrays.asList(
                 participateDTO.getFirst(), participateDTO.getSecond(), participateDTO.getThird(),
                 participateDTO.getFourth(), participateDTO.getFifth()
         );
-
         if (participateDTO.allNonZero()) {
-            if (checker1Name != null) {
-                participateDTO.setChecker1(checker1Name);
-            }
-
             switch (calcType) {
-                case "Ao5" -> {
+                case "ao5" -> {
                     participateDTO.setAverage(calculateAo5Average(times));
                     participateDTO.setSingle(calculateSingle(times));
                 }
-                case "Bo3" -> {
+                case "bo3" -> {
                     participateDTO.setAverage(calculateBo3Average(times.subList(0, 3)));
                     participateDTO.setSingle(calculateSingle(times.subList(0, 3)));
                 }
-                case "Single" -> participateDTO.setAverage(calculateSingle(times.subList(0, 1)));
+                case "single" -> participateDTO.setAverage(calculateSingle(times.subList(0, 1)));
             }
         } else {
             participateDTO.setAverage(BigDecimal.ZERO);
             participateDTO.setSingle(BigDecimal.ZERO);
-            participateDTO.setRanking(0);
-            participateDTO.setChecker1(null);
+            participateDTO.setRanking(null);
         }
-
-        participateDTO.setChecker2(null);
-
-        Map<String, BestType> bestTypeMap = calculateBestType(
-                participateDTO.getAccount().getEmail(),
-                participateDTO.getAccount().getState(),
-                participateDTO.getRound().getCubeEvent().getEventName(),
-                participateDTO.getSingle(),
-                participateDTO.getAverage()
-        );
-
-        participateDTO.setSingleBestType(bestTypeMap.get("single"));
-        participateDTO.setAverageBestType(bestTypeMap.get("average"));
 
         participateRepository.save(participateDTO.toEntityFull(accountRepository));
         participateRepository.setRankOnRound(participateDTO.getRound().getIdx());
+        List<Participate> participateList=participateRepository.findByRound_IdxForBestType(participateDTO.getRound().getIdx());
+        for(Participate participate: participateList) {
+            if(!participate.getIdx().equals(participateDTO.getIdx()) && (participate.getSingleBestType()==null || participate.getSingleBestType()==BestType.PR) && (participate.getAverageBestType()==null || participate.getAverageBestType()==BestType.PR)){
+                continue;
+            }
+            ParticipateDTO eachParticipateDTO=new ParticipateDTO(participate);
+            Map<String, BestType> bestTypeMap = calculateBestType(
+                    participate.getIdx(),
+                    participate.getAccount().getEmail(),
+                    participate.getAccount().getState(),
+                    participate.getRound().getCubeEvent().getEventName(),
+                    participate.getSingle(),
+                    participate.getAverage()
+            );
+            eachParticipateDTO.setSingleBestType(bestTypeMap.get("single"));
+            eachParticipateDTO.setAverageBestType(bestTypeMap.get("average"));
+            participateRepository.save(eachParticipateDTO.toEntityFull(accountRepository));
+        }
     }
 
 
@@ -152,9 +237,15 @@ public class ParticipateService {
         participateRepository.setRankOnRound(roundIdx);
     }
 
-    public Integer addAdvance(Integer pastRoundIdx, Integer advanceRoundIdx){
+    public void quitParticipate(List<Integer> partList) {
+        for(Integer part:partList){
+            participateRepository.deleteByIdx(part);
+        }
+    }
+
+    /**public Integer addAdvance(Integer pastRoundIdx, Integer advanceRoundIdx){
         Round pastRound=roundRepository.findByIdx(pastRoundIdx);
-        List<ParticipateDTO> participateList=getParticipateForUser(pastRoundIdx);
+        List<ParticipateUserDTO> participateList=getParticipateForUser(pastRoundIdx);
         List<Participate> advanceList=new ArrayList<>();
         for(int i=0; i<pastRound.getAdvance(); i++){
             ParticipateDTO advanceParticipate=participateList.get(i);
@@ -162,7 +253,7 @@ public class ParticipateService {
             advanceList.add(advanceParticipate.toEntity(accountRepository));
         }
         return participateRepository.saveAll(advanceList).size();
-    }
+    }**/
 
     public Integer addParticipate(List<ParticipateRequestDTO> participates) {
         List<Participate> participateList=new ArrayList<>();
@@ -170,12 +261,6 @@ public class ParticipateService {
             participateList.add(participateRequestDTO.toEntity(accountRepository, roundRepository));
         }
         return participateRepository.saveAll(participateList).size();
-    }
-
-    public void updateChecker(String checkerName, Integer idx){
-        ParticipateDTO participateDTO=new ParticipateDTO(participateRepository.findByIdx(idx));
-        participateDTO.setChecker2(checkerName);
-        participateRepository.save(participateDTO.toEntityFull(accountRepository));
     }
 
     private static BigDecimal calculateAo5Average(List<BigDecimal> times) {
@@ -220,11 +305,14 @@ public class ParticipateService {
     }
 
 
-    private Map<String, BestType> calculateBestType(String email, String state, String eventName, BigDecimal single, BigDecimal average){
+    private Map<String, BestType> calculateBestType(Integer idx, String email, String state, String eventName, BigDecimal single, BigDecimal average){
         Map<String, BestType> best=new HashMap<>();
-        if(participateRepository.findPersonalSingleBest(email, eventName).compareTo(single)>0){
-            if(participateRepository.findStateSingleBest(state, eventName).compareTo(single)>0){
-                if(participateRepository.findAllSingleBest(eventName).compareTo(single)>0){
+        BestResult personalSingleBest=participateRepository.findPersonalSingleBest(email, eventName);
+        if(personalSingleBest==null || personalSingleBest.getBest().compareTo(single)>0 || (personalSingleBest.getIdx().equals(idx) && personalSingleBest.getBest().compareTo(single)>=0)){
+            BestResult stateSingleBest=participateRepository.findStateSingleBest(state, eventName);
+            if(stateSingleBest==null || stateSingleBest.getBest().compareTo(single)>0 || (stateSingleBest.getIdx().equals(idx) && stateSingleBest.getBest().compareTo(single)>=0)){
+                BestResult allSingleBest=participateRepository.findAllSingleBest(eventName);
+                if(allSingleBest==null || allSingleBest.getBest().compareTo(single)>0 || (allSingleBest.getIdx().equals(idx) && allSingleBest.getBest().compareTo(single)>=0)){
                     best.put("single", BestType.CCR);
                 }
                 else{
@@ -238,9 +326,12 @@ public class ParticipateService {
         else{
             best.put("single",null);
         }
-        if(participateRepository.findPersonalAverageBest(email, eventName).compareTo(average)>0){
-            if(participateRepository.findStateAverageBest(state, eventName).compareTo(average)>0){
-                if(participateRepository.findAllAverageBest(eventName).compareTo(average)>0){
+        BestResult personalAverageBest=participateRepository.findPersonalAverageBest(email, eventName);
+        if(personalAverageBest==null || personalAverageBest.getBest().compareTo(average)>0 || (personalAverageBest.getIdx().equals(idx) && personalAverageBest.getBest().compareTo(single)>=0)){
+            BestResult stateAverageBest=participateRepository.findStateAverageBest(state, eventName);
+            if(stateAverageBest==null || stateAverageBest.getBest().compareTo(average)>0 || (stateAverageBest.getIdx().equals(idx) && stateAverageBest.getBest().compareTo(single)>=0)){
+                BestResult allAverageBest=participateRepository.findAllAverageBest(eventName);
+                if(allAverageBest==null || allAverageBest.getBest().compareTo(average)>0 || (allAverageBest.getIdx().equals(idx) && allAverageBest.getBest().compareTo(single)>=0)){
                     best.put("average", BestType.CCR);
                 }
                 else{

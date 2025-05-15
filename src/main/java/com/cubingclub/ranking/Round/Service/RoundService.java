@@ -34,7 +34,9 @@ public class RoundService {
                 list.add(roundRepository.save(roundDTO.toEntity(competitionRepository, cubeEventRepository)).getIdx());
             }
             else{
-                list.add(roundRepository.save(roundDTO.toEntityNoIdx(competitionRepository, cubeEventRepository)).getIdx());
+                if(competitionRepository.findByIdx(roundDTO.getComp())!=null) {
+                    list.add(roundRepository.save(roundDTO.toEntityNoIdx(competitionRepository, cubeEventRepository)).getIdx());
+                }
             }
         }
         return list;

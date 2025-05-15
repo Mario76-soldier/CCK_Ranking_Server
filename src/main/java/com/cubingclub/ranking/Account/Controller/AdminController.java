@@ -1,9 +1,15 @@
 package com.cubingclub.ranking.Account.Controller;
 
+import com.cubingclub.ranking.Account.DTO.AccountDTO;
 import com.cubingclub.ranking.Account.DTO.RoleUpdateDTO;
 import com.cubingclub.ranking.Account.Entity.UserRole;
 import com.cubingclub.ranking.Account.Service.AccountService;
 import com.cubingclub.ranking.Account.Service.AdminService;
+import com.cubingclub.ranking.Participate.DTO.ExtraDTO;
+import com.cubingclub.ranking.Participate.DTO.ParticipateDTO;
+import com.cubingclub.ranking.Participate.Service.ParticipateService;
+import com.cubingclub.ranking.RFID.DTO.RFIDCreateDTO;
+import com.cubingclub.ranking.RFID.Service.RFIDService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -19,6 +25,8 @@ import org.springframework.web.bind.annotation.*;
 public class AdminController {
     private final AccountService accountService;
     private final AdminService adminService;
+    private final RFIDService rfidService;
+    private final ParticipateService participateService;
 
     @GetMapping("/list")
     public ResponseEntity<?> UserList(){
@@ -40,5 +48,25 @@ public class AdminController {
             return ResponseEntity.badRequest().build();
         }
         return ResponseEntity.ok(adminService.updatePosition(roleUpdateDTO));
+    }
+    @PostMapping("/rfid")
+    public ResponseEntity<?> CreateRFID(@RequestBody RFIDCreateDTO rfidCreateDTO){
+        try{
+            rfidService.createRFID(rfidCreateDTO);
+            return ResponseEntity.ok().build();
+        }
+        catch(Exception e){
+            return ResponseEntity.badRequest().body(e);
+        }
+    }
+    @DeleteMapping("/rfid/{email}")
+    public ResponseEntity<?> DeleteRFID(@PathVariable(name = "email")String email){
+        try{
+            rfidService.deleteRFID(email);
+            return ResponseEntity.ok().build();
+        }
+        catch(Exception e){
+            return ResponseEntity.badRequest().body(e);
+        }
     }
 }

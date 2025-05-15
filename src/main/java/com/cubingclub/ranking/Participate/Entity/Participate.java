@@ -25,54 +25,70 @@ public class Participate {
     private Integer idx;
     @Column
     private Integer pdx;
-    @ManyToOne
+    @ManyToOne(fetch=FetchType.LAZY)
     @JoinColumn
     private Account account;
-    @ManyToOne(fetch=FetchType.EAGER)
+    @ManyToOne(fetch=FetchType.LAZY)
     @JoinColumn
     private Round round;
     @Column(precision = 10, scale=2)
-    private BigDecimal first=BigDecimal.ZERO;
-    @Column(length=30)
-    private String firstJudge;
-    @Column(length=30)
-    private String firstScrambler;
+    private BigDecimal first;
+    @ManyToOne(fetch=FetchType.LAZY)
+    @JoinColumn
+    private Account firstJudge;
+    @ManyToOne(fetch=FetchType.LAZY)
+    @JoinColumn
+    private Account firstScrambler;
     @Column(precision = 10, scale=2)
-    private BigDecimal second=BigDecimal.ZERO;
-    @Column(length=30)
-    private String secondJudge;
-    @Column(length=30)
-    private String secondScrambler;
+    private BigDecimal second;
+    @ManyToOne(fetch=FetchType.LAZY)
+    @JoinColumn
+    private Account secondJudge;
+    @ManyToOne(fetch=FetchType.LAZY)
+    @JoinColumn
+    private Account secondScrambler;
     @Column(precision = 10, scale=2)
-    private BigDecimal third=BigDecimal.ZERO;
-    @Column(length=30)
-    private String thirdJudge;
-    @Column(length=30)
-    private String thirdScrambler;
+    private BigDecimal third;
+    @ManyToOne(fetch=FetchType.LAZY)
+    @JoinColumn
+    private Account thirdJudge;
+    @ManyToOne(fetch=FetchType.LAZY)
+    @JoinColumn
+    private Account thirdScrambler;
     @Column(precision = 10, scale=2)
-    private BigDecimal fourth=BigDecimal.ZERO;
-    @Column(length=30)
-    private String fourthJudge;
-    @Column(length=30)
-    private String fourthScrambler;
+    private BigDecimal fourth;
+    @ManyToOne(fetch=FetchType.LAZY)
+    @JoinColumn
+    private Account fourthJudge;
+    @ManyToOne(fetch=FetchType.LAZY)
+    @JoinColumn
+    private Account fourthScrambler;
     @Column(precision = 10, scale=2)
-    private BigDecimal fifth=BigDecimal.ZERO;
-    @Column(length=30)
-    private String fifthJudge;
-    @Column(length=30)
-    private String fifthScrambler;
+    private BigDecimal fifth;
+    @ManyToOne(fetch=FetchType.LAZY)
+    @JoinColumn
+    private Account fifthJudge;
+    @ManyToOne(fetch=FetchType.LAZY)
+    @JoinColumn
+    private Account fifthScrambler;
     @Column
     private Integer extra1;
     @Column
     private String extra1Reason;
+    @ManyToOne(fetch=FetchType.LAZY)
+    @JoinColumn
+    private Account extra1Delegate;
     @Column
     private Integer extra2;
     @Column
     private String extra2Reason;
+    @ManyToOne(fetch=FetchType.LAZY)
+    @JoinColumn
+    private Account extra2Delegate;
     @Column(precision = 10, scale=2)
-    private BigDecimal single=BigDecimal.ZERO;
+    private BigDecimal single;
     @Column(precision = 10, scale=2)
-    private BigDecimal average=BigDecimal.ZERO;
+    private BigDecimal average;
     @Column
     private Integer ranking;
     @Column
@@ -81,11 +97,7 @@ public class Participate {
     private BestType singleBestType;
     @Column
     private BestType averageBestType;
-    @Column(length=20)
-    private String checker1;
-    @Column(length=20)
-    private String checker2;
-    public Participate update(BigDecimal First, BigDecimal Second, BigDecimal Third, BigDecimal Fourth, BigDecimal Fifth, BigDecimal Single, BigDecimal Average, Integer Ranking, Integer StateRanking, BestType singleBestType, BestType averageBestType, String Checker1){
+    public Participate update(BigDecimal First, BigDecimal Second, BigDecimal Third, BigDecimal Fourth, BigDecimal Fifth, BigDecimal Single, BigDecimal Average, Integer Ranking, Integer StateRanking, BestType singleBestType, BestType averageBestType){
         this.first=First;
         this.second=Second;
         this.third=Third;
@@ -95,15 +107,8 @@ public class Participate {
         this.average=Average;
         this.ranking=Ranking;
         this.stateRanking=StateRanking;
-        this.checker1=Checker1;
         this.singleBestType=singleBestType;
         this.averageBestType=averageBestType;
         return this;
     }
-
-    public Participate update(String Checker2){
-        this.checker2=Checker2;
-        return this;
-    }
-
 }

@@ -10,7 +10,7 @@ import java.util.List;
 
 public interface RoundRepository extends JpaRepository<Round, Integer> {
     Round findByIdx(Integer idx);
-    @Query("select r from Round r join fetch r.cubeEvent ce join fetch r.comp c where r.comp.idx=:compIdx order by r.eventStart desc")
+    @Query("select r from Round r join fetch r.cubeEvent ce join fetch r.comp c where r.comp.idx=:compIdx order by r.eventStart asc")
     List<Round> findRoundList(@Param(value="compIdx")Integer compIdx);
     @Modifying
     @Query("update Round u set u.advance=:advance where u.idx=:idx")
