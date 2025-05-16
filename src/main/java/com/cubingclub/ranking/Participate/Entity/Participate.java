@@ -80,10 +80,16 @@ public class Participate {
     @ManyToOne(fetch=FetchType.LAZY)
     @JoinColumn
     private Account extra1Delegate;
+    @ManyToOne(fetch=FetchType.LAZY)
+    @JoinColumn
+    private Account extra1Scrambler;
     @Column
     private Integer extra2;
     @Column
     private String extra2Reason;
+    @ManyToOne(fetch=FetchType.LAZY)
+    @JoinColumn
+    private Account extra2Scrambler;
     @ManyToOne(fetch=FetchType.LAZY)
     @JoinColumn
     private Account extra2Delegate;
