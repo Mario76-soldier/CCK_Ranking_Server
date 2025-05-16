@@ -31,6 +31,8 @@ public class Participate {
     @ManyToOne(fetch=FetchType.LAZY)
     @JoinColumn
     private Round round;
+    @Column
+    private String roundGroup;
     @Column(precision = 10, scale=2)
     private BigDecimal first;
     @ManyToOne(fetch=FetchType.LAZY)
@@ -78,10 +80,16 @@ public class Participate {
     @ManyToOne(fetch=FetchType.LAZY)
     @JoinColumn
     private Account extra1Delegate;
+    @ManyToOne(fetch=FetchType.LAZY)
+    @JoinColumn
+    private Account extra1Scrambler;
     @Column
     private Integer extra2;
     @Column
     private String extra2Reason;
+    @ManyToOne(fetch=FetchType.LAZY)
+    @JoinColumn
+    private Account extra2Scrambler;
     @ManyToOne(fetch=FetchType.LAZY)
     @JoinColumn
     private Account extra2Delegate;

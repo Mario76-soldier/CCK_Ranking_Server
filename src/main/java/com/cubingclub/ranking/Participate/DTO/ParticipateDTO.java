@@ -21,6 +21,7 @@ public class ParticipateDTO {
     private Integer pdx;
     private AccountDTO account;
     private Round round;
+    private String roundGroup;
     private BigDecimal first;
     private AccountDTO firstJudge;
     private AccountDTO firstScrambler;
@@ -39,9 +40,11 @@ public class ParticipateDTO {
     private Integer extra1;
     private String extra1Reason;
     private AccountDTO extra1Delegate;
+    private AccountDTO extra1Scrambler;
     private Integer extra2;
     private String extra2Reason;
     private AccountDTO extra2Delegate;
+    private AccountDTO extra2Scrambler;
     private BigDecimal single;
     private BigDecimal average;
     private Integer ranking;
@@ -53,6 +56,7 @@ public class ParticipateDTO {
         this.pdx=entity.getPdx();
         this.account=new AccountDTO(entity.getAccount());
         this.round=entity.getRound();
+        this.roundGroup=entity.getRoundGroup();
         this.first=entity.getFirst();
         this.second=entity.getSecond();
         this.third=entity.getThird();
@@ -71,9 +75,11 @@ public class ParticipateDTO {
         this.extra1=entity.getExtra1();
         this.extra1Reason=entity.getExtra1Reason();
         this.extra1Delegate=AccountDTO.from(entity.getExtra1Delegate());
+        this.extra1Scrambler=AccountDTO.from(entity.getExtra1Scrambler());
         this.extra2=entity.getExtra2();
         this.extra2Reason=entity.getExtra2Reason();
         this.extra2Delegate=AccountDTO.from(entity.getExtra2Delegate());
+        this.extra2Scrambler=AccountDTO.from(entity.getExtra2Scrambler());
         this.single=entity.getSingle();
         this.average=entity.getAverage();
         this.ranking=entity.getRanking();
@@ -81,10 +87,11 @@ public class ParticipateDTO {
         this.singleBestType=entity.getSingleBestType();
         this.averageBestType=entity.getAverageBestType();
     }
-    public ParticipateDTO(Account account, Integer pdx, Round round) {
+    public ParticipateDTO(Account account, Integer pdx, Round round, String roundGroup) {
         this.account=new AccountDTO(account);
         this.pdx=pdx;
         this.round=round;
+        this.roundGroup=roundGroup;
     }
     private boolean isNonZero(BigDecimal value) {
         return value != null && value.compareTo(BigDecimal.ZERO) != 0;
@@ -108,6 +115,7 @@ public class ParticipateDTO {
                 .pdx(pdx)
                 .account(accountRepository.findByEmail(account.getEmail()).orElse(null))
                 .round(round)
+                .roundGroup(roundGroup)
                 .build();
     }
     public Participate toEntityFull(AccountRepository accountRepository) {
@@ -116,6 +124,7 @@ public class ParticipateDTO {
                 .pdx(pdx)
                 .account(accountRepository.findByEmail(account.getEmail()).orElse(null))
                 .round(round)
+                .roundGroup(roundGroup)
                 .first(first != null ? first : BigDecimal.ZERO)
                 .firstJudge(firstJudge != null ? accountRepository.findByEmail(firstJudge.getEmail()).orElse(null) : null)
                 .firstScrambler(firstScrambler != null ? accountRepository.findByEmail(firstScrambler.getEmail()).orElse(null) : null)
@@ -134,9 +143,11 @@ public class ParticipateDTO {
                 .extra1(extra1)
                 .extra1Reason(extra1Reason)
                 .extra1Delegate(extra1Delegate != null ? accountRepository.findByEmail(extra1Delegate.getEmail()).orElse(null) : null)
+                .extra1Scrambler(extra1Scrambler != null? accountRepository.findByEmail(extra1Scrambler.getEmail()).orElse(null):null)
                 .extra2(extra2)
                 .extra2Reason(extra2Reason)
                 .extra2Delegate(extra2Delegate != null ? accountRepository.findByEmail(extra2Delegate.getEmail()).orElse(null) : null)
+                .extra2Scrambler(extra2Scrambler != null? accountRepository.findByEmail(extra2Scrambler.getEmail()).orElse(null):null)
                 .single(single != null ? single : BigDecimal.ZERO)
                 .average(average != null ? average : BigDecimal.ZERO)
                 .ranking(ranking)

@@ -15,9 +15,12 @@ public class CubeEvent {
     private String eventName;
     @Column(length=15)
     private String avgCalc;
+    @Column
+    private ColorType colorType;
     @Builder
-    public CubeEvent(String EventName, String AvgCalc){
+    public CubeEvent(String EventName, String AvgCalc, ColorType colorType){
         this.eventName=EventName;
         this.avgCalc=AvgCalc;
+        this.colorType=colorType;
     }
 }

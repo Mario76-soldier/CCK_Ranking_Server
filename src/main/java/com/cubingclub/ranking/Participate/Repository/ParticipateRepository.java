@@ -54,7 +54,7 @@ public interface ParticipateRepository extends JpaRepository<Participate, Intege
             "(case when p.average = 0 then 5 when p.average = -2 then 4 when p.average = -1 then 3 when p.single = -2 then 2 when p.single = -1 then 1 else 0 end),"+
             "p.average asc, p.single asc")
     List<Integer> findByRoundAndStateOrder(@Param(value="roundIdx")Integer roundIdx, @Param(value="state")String state);
-    List<Participate> findByAccount_EmailAndRound_Comp_Idx(String email, Integer compIdx);
+    List<Participate> findByAccount_EmailAndRound_Comp_IdxOrderByRound_EventStart(String email, Integer compIdx);
     @Query("select p from Participate p join fetch p.round r join fetch r.cubeEvent ce join fetch r.comp c where p.account.email=:email order by ce.eventName")
     List<Participate> findByEmailOrderByRound_CubeEvent_EventName(String email);
     @Query("select p from Participate p join fetch p.round r join fetch r.cubeEvent ce join fetch r.comp c where p.account.email=:email and ce.eventName=:eventName order by p.average limit 1")
@@ -66,6 +66,6 @@ public interface ParticipateRepository extends JpaRepository<Participate, Intege
     void deleteByRound_Idx(Integer idx);
     @Query("SELECT r.idx, COUNT(*) FROM Participate p JOIN p.round r GROUP BY r.idx")
     List<Object[]> findAllRoundParticipantCounts();
-    //@Query("select count(p.idx) from Participate p join fetch Round r where p.round.idx=:roundIdx and p.email.")
+    //@Query("select count(p.idx) from Participate p join fetch Scrambler r where p.round.idx=:roundIdx and p.email.")
     //Integer countParticipateByRoundState(@Param(value="roundIdx")Integer roundIdx);
 }

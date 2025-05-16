@@ -51,7 +51,7 @@ public class ParticipateService {
 
     public RecorderResponseDTO getForRecorder(String email, Integer compIdx) {
         if(accountRepository.findByEmail(email).isPresent()) {
-            List<Participate> list = participateRepository.findByAccount_EmailAndRound_Comp_Idx(email, compIdx);
+            List<Participate> list = participateRepository.findByAccount_EmailAndRound_Comp_IdxOrderByRound_EventStart(email, compIdx);
 
             for (Participate p : list) {
                 String name = p.getAccount().getEnName();
@@ -183,6 +183,35 @@ public class ParticipateService {
 
         return String.format("%d:%02d.%02d", minutes, secs, millis);
     }
+
+    public void updateScrambler(Integer partIdx, String email, String seq){
+        ParticipateDTO participateDTO=new ParticipateDTO(participateRepository.findByIdx(partIdx));
+        switch (seq) {
+            case "1" -> {
+                participateDTO.setFirstScrambler(new AccountDTO(accountRepository.findByEmail(email).orElseThrow()));
+            }
+            case "2" -> {
+                participateDTO.setSecondScrambler(new AccountDTO(accountRepository.findByEmail(email).orElseThrow()));
+            }
+            case "3" -> {
+                participateDTO.setThirdScrambler(new AccountDTO(accountRepository.findByEmail(email).orElseThrow()));
+            }
+            case "4" -> {
+                participateDTO.setFourthScrambler(new AccountDTO(accountRepository.findByEmail(email).orElseThrow()));
+            }
+            case "5" -> {
+                participateDTO.setFifthScrambler(new AccountDTO(accountRepository.findByEmail(email).orElseThrow()));
+            }
+            case "ex1" -> {
+                participateDTO.setExtra1Scrambler(new AccountDTO(accountRepository.findByEmail(email).orElseThrow()));
+            }
+            case "ex2" -> {
+                participateDTO.setExtra2Scrambler(new AccountDTO(accountRepository.findByEmail(email).orElseThrow()));
+            }
+        }
+        participateRepository.save(participateDTO.toEntityFull(accountRepository));
+    }
+
     private void applyRecordUpdate(ParticipateDTO participateDTO) {
         String calcType = participateDTO.getRound().getCubeEvent().getAvgCalc();
 
@@ -244,7 +273,7 @@ public class ParticipateService {
     }
 
     /**public Integer addAdvance(Integer pastRoundIdx, Integer advanceRoundIdx){
-        Round pastRound=roundRepository.findByIdx(pastRoundIdx);
+        Scrambler pastRound=roundRepository.findByIdx(pastRoundIdx);
         List<ParticipateUserDTO> participateList=getParticipateForUser(pastRoundIdx);
         List<Participate> advanceList=new ArrayList<>();
         for(int i=0; i<pastRound.getAdvance(); i++){

@@ -7,6 +7,8 @@ import com.cubingclub.ranking.CubeEvent.Repository.CubeEventRepository;
 import com.cubingclub.ranking.Participate.Repository.ParticipateRepository;
 import com.cubingclub.ranking.Round.Repository.RoundRepository;
 import com.cubingclub.ranking.Round.Entity.Round;
+import com.cubingclub.ranking.Scrambler.Repository.ScramblerRepository;
+import com.cubingclub.ranking.Scrambler.Service.ScramblerService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -25,17 +27,24 @@ import java.util.Map;
 public class RoundService {
     private final ParticipateRepository participateRepository;
     private final RoundRepository roundRepository;
+    private final ScramblerRepository scramblerRepository;
     private final CompetitionRepository competitionRepository;
     private final CubeEventRepository cubeEventRepository;
+    private final ScramblerService scramblerService;
     public List<Integer> create(List<CreateRoundDTO> roundList){
         List<Integer> list=new ArrayList<>();
+        Integer roundIdx;
         for(CreateRoundDTO roundDTO:roundList){
             if(roundDTO.getIdx()!=null) {
-                list.add(roundRepository.save(roundDTO.toEntity(competitionRepository, cubeEventRepository)).getIdx());
+                roundIdx=roundRepository.save(roundDTO.toEntity(competitionRepository, cubeEventRepository)).getIdx();
+                list.add(roundIdx);
+                scramblerService.saveScramble(roundIdx, roundDTO.getGroupList());
             }
             else{
                 if(competitionRepository.findByIdx(roundDTO.getComp())!=null) {
-                    list.add(roundRepository.save(roundDTO.toEntityNoIdx(competitionRepository, cubeEventRepository)).getIdx());
+                    roundIdx=roundRepository.save(roundDTO.toEntity(competitionRepository, cubeEventRepository)).getIdx();
+                    list.add(roundIdx);
+                    scramblerService.saveScramble(roundIdx, roundDTO.getGroupList());
                 }
             }
         }
@@ -68,6 +77,7 @@ public class RoundService {
     }
     public void deleteByRoundIdx(Integer roundIdx){
         participateRepository.deleteByRound_Idx(roundIdx);
+        scramblerRepository.deleteByRound_Idx(roundIdx);
         roundRepository.deleteByIdx(roundIdx);
     }
     public void updateAdvance(Integer roundIdx, Integer advance){
