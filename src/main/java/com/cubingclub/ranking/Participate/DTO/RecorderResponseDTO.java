@@ -13,4 +13,5 @@ public class RecorderResponseDTO {
     String name;
     String state;
     String roundName;
+    Integer extraNum;
 }

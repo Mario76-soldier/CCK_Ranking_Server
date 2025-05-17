@@ -14,12 +14,14 @@ public class ParticipateRequestDTO {
     private Integer pdx;
     private String email;
     private Integer round;
+    private String roundGroup;
     public Participate toEntity(AccountRepository accountRepository, RoundRepository roundRepository){
         return Participate
                 .builder()
                 .pdx(pdx)
                 .account(accountRepository.findByEmail(email).orElseThrow(null))
                 .round(roundRepository.findByIdx(round))
+                .roundGroup(roundGroup)
                 .build();
     }
 }

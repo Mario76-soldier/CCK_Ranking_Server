@@ -41,4 +41,9 @@ public class RoundController {
         roundService.updateAdvance(roundIdx, advance);
         return ResponseEntity.ok(roundService.getOne(roundIdx).getAdvance());
     }
+
+    @GetMapping("/group/{roundIdx}")
+    public ResponseEntity<List<String>> GroupList(@PathVariable(value="roundIdx")Integer roundIdx){
+        return ResponseEntity.ok(roundService.getGroupList(roundIdx));
+    }
 }
