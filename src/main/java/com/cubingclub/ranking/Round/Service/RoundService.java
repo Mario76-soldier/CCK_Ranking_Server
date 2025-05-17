@@ -5,6 +5,8 @@ import com.cubingclub.ranking.Round.DTO.RoundDTO;
 import com.cubingclub.ranking.Competition.Repository.CompetitionRepository;
 import com.cubingclub.ranking.CubeEvent.Repository.CubeEventRepository;
 import com.cubingclub.ranking.Participate.Repository.ParticipateRepository;
+import com.cubingclub.ranking.Round.DTO.RoundGroupDTO;
+import com.cubingclub.ranking.Round.Repository.RoundGroupRepository;
 import com.cubingclub.ranking.Round.Repository.RoundRepository;
 import com.cubingclub.ranking.Round.Entity.Round;
 import com.cubingclub.ranking.Scrambler.Repository.ScramblerRepository;
@@ -27,6 +29,7 @@ import java.util.Map;
 public class RoundService {
     private final ParticipateRepository participateRepository;
     private final RoundRepository roundRepository;
+    private final RoundGroupRepository roundGroupRepository;
     private final ScramblerRepository scramblerRepository;
     private final CompetitionRepository competitionRepository;
     private final CubeEventRepository cubeEventRepository;
@@ -37,14 +40,26 @@ public class RoundService {
         for(CreateRoundDTO roundDTO:roundList){
             if(roundDTO.getIdx()!=null) {
                 roundIdx=roundRepository.save(roundDTO.toEntity(competitionRepository, cubeEventRepository)).getIdx();
+                List<String> roundGroup=roundDTO.getGroupList();
                 list.add(roundIdx);
-                scramblerService.saveScramble(roundIdx, roundDTO.getGroupList());
+                for (String s : roundGroup) {
+                    if(roundGroupRepository.findByRound_IdxAndGroupName(roundIdx, s)==null) {
+                        RoundGroupDTO roundGroupDTO = new RoundGroupDTO(roundIdx, s);
+                        roundGroupRepository.save(roundGroupDTO.toEntity(roundRepository));
+                    }
+                }
+                scramblerService.saveScramble(roundIdx, roundGroup);
             }
             else{
                 if(competitionRepository.findByIdx(roundDTO.getComp())!=null) {
                     roundIdx=roundRepository.save(roundDTO.toEntity(competitionRepository, cubeEventRepository)).getIdx();
+                    List<String> roundGroup=roundDTO.getGroupList();
                     list.add(roundIdx);
-                    scramblerService.saveScramble(roundIdx, roundDTO.getGroupList());
+                    for (String s : roundGroup) {
+                        RoundGroupDTO roundGroupDTO = new RoundGroupDTO(roundIdx, s);
+                        roundGroupRepository.save(roundGroupDTO.toEntity(roundRepository));
+                    }
+                    scramblerService.saveScramble(roundIdx, roundGroup);
                 }
             }
         }
@@ -84,5 +99,9 @@ public class RoundService {
         RoundDTO roundDTO=new RoundDTO(roundRepository.findByIdx(roundIdx));
         roundDTO.setAdvance(advance);
         roundRepository.save(roundDTO.toEntity());
+    }
+
+    public List<String> getGroupList(Integer roundIdx){
+        return roundGroupRepository.findGroupByRound_Idx(roundIdx);
     }
 }

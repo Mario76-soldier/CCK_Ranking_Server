@@ -58,15 +58,62 @@ public class ParticipateService {
                 String roundName = p.getRound().getCubeEvent().getEventName() + " " + p.getRound().getRoundName();
                 String type = p.getRound().getCubeEvent().getAvgCalc();
                 String state=p.getAccount().getState();
-
-                if (isEmpty(p.getFirst())) return new RecorderResponseDTO(p.getIdx(), 1, name, state, roundName);
+                if(p.getExtra1()!=null){
+                    if(p.getExtra2()!=null){
+                            switch (p.getExtra2()){
+                                case 1-> {
+                                    if (isEmpty(p.getFirst()))
+                                        return new RecorderResponseDTO(p.getIdx(), 1, name, state, roundName, 2);
+                                }
+                                case 2-> {
+                                    if (isEmpty(p.getSecond()))
+                                        return new RecorderResponseDTO(p.getIdx(), 2, name, state, roundName, 2);
+                                }
+                                case 3->{
+                                    if (isEmpty(p.getThird()))
+                                        return new RecorderResponseDTO(p.getIdx(), 3, name, state, roundName, 2);
+                                }
+                                case 4-> {
+                                    if (isEmpty(p.getFourth()))
+                                        return new RecorderResponseDTO(p.getIdx(), 4, name, state, roundName, 2);
+                                }
+                                case 5->{
+                                    if (isEmpty(p.getFifth()))
+                                        return new RecorderResponseDTO(p.getIdx(), 5, name, state, roundName, 2);
+                                }
+                            }
+                    }
+                    switch (p.getExtra1()){
+                        case 1-> {
+                            if (isEmpty(p.getFirst()))
+                                return new RecorderResponseDTO(p.getIdx(), 1, name, state, roundName, 1);
+                        }
+                        case 2-> {
+                            if (isEmpty(p.getSecond()))
+                                return new RecorderResponseDTO(p.getIdx(), 2, name, state, roundName, 1);
+                        }
+                        case 3->{
+                            if (isEmpty(p.getThird()))
+                                return new RecorderResponseDTO(p.getIdx(), 3, name, state, roundName, 1);
+                        }
+                        case 4-> {
+                            if (isEmpty(p.getFourth()))
+                                return new RecorderResponseDTO(p.getIdx(), 4, name, state, roundName, 1);
+                        }
+                        case 5->{
+                            if (isEmpty(p.getFifth()))
+                                return new RecorderResponseDTO(p.getIdx(), 5, name, state, roundName, 1);
+                        }
+                    }
+                }
+                if (isEmpty(p.getFirst())) return new RecorderResponseDTO(p.getIdx(), 1, name, state, roundName, 0);
                 if (!"single".equals(type)) {
-                    if (isEmpty(p.getSecond())) return new RecorderResponseDTO(p.getIdx(), 2, name, state, roundName);
-                    if (isEmpty(p.getThird())) return new RecorderResponseDTO(p.getIdx(), 3, name, state, roundName);
+                    if (isEmpty(p.getSecond())) return new RecorderResponseDTO(p.getIdx(), 2, name, state, roundName, 0);
+                    if (isEmpty(p.getThird())) return new RecorderResponseDTO(p.getIdx(), 3, name, state, roundName, 0);
                 }
                 if ("ao5".equals(type)) {
-                    if (isEmpty(p.getFourth())) return new RecorderResponseDTO(p.getIdx(), 4, name, state, roundName);
-                    if (isEmpty(p.getFifth())) return new RecorderResponseDTO(p.getIdx(), 5, name, state, roundName);
+                    if (isEmpty(p.getFourth())) return new RecorderResponseDTO(p.getIdx(), 4, name, state, roundName, 0);
+                    if (isEmpty(p.getFifth())) return new RecorderResponseDTO(p.getIdx(), 5, name, state, roundName, 0);
                 }
             }
         }

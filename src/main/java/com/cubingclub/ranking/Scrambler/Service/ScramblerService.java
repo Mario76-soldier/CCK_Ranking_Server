@@ -250,7 +250,14 @@ public class ScramblerService {
         if(participate.getRoundGroup()==null){
             return null;
         }
-        ScramblerResponseDTO scramblerDTO=new ScramblerResponseDTO(scramblerRepository.findByRound_IdxAndRoundGroupAndSeq(participate.getRound().getIdx(), participate.getRoundGroup(), record.getSeq().toString()));
+        String seq=record.getSeq().toString();
+        if (record.getExtraNum().equals(2)) {
+            seq="ex2";
+        }
+        else if(record.getExtraNum().equals(1)){
+            seq="ex1";
+        }
+        ScramblerResponseDTO scramblerDTO=new ScramblerResponseDTO(scramblerRepository.findByRound_IdxAndRoundGroupAndSeq(participate.getRound().getIdx(), participate.getRoundGroup(), seq));
         scramblerDTO.setAccount(account);
         scramblerDTO.setPartIdx(record.getIdx());
         return scramblerDTO;
