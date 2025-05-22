@@ -14,7 +14,7 @@ import lombok.Setter;
 @AllArgsConstructor
 public class ScramblerResponseDTO {
     private Integer idx;
-    private Integer partIdx;
+    private Integer attemptIdx;
     private Account account;
     private Round round;
     private String roundGroup;

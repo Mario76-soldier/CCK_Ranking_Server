@@ -2,12 +2,15 @@ package com.cubingclub.ranking.Scrambler.Service;
 
 import com.cubingclub.ranking.Account.Entity.Account;
 import com.cubingclub.ranking.Account.Repository.AccountRepository;
-import com.cubingclub.ranking.Participate.DTO.ParticipateDTO;
-import com.cubingclub.ranking.Participate.DTO.RecorderResponseDTO;
-import com.cubingclub.ranking.Participate.Entity.Participate;
-import com.cubingclub.ranking.Participate.Service.ParticipateService;
+import com.cubingclub.ranking.Record.DTO.AttemptDTO;
+import com.cubingclub.ranking.Record.DTO.RecordDTO;
+import com.cubingclub.ranking.Record.DTO.RecorderResponseDTO;
+import com.cubingclub.ranking.Record.Entity.Attempt;
+import com.cubingclub.ranking.Record.Entity.Record;
+import com.cubingclub.ranking.Record.Repository.AttemptRepository;
+import com.cubingclub.ranking.Record.Repository.RecordRepository;
+import com.cubingclub.ranking.Record.Service.RecordService;
 import com.cubingclub.ranking.RFID.Repository.RFIDRepository;
-import com.cubingclub.ranking.RFID.Service.RFIDService;
 import com.cubingclub.ranking.Round.Repository.RoundRepository;
 import com.cubingclub.ranking.Round.Entity.Round;
 import com.cubingclub.ranking.Scrambler.DTO.ScramblerDTO;
@@ -22,7 +25,6 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -34,11 +36,13 @@ import java.util.stream.Collectors;
 @Transactional
 public class ScramblerService {
     private final RFIDRepository rfidRepository;
+    private final RecordRepository recordRepository;
     private final AccountRepository accountRepository;
+    private final AttemptRepository attemptRepository;
     private final RoundRepository roundRepository;
     private final ScramblerRepository scramblerRepository;
     private final WebClient webClient;
-    private final ParticipateService participateService;
+    private final RecordService recordService;
     private final Map<String, String> cube=Map.of(
             "B","#0000ff",
             "R","#ff0000",
@@ -241,25 +245,28 @@ public class ScramblerService {
 
     public ScramblerResponseDTO getScramble(Integer compIdx, String uid){
         String email=rfidRepository.findEmailByUid(uid);
-        RecorderResponseDTO record=participateService.getForRecorder(email, compIdx);
+        RecorderResponseDTO record=recordService.getForRecorder(email, compIdx);
         if(record==null){
             return null;
         }
+        Attempt attempt=attemptRepository.findByIdx(record.getAttemptIdx());
         Account account=accountRepository.findByEmail(email).orElseThrow();
-        ParticipateDTO participate=participateService.getParticipateOne(record.getIdx());
-        if(participate.getRoundGroup()==null){
+        RecordDTO recordDTO=new RecordDTO(attempt.getRecord());
+        if(recordDTO.getRoundGroup()==null){
             return null;
         }
-        String seq=record.getSeq().toString();
-        if (record.getExtraNum().equals(2)) {
-            seq="ex2";
+        String seq=record.getSeq().toString();;
+        if(record.getExtraNum()!=null){
+            if (record.getExtraNum().equals(2)) {
+                seq="ex2";
+            }
+            else if(record.getExtraNum().equals(1)){
+                seq="ex1";
+            }
         }
-        else if(record.getExtraNum().equals(1)){
-            seq="ex1";
-        }
-        ScramblerResponseDTO scramblerDTO=new ScramblerResponseDTO(scramblerRepository.findByRound_IdxAndRoundGroupAndSeq(participate.getRound().getIdx(), participate.getRoundGroup(), seq));
+        ScramblerResponseDTO scramblerDTO=new ScramblerResponseDTO(scramblerRepository.findByRound_IdxAndRoundGroupAndSeq(recordDTO.getRound().getIdx(), recordDTO.getRoundGroup(), seq));
         scramblerDTO.setAccount(account);
-        scramblerDTO.setPartIdx(record.getIdx());
+        scramblerDTO.setAttemptIdx(record.getAttemptIdx());
         return scramblerDTO;
     }
 
@@ -272,12 +279,14 @@ public class ScramblerService {
                 ));
     }
 
-    public int updateScrambler(Integer partIdx, String uid, String seq){
+    public int updateScrambler(Integer attemptIdx, String uid, Integer exNumber){
         String email=rfidRepository.findEmailByUid(uid);
         if(email==null){
             return -1;
         }
-        participateService.updateScrambler(partIdx, rfidRepository.findEmailByUid(uid), seq);
+        if(recordService.updateScrambler(attemptIdx, rfidRepository.findEmailByUid(uid), exNumber)==-1){
+            return -2;
+        }
         return 0;
     }
 

@@ -1,16 +1,10 @@
-package com.cubingclub.ranking.Participate.Controller;
+package com.cubingclub.ranking.Record.Controller;
 
 import com.cubingclub.ranking.Account.DTO.AccountDTO;
-import com.cubingclub.ranking.Account.DTO.AccountResponseDTO;
-import com.cubingclub.ranking.Account.Service.AccountService;
 import com.cubingclub.ranking.Competition.DTO.CompetitionDTO;
-import com.cubingclub.ranking.Participate.DTO.ParticipateDTO;
-import com.cubingclub.ranking.Participate.DTO.RecorderDTO;
-import com.cubingclub.ranking.Participate.DTO.RecorderResponseDTO;
+import com.cubingclub.ranking.Record.DTO.*;
 import com.cubingclub.ranking.Competition.Service.CompetitionService;
-import com.cubingclub.ranking.Participate.DTO.SingleAverageDTO;
-import com.cubingclub.ranking.Participate.Service.ParticipateService;
-import com.cubingclub.ranking.RFID.Entity.RFID;
+import com.cubingclub.ranking.Record.Service.RecordService;
 import com.cubingclub.ranking.RFID.Service.RFIDService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -27,7 +21,7 @@ import java.util.List;
 @RequestMapping("/api/recorder")
 public class RecorderController {
     private final CompetitionService competitionService;
-    private final ParticipateService participateService;
+    private final RecordService participateService;
     private final RFIDService rfidService;
     @GetMapping("/comp")
     public ResponseEntity<List<CompetitionDTO>> CompIdx(){
@@ -50,21 +44,22 @@ public class RecorderController {
         return ResponseEntity.ok(recorderResponseDTO);
     }
     @PostMapping("/record")
-    public ResponseEntity<?> Record(@RequestBody RecorderDTO recordDTO){
-        participateService.updateRecordOne(recordDTO.getIdx(), recordDTO.getSeq(), recordDTO.getRecord(), recordDTO.getJudgeEmail());
-        ParticipateDTO participateDTO=participateService.getParticipateOne(recordDTO.getIdx());
-        String eventName=participateDTO.getRound().getCubeEvent().getEventName();
+    public ResponseEntity<?> Record(@RequestBody RecorderDTO recorderDTO){
+        participateService.updateRecordOne(recorderDTO.getIdx(), recorderDTO.getRecord(), recorderDTO.getJudgeEmail());
+        AttemptDTO attemptDTO=participateService.getAttempt(recorderDTO.getIdx());
+        RecordDTO recordDTO=participateService.getParticipateOne(attemptDTO.getRecordIdx());
+        String eventName=recordDTO.getRound().getCubeEvent().getEventName();
         SingleAverageDTO singleAverageDTO=new SingleAverageDTO();
-        if(recordDTO.getSeq().equals(4)){
+        if(attemptDTO.getAttemptTry().equals(4)){
             return ResponseEntity.ok(participateService.calculateExpectation(recordDTO.getIdx()));
         }
-        else if (recordDTO.getSeq().equals(5) || (recordDTO.getSeq().equals(3) && eventName.equals("bo3"))){
-            singleAverageDTO.setSingle(participateService.formatSeconds(participateDTO.getSingle()));
-            singleAverageDTO.setAverage(participateService.formatSeconds(participateDTO.getAverage()));
+        else if (attemptDTO.getAttemptTry().equals(5) || (attemptDTO.getAttemptTry().equals(3) && eventName.equals("bo3"))){
+            singleAverageDTO.setSingle(participateService.formatSeconds(recordDTO.getSingle()));
+            singleAverageDTO.setAverage(participateService.formatSeconds(recordDTO.getAverage()));
             return ResponseEntity.ok(singleAverageDTO);
         }
-        else if(recordDTO.getSeq().equals(1) && eventName.equals("single")){
-            singleAverageDTO.setSingle(participateService.formatSeconds(participateDTO.getSingle()));
+        else if(attemptDTO.getAttemptTry().equals(1) && eventName.equals("single")){
+            singleAverageDTO.setSingle(participateService.formatSeconds(recordDTO.getSingle()));
             return ResponseEntity.ok(singleAverageDTO);
         }
         return ResponseEntity.ok().build();

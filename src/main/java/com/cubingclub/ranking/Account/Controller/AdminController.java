@@ -1,13 +1,10 @@
 package com.cubingclub.ranking.Account.Controller;
 
-import com.cubingclub.ranking.Account.DTO.AccountDTO;
 import com.cubingclub.ranking.Account.DTO.RoleUpdateDTO;
 import com.cubingclub.ranking.Account.Entity.UserRole;
 import com.cubingclub.ranking.Account.Service.AccountService;
 import com.cubingclub.ranking.Account.Service.AdminService;
-import com.cubingclub.ranking.Participate.DTO.ExtraDTO;
-import com.cubingclub.ranking.Participate.DTO.ParticipateDTO;
-import com.cubingclub.ranking.Participate.Service.ParticipateService;
+import com.cubingclub.ranking.Record.Service.RecordService;
 import com.cubingclub.ranking.RFID.DTO.RFIDCreateDTO;
 import com.cubingclub.ranking.RFID.Service.RFIDService;
 import lombok.RequiredArgsConstructor;
@@ -26,7 +23,7 @@ public class AdminController {
     private final AccountService accountService;
     private final AdminService adminService;
     private final RFIDService rfidService;
-    private final ParticipateService participateService;
+    private final RecordService participateService;
 
     @GetMapping("/list")
     public ResponseEntity<?> UserList(){
@@ -52,7 +49,9 @@ public class AdminController {
     @PostMapping("/rfid")
     public ResponseEntity<?> CreateRFID(@RequestBody RFIDCreateDTO rfidCreateDTO){
         try{
-            rfidService.createRFID(rfidCreateDTO);
+            if(rfidService.createRFID(rfidCreateDTO)==-1){
+                return ResponseEntity.status(HttpStatus.CONFLICT).build();
+            }
             return ResponseEntity.ok().build();
         }
         catch(Exception e){

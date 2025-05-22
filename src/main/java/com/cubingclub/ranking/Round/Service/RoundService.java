@@ -1,10 +1,10 @@
 package com.cubingclub.ranking.Round.Service;
 
+import com.cubingclub.ranking.Record.Repository.RecordRepository;
 import com.cubingclub.ranking.Round.DTO.CreateRoundDTO;
 import com.cubingclub.ranking.Round.DTO.RoundDTO;
 import com.cubingclub.ranking.Competition.Repository.CompetitionRepository;
 import com.cubingclub.ranking.CubeEvent.Repository.CubeEventRepository;
-import com.cubingclub.ranking.Participate.Repository.ParticipateRepository;
 import com.cubingclub.ranking.Round.DTO.RoundGroupDTO;
 import com.cubingclub.ranking.Round.Repository.RoundGroupRepository;
 import com.cubingclub.ranking.Round.Repository.RoundRepository;
@@ -27,7 +27,7 @@ import java.util.Map;
 @RequiredArgsConstructor
 @Transactional
 public class RoundService {
-    private final ParticipateRepository participateRepository;
+    private final RecordRepository recordRepository;
     private final RoundRepository roundRepository;
     private final RoundGroupRepository roundGroupRepository;
     private final ScramblerRepository scramblerRepository;
@@ -66,7 +66,11 @@ public class RoundService {
         return list;
     }
     public RoundDTO getOne(Integer idx){
-        return new RoundDTO(roundRepository.findByIdx(idx));
+        Round round=roundRepository.findByIdx(idx);
+        if(round==null){
+            return null;
+        }
+        return new RoundDTO(round);
     }
     public Map<String, List<RoundDTO>> getRoundList(Integer compIdx, LocalDateTime date){
         List<Round> list=roundRepository.findRoundList(compIdx);
@@ -91,14 +95,15 @@ public class RoundService {
         return result;
     }
     public void deleteByRoundIdx(Integer roundIdx){
-        participateRepository.deleteByRound_Idx(roundIdx);
+        recordRepository.deleteByRound_Idx(roundIdx);
         scramblerRepository.deleteByRound_Idx(roundIdx);
         roundRepository.deleteByIdx(roundIdx);
     }
     public void updateAdvance(Integer roundIdx, Integer advance){
-        RoundDTO roundDTO=new RoundDTO(roundRepository.findByIdx(roundIdx));
+        Round round=roundRepository.findByIdx(roundIdx);
+        RoundDTO roundDTO=new RoundDTO(round);
         roundDTO.setAdvance(advance);
-        roundRepository.save(roundDTO.toEntity());
+        roundRepository.save(roundDTO.toEntity(round.getRoundGroup()));
     }
 
     public List<String> getGroupList(Integer roundIdx){

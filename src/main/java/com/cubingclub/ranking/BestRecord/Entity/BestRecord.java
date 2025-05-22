@@ -2,7 +2,7 @@ package com.cubingclub.ranking.BestRecord.Entity;
 
 import com.cubingclub.ranking.Account.Entity.Account;
 import com.cubingclub.ranking.CubeEvent.Entity.CubeEvent;
-import com.cubingclub.ranking.Participate.Entity.Participate;
+import com.cubingclub.ranking.Record.Entity.Record;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -28,10 +28,10 @@ public class BestRecord {
     private CubeEvent cubeEvent;
     @OneToOne
     @JoinColumn
-    private Participate single;
+    private Record single;
     @OneToOne
     @JoinColumn
-    private Participate average;
+    private Record average;
     @Column
     private Long singleRanking;
     @Column

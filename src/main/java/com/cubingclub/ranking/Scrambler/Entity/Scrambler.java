@@ -16,7 +16,12 @@ public class Scrambler {
     @Column
     private Integer idx;
     @ManyToOne
-    @JoinColumn
+    @JoinColumn(
+            foreignKey = @ForeignKey(
+                    name = "fk_scrambler_round",
+                    foreignKeyDefinition = "FOREIGN KEY (round_id) REFERENCES round(id) ON DELETE CASCADE"
+            )
+    )
     private Round round;
     @Column
     private String roundGroup;

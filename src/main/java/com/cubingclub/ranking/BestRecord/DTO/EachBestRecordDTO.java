@@ -2,7 +2,7 @@ package com.cubingclub.ranking.BestRecord.DTO;
 
 import com.cubingclub.ranking.BestRecord.Entity.BestRecord;
 import com.cubingclub.ranking.CubeEvent.Entity.CubeEvent;
-import com.cubingclub.ranking.Participate.Entity.Participate;
+import com.cubingclub.ranking.Record.Entity.Record;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -12,8 +12,8 @@ import lombok.Setter;
 @NoArgsConstructor
 public class EachBestRecordDTO {
     private CubeEvent cubeEvent;
-    private Participate single;
-    private Participate average;
+    private Record single;
+    private Record average;
     private Long singleRanking;
     private Long averageRanking;
     private Long allPart;

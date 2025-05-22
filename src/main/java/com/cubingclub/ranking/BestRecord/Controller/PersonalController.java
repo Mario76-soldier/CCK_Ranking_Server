@@ -1,5 +1,5 @@
 package com.cubingclub.ranking.BestRecord.Controller;
-
+/*
 import com.cubingclub.ranking.BestRecord.Service.PersonalService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -21,3 +21,4 @@ public class PersonalController {
         return ResponseEntity.ok(personalService.getBestRecord(email));
     }
 }
+*/

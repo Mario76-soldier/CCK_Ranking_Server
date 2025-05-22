@@ -1,5 +1,6 @@
 package com.cubingclub.ranking.Round.Entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
@@ -14,8 +15,9 @@ public class RoundGroup {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column
     private Integer idx;
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn
+    @JsonIgnore
     private Round round;
     @Column
     private String groupName;

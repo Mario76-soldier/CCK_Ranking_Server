@@ -1,18 +1,13 @@
 package com.cubingclub.ranking.Scrambler.Controller;
 
-import com.cubingclub.ranking.Account.DTO.AccountDTO;
-import com.cubingclub.ranking.Account.Service.AccountService;
-import com.cubingclub.ranking.Participate.DTO.*;
-import com.cubingclub.ranking.Participate.Service.ParticipateService;
 import com.cubingclub.ranking.Scrambler.DTO.ScramblerDTO;
 import com.cubingclub.ranking.Scrambler.DTO.ScramblerResponseDTO;
 import com.cubingclub.ranking.Scrambler.DTO.ScramblerUpdateDTO;
 import com.cubingclub.ranking.Scrambler.Service.ScramblerService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -38,8 +33,12 @@ public class ScramblerController {
     }
     @PostMapping("/scrambler")
     public ResponseEntity<?> SetScrambler(@RequestBody ScramblerUpdateDTO scramblerUpdateDTO){
-        if(scramblerService.updateScrambler(scramblerUpdateDTO.getPartIdx(), scramblerUpdateDTO.getUid(), scramblerUpdateDTO.getSeq())==-1){
+        int code=scramblerService.updateScrambler(scramblerUpdateDTO.getAttemptIdx(), scramblerUpdateDTO.getUid(), scramblerUpdateDTO.getExNumber());
+        if(code==-1){
             return ResponseEntity.noContent().build();
+        }
+        else if(code==-2){
+            return ResponseEntity.status(HttpStatus.CONFLICT).build();
         }
         return ResponseEntity.ok().build();
     }

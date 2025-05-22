@@ -1,4 +1,4 @@
-package com.cubingclub.ranking.Participate.DTO;
+package com.cubingclub.ranking.Record.DTO;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -8,7 +8,7 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 public class RecorderResponseDTO {
-    Integer idx;
+    Integer attemptIdx;
     Integer seq;
     String name;
     String state;

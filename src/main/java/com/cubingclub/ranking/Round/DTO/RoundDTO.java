@@ -3,12 +3,14 @@ package com.cubingclub.ranking.Round.DTO;
 import com.cubingclub.ranking.Competition.Entity.Competition;
 import com.cubingclub.ranking.CubeEvent.Entity.CubeEvent;
 import com.cubingclub.ranking.Round.Entity.Round;
+import com.cubingclub.ranking.Round.Entity.RoundGroup;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Getter
 @Setter
@@ -21,6 +23,7 @@ public class RoundDTO {
     private String roundName;
     private LocalDateTime eventStart;
     private LocalDateTime eventEnd;
+    private List<RoundGroup> roundGroup;
     private Integer advance;
     public RoundDTO(Round entity){
         this.idx=entity.getIdx();
@@ -29,9 +32,10 @@ public class RoundDTO {
         this.roundName=entity.getRoundName();
         this.eventStart=entity.getEventStart();
         this.eventEnd=entity.getEventEnd();
+        this.roundGroup=entity.getRoundGroup();
         this.advance=entity.getAdvance();
     }
-    public Round toEntity(){
+    public Round toEntity(List<RoundGroup> roundGroup){
         return Round.builder()
                 .Idx(idx)
                 .Comp(comp)
@@ -39,6 +43,7 @@ public class RoundDTO {
                 .RoundName(roundName)
                 .EventStart(eventStart)
                 .EventEnd(eventEnd)
+                .roundGroup(roundGroup)
                 .Advance(advance)
                 .build();
     }

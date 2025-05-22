@@ -10,6 +10,5 @@ public interface AccountListDTO {
     LocalDate getBirthDate();
     String getState();
     String getGender();
-    String getPhoneNum();
     UserRole getPosition();
 }
