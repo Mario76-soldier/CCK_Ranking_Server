@@ -1,9 +1,9 @@
-package com.cubingclub.ranking.Participate.Controller;
+package com.cubingclub.ranking.Record.Controller;
 
 import com.cubingclub.ranking.Account.DTO.AccountDTO;
 import com.cubingclub.ranking.Account.Service.AccountService;
-import com.cubingclub.ranking.Participate.DTO.*;
-import com.cubingclub.ranking.Participate.Service.ParticipateService;
+import com.cubingclub.ranking.Record.DTO.*;
+import com.cubingclub.ranking.Record.Service.RecordService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -17,16 +17,12 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api")
-public class ParticipateController {
-    private final ParticipateService participateService;
+public class RecordController {
+    private final RecordService participateService;
     private final AccountService accountService;
     @GetMapping("/records/{roundIdx}")
-    public ResponseEntity<List<ParticipateUserDTO>> RecordList(@PathVariable(value="roundIdx") Integer roundIdx){
-        return ResponseEntity.ok(participateService.getParticipateForUser(roundIdx));
-    }
-    @GetMapping("/admin/records/{roundIdx}")
-    public ResponseEntity<List<ParticipateDTO>> AdminRecordList(@PathVariable(value="roundIdx") Integer roundIdx){
-        return ResponseEntity.ok(participateService.getParticipateForAdmin(roundIdx));
+    public ResponseEntity<List<RecordDTO>> RecordList(@PathVariable(value="roundIdx") Integer roundIdx){
+        return ResponseEntity.ok(participateService.getParticipate(roundIdx));
     }
     @PostMapping("/record")
     public ResponseEntity<?> UpdateRecord(@RequestBody ParticipateRecordDTO participateRecordDTO){
@@ -49,7 +45,7 @@ public class ParticipateController {
     }**/
 
     @PostMapping("/participate")//선수 추가 콜
-    public ResponseEntity<Integer> AddParticipate(@RequestBody List<ParticipateRequestDTO> participates){
+    public ResponseEntity<Integer> AddParticipate(@RequestBody List<RecordRequestDTO> participates){
         return ResponseEntity.ok(participateService.addParticipate(participates));
     }
 

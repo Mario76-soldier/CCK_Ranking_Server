@@ -56,7 +56,7 @@ public class AccountService {
             return -1;
         }
         if(accountEditDTO.getNewPassword()==null){
-            accountRepository.updateAccountInfo(accountEditDTO.getPhoneNum(), accountEditDTO.getState(), accountEditDTO.getEmail());
+            accountRepository.updateAccountInfo(accountEditDTO.getState(), accountEditDTO.getEmail());
             return 0;
         }
         else{

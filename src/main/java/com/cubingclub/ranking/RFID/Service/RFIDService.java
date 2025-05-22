@@ -18,11 +18,13 @@ import org.springframework.stereotype.Service;
 public class RFIDService {
     private final RFIDRepository rfidRepository;
     private final AccountRepository accountRepository;
-    public void createRFID(RFIDCreateDTO rfidCreateDTO){
-        if(rfidRepository.findAccountByUid(rfidCreateDTO.getUid())==null)
+    public Integer createRFID(RFIDCreateDTO rfidCreateDTO) {
+        if (rfidRepository.findAccountByUid(rfidCreateDTO.getUid()) == null){
             rfidRepository.save(rfidCreateDTO.toEntity(accountRepository));
+            return 0;
+        }
         else{
-            return;
+            return -1;
         }
     }
     public AccountDTO getAccountInfo(String uid){

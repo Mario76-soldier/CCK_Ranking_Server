@@ -26,7 +26,7 @@ public class MailController {
         }
         return ResponseEntity.ok().build();
     }
-    @PostMapping ("/password/{email}")
+    @PostMapping ("/password/{email}")//비밀번호 무작정 바꿀 수도 있기 때문에 이에 대한 대책 필요할 것...
     public ResponseEntity<?> pwMailSend(@PathVariable(name = "email")String email){
         log.info("Email request created");
         log.info("Email request address :"+email);

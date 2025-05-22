@@ -5,12 +5,12 @@ import com.cubingclub.ranking.BestRecord.DTO.BestRecordDTO;
 import com.cubingclub.ranking.BestRecord.DTO.BestRecordListDTO;
 import com.cubingclub.ranking.BestRecord.DTO.EachBestRecordDTO;
 import com.cubingclub.ranking.BestRecord.Entity.BestRecord;
-import com.cubingclub.ranking.Participate.DTO.PersonalRecordDTO;
-import com.cubingclub.ranking.Participate.Entity.Participate;
+import com.cubingclub.ranking.Record.DTO.RecordDTO;
+import com.cubingclub.ranking.Record.Entity.Record;
 import com.cubingclub.ranking.Account.Repository.AccountRepository;
 import com.cubingclub.ranking.BestRecord.Repository.BestRecordRepository;
 import com.cubingclub.ranking.CubeEvent.Repository.CubeEventRepository;
-import com.cubingclub.ranking.Participate.Repository.ParticipateRepository;
+import com.cubingclub.ranking.Record.Repository.RecordRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -21,18 +21,19 @@ import java.math.BigInteger;
 import java.util.*;
 import java.util.stream.Collectors;
 
+/*
 @Slf4j
 @Service
 @RequiredArgsConstructor
 @Transactional
 public class PersonalService {
     private final AccountRepository accountRepository;
-    private final ParticipateRepository participateRepository;
+    private final RecordRepository recordRepository;
     private final BestRecordRepository bestRecordRepository;
     private final CubeEventRepository cubeEventRepository;
-    public Map<String, List<PersonalRecordDTO>> getPersonalRecord(String email){
-        List<Participate> participates=participateRepository.findByEmailOrderByRound_CubeEvent_EventName(email);
-        List<Object[]> roundParticipantCountsList = participateRepository.findAllRoundParticipantCounts();
+    public Map<String, List<RecordDTO>> getPersonalRecord(String email){
+        List<Record> records = recordRepository.findByEmailOrderByRound_CubeEvent_EventName(email);
+        List<Object[]> roundParticipantCountsList = recordRepository.findAllRoundParticipantCounts();
 
         // Object[] → Map<Integer, Long> 변환
         Map<Integer, Long> roundParticipantCounts = roundParticipantCountsList.stream()
@@ -40,8 +41,8 @@ public class PersonalService {
                         row -> (Integer) row[0], // r.idx
                         row -> ((Number) row[1]).longValue() // COUNT(*)
                 ));
-        return participates.stream()
-                .map(PersonalRecordDTO::new)
+        return records.stream()
+                .map(RecordDTO::new)
                 .peek(personalRecordDTO -> {
                             personalRecordDTO.setRankingAll(Math.toIntExact(roundParticipantCounts.get(personalRecordDTO.getRound().getIdx())));
                         }
@@ -113,35 +114,35 @@ public class PersonalService {
     public void updateBest(Integer partIdx, String email, String eventName, BigDecimal single, BigDecimal average) {
         boolean updatedSingle = false;
         boolean updatedAverage = false;
-        Participate participate=participateRepository.findByIdx(partIdx);
+        Record record = recordRepository.findByIdx(partIdx);
         Optional<BestRecord> optionalRecord = bestRecordRepository.findByEmailAndEventName(email, eventName);
         if (single==null || single.compareTo(new BigDecimal(BigInteger.ZERO))==0 || average==null || average.compareTo(new BigDecimal(BigInteger.ZERO))==0 ) {
             return;
         }
         BestRecordDTO bestRecordDTO;
         if(optionalRecord.isEmpty()){
-            bestRecordDTO=new BestRecordDTO(accountRepository.findByEmail(email).orElseThrow(() -> new RuntimeException("Account not found")), participate, participate, cubeEventRepository.findByEventName(eventName));
+            bestRecordDTO=new BestRecordDTO(accountRepository.findByEmail(email).orElseThrow(() -> new RuntimeException("Account not found")), record, record, cubeEventRepository.findByEventName(eventName));
             updatedSingle = true;
             updatedAverage = true;
         }
         else {
             bestRecordDTO = new BestRecordDTO(optionalRecord.get());
-            if(bestRecordDTO.getSingle().equals(participate)){
-                bestRecordDTO.setSingle(participate);
+            if(bestRecordDTO.getSingle().equals(record)){
+                bestRecordDTO.setSingle(record);
                 updatedSingle = true;
             }
-            if(bestRecordDTO.getAverage().equals(participate)){
-                bestRecordDTO.setAverage(participate);
+            if(bestRecordDTO.getAverage().equals(record)){
+                bestRecordDTO.setAverage(record);
                 updatedAverage = true;
             }
         }
         if (shouldUpdate(bestRecordDTO.getSingle().getSingle(), single)) {
-            bestRecordDTO.setSingle(participate);
+            bestRecordDTO.setSingle(record);
             updatedSingle = true;
         }
 
         if (shouldUpdate(bestRecordDTO.getAverage().getAverage(), average)) {
-            bestRecordDTO.setAverage(participate);
+            bestRecordDTO.setAverage(record);
             updatedAverage = true;
         }
 
@@ -193,8 +194,8 @@ public class PersonalService {
     }
 
     public void findPreviousBest(String email, String eventName){
-        Participate single=participateRepository.findSingleBest(email, eventName).orElse(null);
-        Participate average=participateRepository.findAverageBest(email, eventName).orElse(null);
+        Record single= recordRepository.findSingleBest(email, eventName).orElse(null);
+        Record average= recordRepository.findAverageBest(email, eventName).orElse(null);
         BestRecord bestRecord=bestRecordRepository.findByEmailAndEventName(email, eventName).orElseThrow();
         if(single!=null && average!=null) {
             BestRecordDTO bestRecordDTO = new BestRecordDTO(bestRecord);
@@ -207,3 +208,4 @@ public class PersonalService {
         }
     }
 }
+ */

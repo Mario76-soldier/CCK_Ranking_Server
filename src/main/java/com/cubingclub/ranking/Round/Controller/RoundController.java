@@ -25,7 +25,11 @@ public class RoundController {
     }
     @GetMapping("/round/{roundIdx}")
     public ResponseEntity<RoundDTO> RoundInfo(@PathVariable(value="roundIdx")Integer roundIdx){
-        return ResponseEntity.ok(roundService.getOne(roundIdx));
+        RoundDTO roundDTO=roundService.getOne(roundIdx);
+        if(roundDTO==null){
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.ok(roundDTO);
     }
     @PostMapping("/round")
     public ResponseEntity<List<Integer>> CreateRound(@RequestBody List<CreateRoundDTO> roundList){

@@ -1,6 +1,6 @@
-package com.cubingclub.ranking.Participate.DTO;
+package com.cubingclub.ranking.Record.DTO;
 
-import com.cubingclub.ranking.Participate.Entity.BestType;
+import com.cubingclub.ranking.Record.Entity.BestType;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -12,7 +12,7 @@ import java.math.BigDecimal;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class ParticipateUserDTO {
+public class RecordForUserDTO {
     private Integer idx;
     private Integer pdx;
     private String email;

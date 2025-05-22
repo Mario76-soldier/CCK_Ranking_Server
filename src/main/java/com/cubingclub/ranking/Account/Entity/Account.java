@@ -35,8 +35,6 @@ public class Account {
     private String state;
     @Column(length=10)
     private Gender gender;
-    @Column(length=20)
-    private String phoneNum;
 
     public Account roleUpdate(UserRole position){
         this.position=position;

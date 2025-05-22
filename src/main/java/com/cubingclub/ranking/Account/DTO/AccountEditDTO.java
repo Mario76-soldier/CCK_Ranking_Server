@@ -15,5 +15,4 @@ public class AccountEditDTO {
     private String newPassword;
     private String newPasswordCheck;
     private String state;
-    private String phoneNum;
 }

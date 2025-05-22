@@ -8,7 +8,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 public class ScramblerUpdateDTO {
-    Integer partIdx;
+    Integer attemptIdx;
     String uid;
-    String seq;
+    Integer exNumber;
 }

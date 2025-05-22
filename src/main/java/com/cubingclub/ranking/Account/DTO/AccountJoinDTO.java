@@ -26,7 +26,6 @@ public class AccountJoinDTO {
     private LocalDate birthDate;
     private String state;
     private Gender gender;
-    private String phoneNum;
     private String authNum;
     public Account toEntity(String encodedPassword){
         return Account.builder()
@@ -38,7 +37,6 @@ public class AccountJoinDTO {
                 .birthDate(this.birthDate)
                 .state(this.state)
                 .gender(this.gender)
-                .phoneNum(this.phoneNum)
                 .build();
     }
 }

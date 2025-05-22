@@ -3,7 +3,7 @@ package com.cubingclub.ranking.BestRecord.DTO;
 import com.cubingclub.ranking.Account.Entity.Account;
 import com.cubingclub.ranking.BestRecord.Entity.BestRecord;
 import com.cubingclub.ranking.CubeEvent.Entity.CubeEvent;
-import com.cubingclub.ranking.Participate.Entity.Participate;
+import com.cubingclub.ranking.Record.Entity.Record;
 import lombok.*;
 
 @Getter
@@ -13,14 +13,14 @@ public class BestRecordDTO {
     private Integer idx;
     private Account account;
     private CubeEvent cubeEvent;
-    private Participate single;
-    private Participate average;
+    private Record single;
+    private Record average;
     private Long singleRanking;
     private Long averageRanking;
     private Long stateSingleRanking;
     private Long stateAverageRanking;
 
-    public BestRecordDTO(Account account, Participate single, Participate average, CubeEvent cubeEvent) {
+    public BestRecordDTO(Account account, Record single, Record average, CubeEvent cubeEvent) {
         this.account=account;
         this.cubeEvent=cubeEvent;
         this.single=single;

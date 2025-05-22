@@ -1,4 +1,4 @@
-package com.cubingclub.ranking.Participate.DTO;
+package com.cubingclub.ranking.Record.DTO;
 
 import java.math.BigDecimal;
 
