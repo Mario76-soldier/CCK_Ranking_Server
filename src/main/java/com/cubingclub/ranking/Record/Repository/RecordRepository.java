@@ -21,29 +21,35 @@ public interface RecordRepository extends JpaRepository<Record, Integer> {
     List<Record> findByRound_IdxForBestType(@Param(value="roundIdx")Integer roundIdx);
     @Modifying
     @Query(value = "UPDATE Record r JOIN (" +
-            "SELECT idx, RANK() OVER (ORDER BY (CASE WHEN average = -2 THEN 2 WHEN average = -1 THEN 1 ELSE 0 END), average) AS new_rank " +
-            "FROM Record WHERE round_idx = :roundIdx AND average IS NOT NULL AND average != 0" +
+            "SELECT idx, RANK() OVER (" +
+            "ORDER BY " +
+            "(CASE WHEN average = -2 THEN 2 WHEN average = -1 THEN 1 ELSE 0 END), average, " +
+            "(CASE WHEN single = -2 THEN 2 WHEN single = -1 THEN 1 ELSE 0 END), single" +
+            ") AS new_rank " +
+            "FROM Record " +
+            "WHERE round_idx = :roundIdx AND average IS NOT NULL AND average != 0" +
             ") ranked ON r.idx = ranked.idx " +
             "SET r.ranking = ranked.new_rank " +
-            "WHERE r.round_idx = :roundIdx AND r.average IS NOT NULL AND r.average != 0", nativeQuery = true)
+            "WHERE r.round_idx = :roundIdx AND r.average IS NOT NULL AND r.average != 0",
+            nativeQuery = true)
     void setRankOnRound(@Param("roundIdx") Integer roundIdx);
-    @Query("select p.idx as idx, p.single as best from Record p join p.account a join p.round r join r.cubeEvent ce where a.email=:email and ce.eventName=:eventName and p.single!=0 and p.single is not null " +
-            "order by (case when p.single = -2 then 2 when p.single = -1 then 1 else 0 end), p.single asc limit 1")
+    @Query("select p.idx as idx, p.single as best from Record p join p.account a join p.round r join r.cubeEvent ce where a.email=:email and ce.eventName=:eventName and p.single>0 and p.single is not null " +
+            "order by p.single asc limit 1")
     BestResult findPersonalSingleBest(@Param(value="email")String email, @Param(value="eventName")String eventName);
-    @Query("select p.idx as idx, p.average as best from Record p join p.account a join p.round r join r.cubeEvent ce where a.email=:email and ce.eventName=:eventName and p.average!=0 and p.average is not null " +
-            "order by (case when p.average = -2 then 2 when p.average = -1 then 1 else 0 end), p.average asc limit 1")
+    @Query("select p.idx as idx, p.average as best from Record p join p.account a join p.round r join r.cubeEvent ce where a.email=:email and ce.eventName=:eventName and p.average>0 and p.average is not null " +
+            "order by p.average asc limit 1")
     BestResult findPersonalAverageBest(@Param(value="email")String email, @Param(value="eventName")String eventName);
-    @Query("select p.idx as idx, p.single as best from Record p join p.account a join p.round r join r.cubeEvent ce where a.state=:state and ce.eventName=:eventName and p.single!=0 and p.single is not null " +
-            "order by (case when p.single = -2 then 2 when p.single = -1 then 1 else 0 end), p.single asc limit 1")
+    @Query("select p.idx as idx, p.single as best from Record p join p.account a join p.round r join r.cubeEvent ce where a.state=:state and ce.eventName=:eventName and p.single>0 and p.single is not null " +
+            "order by p.single asc limit 1")
     BestResult findStateSingleBest(@Param(value="state")String state, @Param(value="eventName")String eventName);
-    @Query("select p.idx as idx, p.average as best from Record p join p.account a join p.round r join r.cubeEvent ce where a.state=:state and ce.eventName=:eventName and p.average!=0 and p.average is not null " +
-            "order by (case when p.average = -2 then 2 when p.average = -1 then 1 else 0 end), p.average asc limit 1")
+    @Query("select p.idx as idx, p.average as best from Record p join p.account a join p.round r join r.cubeEvent ce where a.state=:state and ce.eventName=:eventName and p.average>0 and p.average is not null " +
+            "order by p.average asc limit 1")
     BestResult findStateAverageBest(@Param(value="state")String state, @Param(value="eventName")String eventName);
-    @Query("select p.idx as idx, p.single as best from Record p join p.account a join p.round r join r.cubeEvent ce where ce.eventName=:eventName and p.single!=0 and p.single is not null " +
-            "order by (case when p.single = -2 then 2 when p.single = -1 then 1 else 0 end), p.single asc limit 1")
+    @Query("select p.idx as idx, p.single as best from Record p join p.account a join p.round r join r.cubeEvent ce where ce.eventName=:eventName and p.single>0 and p.single is not null " +
+            "order by p.single asc limit 1")
     BestResult findAllSingleBest(@Param(value="eventName")String eventName);
-    @Query("select p.idx as idx, p.average as best from Record p join p.account a join  p.round r join  r.cubeEvent ce where ce.eventName=:eventName and p.average!=0 and p.average is not null " +
-            "order by (case when p.average = -2 then 2 when p.average = -1 then 1 else 0 end), p.average asc limit 1")
+    @Query("select p.idx as idx, p.average as best from Record p join p.account a join  p.round r join  r.cubeEvent ce where ce.eventName=:eventName and p.average>0 and p.average is not null " +
+            "order by p.average asc limit 1")
     BestResult findAllAverageBest(@Param(value="eventName")String eventName);
     @Query("select p.idx from Record p where p.round.idx=:roundIdx order by " +
             "(case when p.average = 0 then 5 when p.average = -2 then 4 when p.average = -1 then 3 when p.single = -2 then 2 when p.single = -1 then 1 else 0 end),"+

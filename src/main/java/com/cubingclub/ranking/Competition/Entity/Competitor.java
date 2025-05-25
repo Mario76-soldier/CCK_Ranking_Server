@@ -35,7 +35,10 @@ public class Competitor {
     @Column
     private LocalDateTime timeStamp;
     @ManyToMany
-    @JoinTable(joinColumns = @JoinColumn, inverseJoinColumns = @JoinColumn)
+    @JoinTable(
+            joinColumns = @JoinColumn(name = "competitor_idx", referencedColumnName = "idx"),
+            inverseJoinColumns = @JoinColumn(name = "cubeEvent_eventName", referencedColumnName = "eventName")
+    )
     private List<CubeEvent> eventList;
     @Column(nullable = false)
     private boolean attended;

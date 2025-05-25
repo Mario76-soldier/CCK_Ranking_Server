@@ -19,7 +19,7 @@ public class Scrambler {
     @JoinColumn(
             foreignKey = @ForeignKey(
                     name = "fk_scrambler_round",
-                    foreignKeyDefinition = "FOREIGN KEY (round_id) REFERENCES round(id) ON DELETE CASCADE"
+                    foreignKeyDefinition = "FOREIGN KEY (round_idx) REFERENCES Round(idx) ON DELETE CASCADE"
             )
     )
     private Round round;
