@@ -12,6 +12,7 @@ import com.cubingclub.ranking.Record.Repository.RecordRepository;
 import com.cubingclub.ranking.RFID.Repository.RFIDRepository;
 import com.cubingclub.ranking.Round.Entity.Round;
 import com.cubingclub.ranking.Round.Repository.RoundRepository;
+import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -30,6 +31,7 @@ public class RecordService {
     private final RecordRepository recordRepository;
     private final AttemptRepository attemptRepository;
     private final AccountRepository accountRepository;
+    private final EntityManager em;
 
     private static final BigDecimal DNF = BigDecimal.valueOf(-1);
     private static final BigDecimal DNS = BigDecimal.valueOf(-2);
@@ -204,10 +206,9 @@ public class RecordService {
             }
             case "single" -> {
                 if(attemptList.size()==1 && !isZero) {
-                    recordDTO.setAverage(calculateSingle(times.subList(0, 1)));
+                    recordDTO.setSingle(times.get(0));
                 }
                 else{
-                    recordDTO.setAverage(BigDecimal.ZERO);
                     recordDTO.setSingle(BigDecimal.ZERO);
                     recordDTO.setRanking(null);
                 }
@@ -215,7 +216,7 @@ public class RecordService {
         }
         recordRepository.save(recordDTO.toEntityFull(accountRepository, attemptList));
         recordRepository.setRankOnRound(recordDTO.getRound().getIdx());
-        recordRepository.flush();
+        em.clear();
         List<Record> recordList = recordRepository.findByRound_IdxForBestType(recordDTO.getRound().getIdx());
         for(Record r : recordList) {
             if(!r.getIdx().equals(recordDTO.getIdx()) && (r.getSingleBestType()==null || r.getSingleBestType()==BestType.PR) && (r.getAverageBestType()==null || r.getAverageBestType()==BestType.PR)){
@@ -232,8 +233,9 @@ public class RecordService {
             );
             eachRecordDTO.setSingleBestType(bestTypeMap.get("single"));
             eachRecordDTO.setAverageBestType(bestTypeMap.get("average"));
-            recordRepository.save(eachRecordDTO.toEntityFull(accountRepository, attemptList));
+            recordRepository.save(eachRecordDTO.toEntityFull(accountRepository, r.getAttempts()));
         }
+        recordRepository.flush();
     }
 
 
@@ -332,42 +334,40 @@ public class RecordService {
     private Map<String, BestType> calculateBestType(Integer idx, String email, String state, String eventName, BigDecimal single, BigDecimal average){
         Map<String, BestType> best=new HashMap<>();
         BestResult personalSingleBest= recordRepository.findPersonalSingleBest(email, eventName);
-        if(personalSingleBest==null || personalSingleBest.getBest().compareTo(single)>0 || (personalSingleBest.getIdx().equals(idx) && personalSingleBest.getBest().compareTo(single)>=0)){
-            BestResult stateSingleBest= recordRepository.findStateSingleBest(state, eventName);
-            if(stateSingleBest==null || stateSingleBest.getBest().compareTo(single)>0 || (stateSingleBest.getIdx().equals(idx) && stateSingleBest.getBest().compareTo(single)>=0)){
-                BestResult allSingleBest= recordRepository.findAllSingleBest(eventName);
-                if(allSingleBest==null || allSingleBest.getBest().compareTo(single)>0 || (allSingleBest.getIdx().equals(idx) && allSingleBest.getBest().compareTo(single)>=0)){
-                    best.put("single", BestType.CCR);
+        if(!single.equals(BigDecimal.ZERO) && !single.equals(BigDecimal.valueOf(-1)) && !single.equals(BigDecimal.valueOf(-2))) {
+            if (personalSingleBest == null || personalSingleBest.getBest().compareTo(single) > 0 || (personalSingleBest.getIdx().equals(idx) && personalSingleBest.getBest().compareTo(single) >= 0)) {
+                BestResult stateSingleBest = recordRepository.findStateSingleBest(state, eventName);
+                if (stateSingleBest == null || stateSingleBest.getBest().compareTo(single) > 0 || (stateSingleBest.getIdx().equals(idx) && stateSingleBest.getBest().compareTo(single) >= 0)) {
+                    BestResult allSingleBest = recordRepository.findAllSingleBest(eventName);
+                    if (allSingleBest == null || allSingleBest.getBest().compareTo(single) > 0 || (allSingleBest.getIdx().equals(idx) && allSingleBest.getBest().compareTo(single) >= 0)) {
+                        best.put("single", BestType.CCR);
+                    } else {
+                        best.put("single", BestType.SR);
+                    }
+                } else {
+                    best.put("single", BestType.PR);
                 }
-                else{
-                    best.put("single", BestType.SR);
-                }
+            } else {
+                best.put("single", null);
             }
-            else{
-                best.put("single", BestType.PR);
-            }
-        }
-        else{
-            best.put("single",null);
         }
         BestResult personalAverageBest= recordRepository.findPersonalAverageBest(email, eventName);
-        if(personalAverageBest==null || personalAverageBest.getBest().compareTo(average)>0 || (personalAverageBest.getIdx().equals(idx) && personalAverageBest.getBest().compareTo(single)>=0)){
-            BestResult stateAverageBest= recordRepository.findStateAverageBest(state, eventName);
-            if(stateAverageBest==null || stateAverageBest.getBest().compareTo(average)>0 || (stateAverageBest.getIdx().equals(idx) && stateAverageBest.getBest().compareTo(single)>=0)){
-                BestResult allAverageBest= recordRepository.findAllAverageBest(eventName);
-                if(allAverageBest==null || allAverageBest.getBest().compareTo(average)>0 || (allAverageBest.getIdx().equals(idx) && allAverageBest.getBest().compareTo(single)>=0)){
-                    best.put("average", BestType.CCR);
+        if(!average.equals(BigDecimal.ZERO) && !average.equals(BigDecimal.valueOf(-1)) && !average.equals(BigDecimal.valueOf(-2))) {
+            if (personalAverageBest == null || personalAverageBest.getBest().compareTo(average) > 0 || (personalAverageBest.getIdx().equals(idx) && personalAverageBest.getBest().compareTo(single) >= 0)) {
+                BestResult stateAverageBest = recordRepository.findStateAverageBest(state, eventName);
+                if (stateAverageBest == null || stateAverageBest.getBest().compareTo(average) > 0 || (stateAverageBest.getIdx().equals(idx) && stateAverageBest.getBest().compareTo(single) >= 0)) {
+                    BestResult allAverageBest = recordRepository.findAllAverageBest(eventName);
+                    if (allAverageBest == null || allAverageBest.getBest().compareTo(average) > 0 || (allAverageBest.getIdx().equals(idx) && allAverageBest.getBest().compareTo(single) >= 0)) {
+                        best.put("average", BestType.CCR);
+                    } else {
+                        best.put("average", BestType.SR);
+                    }
+                } else {
+                    best.put("average", BestType.PR);
                 }
-                else{
-                    best.put("average", BestType.SR);
-                }
+            } else {
+                best.put("average", null);
             }
-            else{
-                best.put("average", BestType.PR);
-            }
-        }
-        else{
-            best.put("average",null);
         }
         return best;
     }
