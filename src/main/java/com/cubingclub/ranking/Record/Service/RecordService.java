@@ -207,6 +207,7 @@ public class RecordService {
             case "single" -> {
                 if(attemptList.size()==1 && !isZero) {
                     recordDTO.setSingle(times.get(0));
+                    recordDTO.setAverage(times.get(0));
                 }
                 else{
                     recordDTO.setSingle(BigDecimal.ZERO);
@@ -330,11 +331,10 @@ public class RecordService {
                 .orElse(DNF);
     }
 
-
     private Map<String, BestType> calculateBestType(Integer idx, String email, String state, String eventName, BigDecimal single, BigDecimal average){
         Map<String, BestType> best=new HashMap<>();
         BestResult personalSingleBest= recordRepository.findPersonalSingleBest(email, eventName);
-        if(!single.equals(BigDecimal.ZERO) && !single.equals(BigDecimal.valueOf(-1)) && !single.equals(BigDecimal.valueOf(-2))) {
+        if(single.compareTo(BigDecimal.ZERO)>0) {
             if (personalSingleBest == null || personalSingleBest.getBest().compareTo(single) > 0 || (personalSingleBest.getIdx().equals(idx) && personalSingleBest.getBest().compareTo(single) >= 0)) {
                 BestResult stateSingleBest = recordRepository.findStateSingleBest(state, eventName);
                 if (stateSingleBest == null || stateSingleBest.getBest().compareTo(single) > 0 || (stateSingleBest.getIdx().equals(idx) && stateSingleBest.getBest().compareTo(single) >= 0)) {
@@ -352,7 +352,7 @@ public class RecordService {
             }
         }
         BestResult personalAverageBest= recordRepository.findPersonalAverageBest(email, eventName);
-        if(!average.equals(BigDecimal.ZERO) && !average.equals(BigDecimal.valueOf(-1)) && !average.equals(BigDecimal.valueOf(-2))) {
+        if(average.compareTo(BigDecimal.ZERO)>0) {
             if (personalAverageBest == null || personalAverageBest.getBest().compareTo(average) > 0 || (personalAverageBest.getIdx().equals(idx) && personalAverageBest.getBest().compareTo(single) >= 0)) {
                 BestResult stateAverageBest = recordRepository.findStateAverageBest(state, eventName);
                 if (stateAverageBest == null || stateAverageBest.getBest().compareTo(average) > 0 || (stateAverageBest.getIdx().equals(idx) && stateAverageBest.getBest().compareTo(single) >= 0)) {
