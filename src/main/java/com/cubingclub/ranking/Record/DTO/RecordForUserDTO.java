@@ -1,0 +1,37 @@
+package com.cubingclub.ranking.Record.DTO;
+
+import com.cubingclub.ranking.Record.Entity.BestType;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+import java.math.BigDecimal;
+
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+public class RecordForUserDTO {
+    private Integer idx;
+    private Integer pdx;
+    private String email;
+    private String name;
+    private String enName;
+    private String state;
+    private BigDecimal first;
+    private BigDecimal second;
+    private BigDecimal third;
+    private BigDecimal fourth;
+    private BigDecimal fifth;
+    private Integer extra1;
+    private String extra1Reason;
+    private Integer extra2;
+    private String extra2Reason;
+    private BigDecimal single;
+    private BigDecimal average;
+    private Integer ranking;
+    private Integer stateRanking;
+    private BestType singleBestType;
+    private BestType averageBestType;
+}
