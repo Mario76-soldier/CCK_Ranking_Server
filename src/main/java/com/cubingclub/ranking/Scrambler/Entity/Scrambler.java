@@ -27,7 +27,8 @@ public class Scrambler {
     private String roundGroup;
     @Column
     private String seq;
-    @Column
+    @Lob
+    @Column(columnDefinition = "TEXT")
     private String scramble;
     @Lob
     @Column(columnDefinition = "TEXT")
