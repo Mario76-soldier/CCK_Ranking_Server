@@ -35,8 +35,9 @@ public class SecurityConfig{
                 .httpBasic(Customizer.withDefaults())
                 .sessionManagement(sess->sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(request -> request
-                        .requestMatchers("/api/recorder/**", "/api/scramble/**", "/api/scrambles/**", "/api/scrambler/**").hasRole("ROOT")
-                        .requestMatchers(HttpMethod.GET,"/api/admin/**", "/api/competitor/**").hasAnyRole("ROOT","ADMIN")
+                        .requestMatchers("/api/recorder/**").hasRole("ROOT")
+                        .requestMatchers("/api/scramble/**", "/api/scrambler/**").hasAnyRole("ROOT", "SCRAMBLER")
+                        .requestMatchers(HttpMethod.GET,"/api/admin/**", "/api/competitor/**", "/api/scrambles/**").hasAnyRole("ROOT","ADMIN")
                         .requestMatchers(HttpMethod.POST,"/api/comp/**","/api/round","/api/advance/**","/api/record/**","/api/admin/**", "/api/competitor/**").hasAnyRole("ROOT","ADMIN")
                         .requestMatchers(HttpMethod.DELETE,"/api/comp/**","/api/round/**","/api/record/**").hasAnyRole("ROOT","ADMIN")
                         .requestMatchers(HttpMethod.PUT,"/api/advance/**","/api/checker/**").hasAnyRole("ROOT","ADMIN")

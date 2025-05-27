@@ -8,7 +8,7 @@ import java.math.BigDecimal;
 @Getter
 @Setter
 public class RecorderDTO {
-    Integer idx;
+    Integer attemptIdx;
     String judgeEmail;
     BigDecimal record;
 }

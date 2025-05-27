@@ -118,8 +118,7 @@ public class RecordService {
             return null;
         }
         List<Attempt> attemptList = record.getAttempts();
-        if(attemptList.size()>=4){
-            if(attemptList.get(4).getTime()!=null || attemptList.get(4).getTime().compareTo(BigDecimal.ZERO)!=0) {
+            if(attemptList.get(3).getTime()!=null || attemptList.get(3).getTime().compareTo(BigDecimal.ZERO)!=0) {
                 List<BigDecimal> best = Arrays.asList(
                         attemptList.get(0).getTime(), attemptList.get(1).getTime(), attemptList.get(2).getTime(),
                         attemptList.get(3).getTime(), BigDecimal.valueOf(0.01)
@@ -133,7 +132,6 @@ public class RecordService {
                 expectedBestWorstDTO.setAverage(formatSeconds(calculateAo5Average(worst)));
                 return expectedBestWorstDTO;
             }
-        }
         return null;
     }
     public String formatSeconds(BigDecimal seconds) {
@@ -193,9 +191,9 @@ public class RecordService {
                     recordDTO.setRanking(null);
                 }
             }
-            case "bo3" -> {
+            case "mo3" -> {
                 if(attemptList.size()==3 && !isZero) {
-                    recordDTO.setAverage(calculateBo3Average(times.subList(0, 3)));
+                    recordDTO.setAverage(calculateMo3Average(times.subList(0, 3)));
                     recordDTO.setSingle(calculateSingle(times.subList(0, 3)));
                 }
                 else{
@@ -271,13 +269,14 @@ public class RecordService {
         }
         List<Record> records=recordRepository.saveAll(recordList);
         for(Record record:records){
+            log.info(record.getRound().getCubeEvent().getAvgCalc());
             switch (record.getRound().getCubeEvent().getAvgCalc()){
                 case "ao5"->{
                     for(int i=1; i<=5; i++){
                         attemptRepository.save(new AttemptDTO(record, i).toInitialEntity(recordRepository));
                     }
                 }
-                case "bo3"->{
+                case "mo3"->{
                     for(int i=1; i<=3; i++){
                         attemptRepository.save(new AttemptDTO(record, i).toInitialEntity(recordRepository));
                     }
@@ -315,7 +314,7 @@ public class RecordService {
         return sum.divide(BigDecimal.valueOf(3), 2, RoundingMode.HALF_UP);
     }
 
-    private static BigDecimal calculateBo3Average(List<BigDecimal> times) {
+    private static BigDecimal calculateMo3Average(List<BigDecimal> times) {
         if (times.stream().anyMatch(t -> t.compareTo(BigDecimal.ZERO) < 0)) return DNF;
 
         BigDecimal sum = times.stream()
