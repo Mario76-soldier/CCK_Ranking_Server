@@ -1,5 +1,6 @@
 package com.cubingclub.ranking.Account.Entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -17,13 +18,14 @@ import java.time.LocalDate;
 @Table
 public class Account {
     @Id
-    @Column(length=30)
+    @Column
     private String email;
-    @Column(length=30)
+    @Column
     private String name;
-    @Column(length=40)
+    @Column
     private String enName;
     @Column
+    @JsonIgnore
     private String password;
     @Column
     @Enumerated(EnumType.STRING)
@@ -33,8 +35,10 @@ public class Account {
     private LocalDate birthDate;
     @Column(length=15)
     private String state;
-    @Column(length=10)
+    @Column
     private Gender gender;
+    @Column
+    private String cckId;
 
     public Account roleUpdate(UserRole position){
         this.position=position;
