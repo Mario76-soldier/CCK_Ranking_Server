@@ -15,7 +15,7 @@ public class Scrambler {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column
     private Integer idx;
-    @ManyToOne
+    @ManyToOne(fetch=FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(
             foreignKey = @ForeignKey(
                     name = "fk_scrambler_round",

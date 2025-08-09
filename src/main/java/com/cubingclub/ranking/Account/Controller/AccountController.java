@@ -1,10 +1,7 @@
 package com.cubingclub.ranking.Account.Controller;
 
-import com.cubingclub.ranking.Config.TokenProvider;
 import com.cubingclub.ranking.Account.DTO.AccountJoinDTO;
 import com.cubingclub.ranking.Account.DTO.AccountEditDTO;
-import com.cubingclub.ranking.Account.DTO.AccountRequest;
-import com.cubingclub.ranking.Account.DTO.AccountResponseDTO;
 import com.cubingclub.ranking.Account.Entity.Account;
 import com.cubingclub.ranking.Account.Entity.UserRole;
 import com.cubingclub.ranking.Account.Service.AccountService;
@@ -24,27 +21,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/auth")
 public class AccountController {
     private final AccountService accountService;
-    private final TokenProvider tokenProvider;
     private final MailSendService mailSendService;
-    @PostMapping("/login")
-    public ResponseEntity<?> Login(@Valid @RequestBody AccountJoinDTO accountJoinDTO){
-        if(accountJoinDTO.getEmail()==null){
-            throw new RuntimeException("Invalid email value");
-        }
-        if(accountJoinDTO.getPassword()==null){
-            throw new RuntimeException("Invalid password value");
-        }
-        final AccountRequest accountRequest=new AccountRequest(accountJoinDTO.getEmail(), accountJoinDTO.getPassword());
-        Account account=accountService.login(accountRequest);
-        if(account!=null) {
-            final String token = tokenProvider.create(account);
-            final AccountResponseDTO accountResponseDTO=new AccountResponseDTO(account.getEmail(),account.getName(), account.getEnName(), account.getPosition(), token);
-            return ResponseEntity.ok(accountResponseDTO);
-        }
-        else{
-            return ResponseEntity.badRequest().body("No User Exists");
-        }
-    }
     @PostMapping("/join")
     public ResponseEntity<?> AddJoin(@Valid @RequestBody AccountJoinDTO accountJoinDTO){
         try {

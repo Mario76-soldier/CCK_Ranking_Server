@@ -1,0 +1,62 @@
+package com.cubingclub.ranking.OAuthClient.Service;
+
+import com.cubingclub.ranking.OAuthClient.Entity.OAuthClient;
+import com.cubingclub.ranking.OAuthClient.Repository.OAuthClientRepository;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.oauth2.core.AuthorizationGrantType;
+import org.springframework.security.oauth2.core.ClientAuthenticationMethod;
+import org.springframework.security.oauth2.core.oidc.OidcScopes;
+import org.springframework.security.oauth2.server.authorization.client.RegisteredClient;
+import org.springframework.security.oauth2.server.authorization.settings.ClientSettings;
+import org.springframework.stereotype.Service;
+
+@Service
+@RequiredArgsConstructor
+@Slf4j
+public class OAuthClientService {
+    private final OAuthClientRepository oAuthClientRepository;
+    private final BCryptPasswordEncoder bCryptPasswordEncoder;
+
+    public RegisteredClient loadClientByClientId(String clientId){
+        OAuthClient result=oAuthClientRepository.findByClientId(clientId)
+                .orElseThrow(()->new IllegalArgumentException("Client not found exception: "+clientId));
+        return loadClientByResult(result);
+    }
+
+    public RegisteredClient findByIdString(String id){
+        Long longId=Long.valueOf(id);
+        OAuthClient result=oAuthClientRepository.findById(longId).get();
+        return loadClientByResult(result);
+    }
+
+    public OAuthClient saveOAuthClient(String clientId, String clientSecret, String redirectUri, String postLogoutRedirectUri){
+        if (oAuthClientRepository.findByClientId(clientId).isEmpty()) {
+            OAuthClient client = OAuthClient.builder()
+                    .clientId(clientId)
+                    .clientSecret(clientSecret)
+                    .redirectUri(redirectUri)
+                    .postLogoutRedirectUri(postLogoutRedirectUri)
+                    .requireAuthorizationConsent(true)
+                    .build();
+            return oAuthClientRepository.save(client);
+        }
+        return null;
+    }
+
+    private RegisteredClient loadClientByResult(OAuthClient result){
+        return RegisteredClient.withId(result.getClientId())
+                .clientId(result.getClientId())
+                .clientSecret(bCryptPasswordEncoder.encode(result.getClientSecret()))
+                .clientAuthenticationMethod(ClientAuthenticationMethod.CLIENT_SECRET_BASIC)
+                .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
+                .authorizationGrantType(AuthorizationGrantType.REFRESH_TOKEN)
+                .redirectUri(result.getRedirectUri())
+                .postLogoutRedirectUri(result.getPostLogoutRedirectUri())
+                .scope(OidcScopes.OPENID)
+                .scope(OidcScopes.PROFILE)
+                .clientSettings(ClientSettings.builder().requireAuthorizationConsent(result.isRequireAuthorizationConsent()).build())
+                .build();
+    }
+}

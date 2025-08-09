@@ -95,8 +95,6 @@ public class RoundService {
         return result;
     }
     public void deleteByRoundIdx(Integer roundIdx){
-        recordRepository.deleteByRound_Idx(roundIdx);
-        scramblerRepository.deleteByRound_Idx(roundIdx);
         roundRepository.deleteByIdx(roundIdx);
     }
     public void updateAdvance(Integer roundIdx, Integer advance){
