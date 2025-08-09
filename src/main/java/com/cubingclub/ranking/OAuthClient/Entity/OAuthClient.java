@@ -28,4 +28,7 @@ public class OAuthClient {
     private String postLogoutRedirectUri;
     @Column
     private boolean requireAuthorizationConsent;
+    @Enumerated(EnumType.STRING)
+    @Column
+    private ClientType clientType;  // 추가 필드
 }

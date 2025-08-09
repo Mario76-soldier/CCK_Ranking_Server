@@ -26,16 +26,16 @@ public class RsaKeysService {
     private final RsaKeysRepository rsaKeysRepository;
 
     public RsaKeys saveRsaKeys(String identifier){
-        RsaKeys rsaKeys=new RsaKeys();
-
         KeyPair keyPair=generateRsaKey();
         RSAPublicKey publicKey=(RSAPublicKey) keyPair.getPublic();
         RSAPrivateKey privateKey=(RSAPrivateKey) keyPair.getPrivate();
 
-        rsaKeys.setIdentifier(identifier);
-        rsaKeys.setKeyId(UUID.randomUUID().toString());
-        rsaKeys.setPublicKey(Base64.getEncoder().encodeToString(publicKey.getEncoded()));
-        rsaKeys.setPrivateKey(Base64.getEncoder().encodeToString(privateKey.getEncoded()));
+        RsaKeys rsaKeys=RsaKeys.builder()
+                .identifier(identifier)
+                .keyId(UUID.randomUUID().toString())
+                .publicKey(Base64.getEncoder().encodeToString(publicKey.getEncoded()))
+                .privateKey(Base64.getEncoder().encodeToString(privateKey.getEncoded()))
+                .build();
 
         return rsaKeysRepository.save(rsaKeys);
     }

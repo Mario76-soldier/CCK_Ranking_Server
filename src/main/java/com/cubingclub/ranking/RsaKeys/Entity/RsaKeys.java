@@ -1,14 +1,13 @@
 package com.cubingclub.ranking.RsaKeys.Entity;
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 @Entity
 @Getter
-@Setter
 @NoArgsConstructor
+@AllArgsConstructor
+@Builder
 @Table
 public class RsaKeys {
     @Id

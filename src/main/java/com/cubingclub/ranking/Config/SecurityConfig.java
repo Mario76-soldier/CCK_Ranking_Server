@@ -20,6 +20,9 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.server.authorization.client.RegisteredClient;
 import org.springframework.security.oauth2.server.authorization.client.RegisteredClientRepository;
@@ -38,7 +41,10 @@ import org.springframework.web.cors.CorsConfigurationSource;
 
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 
 @RequiredArgsConstructor
 @Configuration
@@ -72,12 +78,14 @@ public class SecurityConfig{
         http
                 .csrf(AbstractHttpConfigurer::disable)
                 .formLogin(form -> form
+                        .loginPage("/login")
+                        .permitAll()
                         .successHandler(new SavedRequestAwareAuthenticationSuccessHandler())
                 )
                 .httpBasic(Customizer.withDefaults())
                 .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED))
                 .authorizeHttpRequests(request -> request
-                        .requestMatchers("/api/recorder/**").hasRole("ROOT")
+                        .requestMatchers("/api/recorder/**").hasAuthority("SCOPE_limited.read")
                         .requestMatchers("/api/scramble/**", "/api/scrambler/**").hasAnyRole("ROOT", "SCRAMBLER")
                         .requestMatchers(HttpMethod.GET,"/api/admin/**", "/api/competitor/**", "/api/scrambles/**").hasAnyRole("ROOT","ADMIN")
                         .requestMatchers(HttpMethod.POST,"/api/comp/**","/api/round","/api/advance/**","/api/record/**","/api/admin/**", "/api/competitor/**").hasAnyRole("ROOT","ADMIN")
@@ -133,16 +141,9 @@ public class SecurityConfig{
 
     @Bean
     public JwtAuthenticationConverter jwtAuthenticationConverter() {
-        JwtGrantedAuthoritiesConverter grantedAuthoritiesConverter = new JwtGrantedAuthoritiesConverter();
-        // "roles" 클레임을 권한으로 사용
-        grantedAuthoritiesConverter.setAuthoritiesClaimName("roles");
-
-        // 권한 앞에 "ROLE_" 접두사를 붙임 (Spring Security에서 기본 요구)
-        grantedAuthoritiesConverter.setAuthorityPrefix("");
-
-        JwtAuthenticationConverter jwtAuthenticationConverter = new JwtAuthenticationConverter();
-        jwtAuthenticationConverter.setJwtGrantedAuthoritiesConverter(grantedAuthoritiesConverter);
-        return jwtAuthenticationConverter;
+        JwtAuthenticationConverter converter = new JwtAuthenticationConverter();
+        converter.setJwtGrantedAuthoritiesConverter(new CustomJwtGrantedAuthoritiesConverter());
+        return converter;
     }
 
     @Bean

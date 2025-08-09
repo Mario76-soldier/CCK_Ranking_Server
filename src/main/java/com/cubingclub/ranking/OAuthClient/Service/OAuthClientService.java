@@ -1,5 +1,6 @@
 package com.cubingclub.ranking.OAuthClient.Service;
 
+import com.cubingclub.ranking.OAuthClient.Entity.ClientType;
 import com.cubingclub.ranking.OAuthClient.Entity.OAuthClient;
 import com.cubingclub.ranking.OAuthClient.Repository.OAuthClientRepository;
 import lombok.RequiredArgsConstructor;
@@ -31,7 +32,7 @@ public class OAuthClientService {
         return loadClientByResult(result);
     }
 
-    public OAuthClient saveOAuthClient(String clientId, String clientSecret, String redirectUri, String postLogoutRedirectUri){
+    public OAuthClient saveOAuthClient(String clientId, String clientSecret, String redirectUri, String postLogoutRedirectUri, ClientType clientType){
         if (oAuthClientRepository.findByClientId(clientId).isEmpty()) {
             OAuthClient client = OAuthClient.builder()
                     .clientId(clientId)
@@ -39,6 +40,7 @@ public class OAuthClientService {
                     .redirectUri(redirectUri)
                     .postLogoutRedirectUri(postLogoutRedirectUri)
                     .requireAuthorizationConsent(true)
+                    .clientType(clientType)
                     .build();
             return oAuthClientRepository.save(client);
         }
@@ -46,17 +48,29 @@ public class OAuthClientService {
     }
 
     private RegisteredClient loadClientByResult(OAuthClient result){
-        return RegisteredClient.withId(result.getClientId())
+        RegisteredClient.Builder builder = RegisteredClient.withId(result.getClientId())
                 .clientId(result.getClientId())
                 .clientSecret(bCryptPasswordEncoder.encode(result.getClientSecret()))
-                .clientAuthenticationMethod(ClientAuthenticationMethod.CLIENT_SECRET_BASIC)
-                .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
-                .authorizationGrantType(AuthorizationGrantType.REFRESH_TOKEN)
-                .redirectUri(result.getRedirectUri())
-                .postLogoutRedirectUri(result.getPostLogoutRedirectUri())
-                .scope(OidcScopes.OPENID)
-                .scope(OidcScopes.PROFILE)
-                .clientSettings(ClientSettings.builder().requireAuthorizationConsent(result.isRequireAuthorizationConsent()).build())
-                .build();
+                .clientAuthenticationMethod(ClientAuthenticationMethod.CLIENT_SECRET_BASIC);
+
+        if(result.getClientType()==ClientType.IOT){
+            builder
+                    .authorizationGrantType(AuthorizationGrantType.CLIENT_CREDENTIALS)
+                    .scope("limited.read")
+                    .clientSettings(ClientSettings.builder().requireAuthorizationConsent(false).build());
+        }
+        else{
+            builder
+                    .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
+                    .authorizationGrantType(AuthorizationGrantType.REFRESH_TOKEN)
+                    .redirectUri(result.getRedirectUri())
+                    .postLogoutRedirectUri(result.getPostLogoutRedirectUri())
+                    .scope(OidcScopes.OPENID)
+                    .scope(OidcScopes.PROFILE)
+                    .clientSettings(ClientSettings.builder()
+                            .requireAuthorizationConsent(result.isRequireAuthorizationConsent())
+                            .build());
+        }
+        return builder.build();
     }
 }

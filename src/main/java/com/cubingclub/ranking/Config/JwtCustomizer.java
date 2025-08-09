@@ -13,7 +13,6 @@ import java.util.stream.Collectors;
 
 @Component
 public class JwtCustomizer implements OAuth2TokenCustomizer<JwtEncodingContext> {
-
     private String returnClientId() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if(authentication != null) {
@@ -21,7 +20,6 @@ public class JwtCustomizer implements OAuth2TokenCustomizer<JwtEncodingContext> 
         }
         return "unknown";
     }
-
     @Override
     public void customize(JwtEncodingContext context) {
         // Token Type AT Only (Access Token) Customization
