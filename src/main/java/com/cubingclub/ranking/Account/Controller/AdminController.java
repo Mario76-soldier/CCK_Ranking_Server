@@ -23,7 +23,6 @@ public class AdminController {
     private final AccountService accountService;
     private final AdminService adminService;
     private final RFIDService rfidService;
-    private final RecordService participateService;
 
     @GetMapping("/list")
     public ResponseEntity<?> UserList(){

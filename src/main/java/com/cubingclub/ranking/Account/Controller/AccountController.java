@@ -3,7 +3,6 @@ package com.cubingclub.ranking.Account.Controller;
 import com.cubingclub.ranking.Account.DTO.AccountJoinDTO;
 import com.cubingclub.ranking.Account.DTO.AccountEditDTO;
 import com.cubingclub.ranking.Account.Entity.Account;
-import com.cubingclub.ranking.Account.Entity.UserRole;
 import com.cubingclub.ranking.Account.Service.AccountService;
 import com.cubingclub.ranking.Mail.Service.MailSendService;
 import jakarta.validation.Valid;
@@ -39,17 +38,6 @@ public class AccountController {
             }
             Account account=accountService.join(accountJoinDTO);
             return ResponseEntity.ok().body(account);
-        }
-        catch(Exception e){
-            return ResponseEntity.badRequest().body(e);
-        }
-    }
-    @GetMapping("/role")
-    public ResponseEntity<?> CheckRole(){
-        try {
-            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-            UserRole myPosition = accountService.getUserRole(authentication.getName());
-            return ResponseEntity.ok().body(myPosition);
         }
         catch(Exception e){
             return ResponseEntity.badRequest().body(e);

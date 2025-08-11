@@ -9,6 +9,8 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import org.thymeleaf.context.Context;
+import org.thymeleaf.spring6.SpringTemplateEngine;
 
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
@@ -25,6 +27,7 @@ public class MailSendService {
     private final JavaMailSender mailSender;
     private final RandomNumRepository randomNumRepository;
     private final AccountService accountService;
+    private final SpringTemplateEngine springTemplateEngine;
 
     public boolean CheckAuthNum(String email,String authNum){
         if(randomNumRepository.findRandomNumByRandNum(authNum)==null){
@@ -102,45 +105,31 @@ public class MailSendService {
             e.printStackTrace();//e.printStackTrace()는 예외를 기본 오류 스트림에 출력하는 메서드
         }
     }
+
+    public String buildPasswordEmailContent(String tempPassword) {
+        Context context = new Context();
+        context.setVariable("tempPassword", tempPassword);
+
+        // emailTemplate.html 파일을 템플릿으로 지정 (resources/templates/emailTemplate.html)
+        return springTemplateEngine.process("reissue_password", context);
+    }
     //Mail을 어디서 보내는지, 어디로 보내는지 , 인증 번호를 html 형식으로 어떻게 보내는지 작성합니다.
     public String passwordEmail(String email) {
         String tempPassword=makeTempPassword();
         if(!accountService.updatePassword(email, tempPassword)){
             return "-1";
         }
-        String setFrom = "2001cupid@gmail.com"; // email-config에 설정한 자신의 이메일 주소를 입력
-        String title = "CCK Ranking 임시 비밀번호 생성"; // 이메일 제목
-        String content =
-                """
-                        <div
-                        \tstyle="font-family: 'Apple SD Gothic Neo', 'sans-serif' !important; width: 540px; height: 600px; border-top: 4px solid #4D6BB2; margin: 100px auto; padding: 15px 0; box-sizing: border-box;">
-                        \t<h1 style="margin: 20px 0; padding: 0 5px; font-size: 28px; font-weight: 400;">
-                        \t\t<a href="https://ibb.co/dJrR2r4"><img src="https://i.ibb.co/x8DNjDq/compranking.png"
-                        \t\t\t\tstyle="height: 100px; width: 350px; margin-bottom: 20px;" alt="compranking"><br /></a>
-                        \t\t<span style="color: #4D6BB2;">임시 비밀번호 생성</span> 안내입니다.
-                        \t</h1>
-                        \t<div style="border-top: 1px solid #DDD;">
-                        \t\t<p style="font-size: 16px; line-height: 26px; padding: 0 5px;">
-                        \t\t\t안녕하세요.<br />
-                        \t\t\t큐빙클럽코리아 Ranking에 돌아와 주셔서 진심으로 감사드립니다.<br />
-                        \t\t\t아래 <b style="color: #4D6BB2;">임시 비밀번호를 입력</b>하여 로그인 후, 비밀번호를 변경해주세요.<br />
-                        \t\t</p>
-                        \t</div>
-                        \t<div style="border-top: 1px solid #DDD;">
-                        \t\t<h1 style="padding: 0 10px;">"""
-                        +tempPassword+
-                        """
-                        </h1>
-                        \t</div>
-                        \t<div style="border-top: 1px solid #DDD;">
-                        \t\t<p style="font-size: 16px; line-height: 26px; padding: 0 5px;">
-                        \t\t\t감사합니다.
-                        \t\t</p>
-                        \t</div>
-                        </div>
-                        """; //이메일 내용 삽입
+        String setFrom = "cubingclubkorea@gmail.com"; // email-config에 설정한 자신의 이메일 주소를 입력
+        String title = "Cubing Club Korea 임시 비밀번호 생성"; // 이메일 제목
+        String content = buildPasswordEmailContent(tempPassword);
         pwMailSend(setFrom, email, title, content);
         return tempPassword;
+    }
+
+    public String buildEmailAuthContent(String authNumber) {
+        Context context = new Context();
+        context.setVariable("authNumber", authNumber);
+        return springTemplateEngine.process("verify", context);
     }
     public String joinEmail(String email) {
         if(accountService.checkEmailDuplicate(email)){
@@ -150,38 +139,9 @@ public class MailSendService {
         while (randomNumRepository.findRandomNumByRandNum(authNumber)!=null){
             authNumber=makeRandomNumber();
         }
-        String setFrom = "2001cupid@gmail.com"; // email-config에 설정한 자신의 이메일 주소를 입력
-        String title = "CCK Ranking 회원 가입 인증요청"; // 이메일 제목
-        String content =
-                """
-                        <div
-                        \tstyle="font-family: 'Apple SD Gothic Neo', 'sans-serif' !important; width: 540px; height: 600px; border-top: 4px solid #4D6BB2; margin: 100px auto; padding: 15px 0; box-sizing: border-box;">
-                        \t<h1 style="margin: 20px 0; padding: 0 5px; font-size: 28px; font-weight: 400;">
-                        \t\t<a href="https://ibb.co/dJrR2r4"><img src="https://i.ibb.co/x8DNjDq/compranking.png"
-                        \t\t\t\tstyle="height: 100px; width: 350px; margin-bottom: 20px;" alt="compranking"><br /></a>
-                        \t\t<span style="color: #4D6BB2;">메일인증</span> 안내입니다.
-                        \t</h1>
-                        \t<div style="border-top: 1px solid #DDD;">
-                        \t\t<p style="font-size: 16px; line-height: 26px; padding: 0 5px;">
-                        \t\t\t안녕하세요.<br />
-                        \t\t\t큐빙클럽코리아 Ranking에 가입해 주셔서 진심으로 감사드립니다.<br />
-                        \t\t\t아래 <b style="color: #4D6BB2;">인증번호를 입력</b>하여 회원가입을 완료해 주세요.<br />
-                        \t\t</p>
-                        \t</div>
-                        \t<div style="border-top: 1px solid #DDD;">
-                        \t\t<h1 style="padding: 0 10px;">"""
-                        +authNumber+
-                        """
-                        </h1>
-                        \t</div>
-                        \t<div style="border-top: 1px solid #DDD;">
-                        \t\t<p style="font-size: 16px; line-height: 26px; padding: 0 5px;">
-                        \t\t\t제한시간은 <b style="color: #ff0000;">5분</b>입니다.<br />
-                        \t\t\t감사합니다.
-                        \t\t</p>
-                        \t</div>
-                        </div>
-                        """; //이메일 내용 삽입
+        String setFrom = "cubingclubkorea@gmail.com"; // email-config에 설정한 자신의 이메일 주소를 입력
+        String title = "Cubing Club Korea 회원 가입 인증요청"; // 이메일 제목
+        String content = buildEmailAuthContent(authNumber);
         mailSend(setFrom, email, title, content, authNumber);
         return authNumber;
     }
