@@ -10,5 +10,7 @@ public class ViewController {
         return "login";
     }
     @GetMapping("/signup")
-    public String joinPage(){return "signup"; }
+    public String joinPage(){ return "signup"; }
+    @GetMapping("/password-reset")
+    public String passwordPage(){ return "password"; }
 }

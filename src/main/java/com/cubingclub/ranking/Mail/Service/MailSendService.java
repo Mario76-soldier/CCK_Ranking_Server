@@ -1,5 +1,6 @@
 package com.cubingclub.ranking.Mail.Service;
 
+import com.cubingclub.ranking.Account.DTO.PwReissueRequestDTO;
 import com.cubingclub.ranking.Account.Service.AccountService;
 import com.cubingclub.ranking.Mail.Entity.RandomNum;
 import com.cubingclub.ranking.Mail.Repository.RandomNumRepository;
@@ -69,8 +70,8 @@ public class MailSendService {
         }
         return randomNumber.toString();
     }
-    //이메일을 전송합니다.
-    public void mailSend(String setFrom, String toMail, String title, String content, String authNumber) {
+
+    public void mailSend(String setFrom, String toMail, String title, String content) {
         MimeMessage message = mailSender.createMimeMessage();//JavaMailSender 객체를 사용하여 MimeMessage 객체를 생성
         try {
             MimeMessageHelper helper = new MimeMessageHelper(message,true,"utf-8");//이메일 메시지와 관련된 설정을 수행합니다.
@@ -84,26 +85,15 @@ public class MailSendService {
             // 이러한 경우 MessagingException이 발생
             e.printStackTrace();//e.printStackTrace()는 예외를 기본 오류 스트림에 출력하는 메서드
         }
+    }
+
+    //이메일을 전송합니다.
+    public void verifyMailSend(String setFrom, String toMail, String title, String content, String authNumber) {
+        mailSend(setFrom,toMail,title,content);
         if(randomNumRepository.findRandomNumByEmail(toMail)!=null){
             randomNumRepository.deleteByEmail(toMail);
         }
         randomNumRepository.save(RandomNum.builder().randNum(authNumber).email(toMail).expire(LocalDateTime.now().plusMinutes(5)).build());
-    }
-
-    public void pwMailSend(String setFrom, String toMail, String title, String content) {
-        MimeMessage message = mailSender.createMimeMessage();//JavaMailSender 객체를 사용하여 MimeMessage 객체를 생성
-        try {
-            MimeMessageHelper helper = new MimeMessageHelper(message,true,"utf-8");//이메일 메시지와 관련된 설정을 수행합니다.
-            // true를 전달하여 multipart 형식의 메시지를 지원하고, "utf-8"을 전달하여 문자 인코딩을 설정
-            helper.setFrom(setFrom);//이메일의 발신자 주소 설정
-            helper.setTo(toMail);//이메일의 수신자 주소 설정
-            helper.setSubject(title);//이메일의 제목을 설정
-            helper.setText(content,true);//이메일의 내용 설정 두 번째 매개 변수에 true를 설정하여 html 설정으로한다.
-            mailSender.send(message);
-        } catch (MessagingException e) {//이메일 서버에 연결할 수 없거나, 잘못된 이메일 주소를 사용하거나, 인증 오류가 발생하는 등 오류
-            // 이러한 경우 MessagingException이 발생
-            e.printStackTrace();//e.printStackTrace()는 예외를 기본 오류 스트림에 출력하는 메서드
-        }
     }
 
     public String buildPasswordEmailContent(String tempPassword) {
@@ -114,16 +104,19 @@ public class MailSendService {
         return springTemplateEngine.process("reissue_password", context);
     }
     //Mail을 어디서 보내는지, 어디로 보내는지 , 인증 번호를 html 형식으로 어떻게 보내는지 작성합니다.
-    public String passwordEmail(String email) {
+    public Integer passwordEmail(PwReissueRequestDTO pwReissueRequestDTO) {
+        if(!CheckAuthNum(pwReissueRequestDTO.getEmail(), pwReissueRequestDTO.getAuthNum())){
+            return -2;
+        }
         String tempPassword=makeTempPassword();
-        if(!accountService.updatePassword(email, tempPassword)){
-            return "-1";
+        if(!accountService.updatePassword(pwReissueRequestDTO.getEmail(), tempPassword)){
+            return -1;
         }
         String setFrom = "cubingclubkorea@gmail.com"; // email-config에 설정한 자신의 이메일 주소를 입력
         String title = "Cubing Club Korea 임시 비밀번호 생성"; // 이메일 제목
         String content = buildPasswordEmailContent(tempPassword);
-        pwMailSend(setFrom, email, title, content);
-        return tempPassword;
+        mailSend(setFrom, pwReissueRequestDTO.getEmail(), title, content);
+        return 0;
     }
 
     public String buildEmailAuthContent(String authNumber) {
@@ -131,18 +124,32 @@ public class MailSendService {
         context.setVariable("authNumber", authNumber);
         return springTemplateEngine.process("verify", context);
     }
-    public String joinEmail(String email) {
+    public Integer joinEmail(String email) {
         if(accountService.checkEmailDuplicate(email)){
-            return "-1";
+            return -1;
         }
         String authNumber=makeRandomNumber();
         while (randomNumRepository.findRandomNumByRandNum(authNumber)!=null){
             authNumber=makeRandomNumber();
         }
         String setFrom = "cubingclubkorea@gmail.com"; // email-config에 설정한 자신의 이메일 주소를 입력
-        String title = "Cubing Club Korea 회원 가입 인증요청"; // 이메일 제목
+        String title = "Cubing Club Korea 인증요청"; // 이메일 제목
         String content = buildEmailAuthContent(authNumber);
-        mailSend(setFrom, email, title, content, authNumber);
-        return authNumber;
+        verifyMailSend(setFrom, email, title, content, authNumber);
+        return 0;
+    }
+    public Integer verifyPassEmail(String email) {
+        if(!accountService.checkEmailDuplicate(email)){
+            return -1;
+        }
+        String authNumber=makeRandomNumber();
+        while (randomNumRepository.findRandomNumByRandNum(authNumber)!=null){
+            authNumber=makeRandomNumber();
+        }
+        String setFrom = "cubingclubkorea@gmail.com"; // email-config에 설정한 자신의 이메일 주소를 입력
+        String title = "Cubing Club Korea 인증요청"; // 이메일 제목
+        String content = buildEmailAuthContent(authNumber);
+        verifyMailSend(setFrom, email, title, content, authNumber);
+        return 0;
     }
 }

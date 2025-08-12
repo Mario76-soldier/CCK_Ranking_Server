@@ -37,6 +37,10 @@
             <label>인증 코드</label>
         </div>
 
+        <div id="timer" style="display: none; font-size: 0.9em; color: red; margin-top: -5px; margin-bottom: 10px; text-align: left;">
+            남은 시간: 05:00
+        </div>
+
         <div class="input-group password">
             <input type="password" id="password" placeholder=" ">
             <label>비밀번호</label>
@@ -119,7 +123,6 @@
     const emailInput = document.getElementById('email');
     const verifyGroup = document.getElementById('verifyGroup');
     const signupBtn = document.getElementById('signupBtn');
-    const verifyCodeInput = document.getElementById('verifyCode');
 
     // 이메일 형식 검증 (간단한 정규식)
     function isValidEmail(email) {
@@ -131,6 +134,35 @@
     }
     checkEmailForAuth();
     emailInput.addEventListener('input', checkEmailForAuth);
+
+    const timerEl = document.getElementById('timer');
+
+    let timerInterval;
+    let remainingTime = 300; // 5분
+    function startTimer() {
+        clearInterval(timerInterval);
+        remainingTime = 300;
+        timerEl.style.display = 'block';
+        updateTimerDisplay();
+
+        timerInterval = setInterval(() => {
+            remainingTime--;
+            updateTimerDisplay();
+
+            if (remainingTime <= 0) {
+                clearInterval(timerInterval);
+                timerEl.textContent = '인증 시간이 만료되었습니다.';
+                reissueBtn.disabled = true;
+            }
+        }, 1000);
+    }
+
+    function updateTimerDisplay() {
+        const minutes = String(Math.floor(remainingTime / 60)).padStart(2, '0');
+        const seconds = String(remainingTime % 60).padStart(2, '0');
+        timerEl.textContent = `남은 시간: ${minutes}:${seconds}`;
+    }
+
     // 이메일 인증 버튼 클릭 시
     emailBtn.addEventListener('click', async () => {
         const email = emailInput.value.trim();
@@ -140,7 +172,7 @@
         }
 
         try {
-            const response = await fetch('/api/mail/send', {
+            const response = await fetch('/api/mail/send/signup', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -157,6 +189,7 @@
                 }
                 return;
             }
+            startTimer();
             alert("인증 메일이 발송되었습니다.");
             emailBtn.textContent = "이메일 재인증"; // 버튼 문구 변경
             verifyGroup.style.display = 'block'; // 인증 코드 입력창 보이기
@@ -191,6 +224,11 @@
             authNum
         };
 
+        if (remainingTime <= 0) {
+            alert('인증 시간이 만료되었습니다. 다시 인증해주세요.');
+            return;
+        }
+
         try {
             const response = await fetch('/api/auth/join', {
                 method: 'POST',
@@ -201,8 +239,11 @@
             });
 
             if (!response.ok) {
-                const error = await response.json();
-                alert(`회원가입 실패: ${error.message || response.statusText}`);
+                if (response.status === 400) {
+                    alert("인증코드가 틀립니다.");
+                } else {
+                    throw new Error(`서버 오류: ${response.status}`);
+                }
                 return;
             }
 
@@ -311,6 +352,8 @@
 
     // 초기 상태 체크
     checkFormFilled();
+
+
 </script>
 </body>
 </html>
