@@ -14,7 +14,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @Table
 public class RFID {
-    @ManyToOne
+    @ManyToOne(fetch=FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "account_email")
     private Account account;
     @Id

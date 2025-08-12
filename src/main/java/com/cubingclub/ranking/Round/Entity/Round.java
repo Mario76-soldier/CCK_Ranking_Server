@@ -20,7 +20,7 @@ public class Round {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column
     private Integer idx;
-    @ManyToOne
+    @ManyToOne(fetch=FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn
     private Competition comp;
     @ManyToOne

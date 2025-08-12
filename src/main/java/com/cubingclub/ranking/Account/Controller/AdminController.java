@@ -23,7 +23,6 @@ public class AdminController {
     private final AccountService accountService;
     private final AdminService adminService;
     private final RFIDService rfidService;
-    private final RecordService participateService;
 
     @GetMapping("/list")
     public ResponseEntity<?> UserList(){
@@ -38,10 +37,10 @@ public class AdminController {
         Authentication authentication= SecurityContextHolder.getContext().getAuthentication();
         UserRole myPosition=accountService.getUserRole(authentication.getName());
         UserRole targetPosition=accountService.getUserRole(roleUpdateDTO.getEmail());
-        if (myPosition == UserRole.ROLE_CUSTOMER || myPosition == UserRole.ROLE_ADMIN || roleUpdateDTO.getPosition() == UserRole.ROLE_ROOT) {
+        if (myPosition == UserRole.CUSTOMER || myPosition == UserRole.ADMIN || roleUpdateDTO.getPosition() == UserRole.ROOT) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         } else if (targetPosition == roleUpdateDTO.getPosition() ||
-                (targetPosition == UserRole.ROLE_ROOT)) {
+                (targetPosition == UserRole.ROOT)) {
             return ResponseEntity.badRequest().build();
         }
         return ResponseEntity.ok(adminService.updatePosition(roleUpdateDTO));

@@ -33,7 +33,7 @@ public class AccountJoinDTO {
                 .name(this.name)
                 .enName(this.enName)
                 .password(encodedPassword)
-                .position(UserRole.ROLE_CUSTOMER)
+                .position(UserRole.CUSTOMER)
                 .birthDate(this.birthDate)
                 .state(this.state)
                 .gender(this.gender)
