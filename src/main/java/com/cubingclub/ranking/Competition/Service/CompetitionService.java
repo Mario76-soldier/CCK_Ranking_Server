@@ -82,8 +82,6 @@ public class CompetitionService {
         return listDTO;
     }
     public void deleteByIdx(Integer idx){
-        recordRepository.deleteByRound_Comp_Idx(idx);
-        roundRepository.deleteByComp_Idx(idx);
         competitionRepository.deleteByIdx(idx);
     }
     public List<CompetitorDTO> getCompetitorList(Integer compIdx){

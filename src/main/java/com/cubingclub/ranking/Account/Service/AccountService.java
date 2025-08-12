@@ -25,25 +25,6 @@ public class AccountService {
     public Account join(AccountJoinDTO accountJoinDTO){
         return accountRepository.save(accountJoinDTO.toEntity(encoder.encode(accountJoinDTO.getPassword())));
     }
-    public Account login(AccountRequest accountRequest){
-        Optional<Account> account=accountRepository.findByEmail(accountRequest.getEmail());
-        if(account.isEmpty()){
-            return null;
-        }
-        Account account1=account.get();
-        if(!encoder.matches(accountRequest.getPassword(), account1.getPassword())){
-            return null;
-        }
-        return account1;
-    }
-    public String getUserName(String email){
-        if(accountRepository.findByEmail(email).isPresent()) {
-            return accountRepository.findByEmail(email).get().getName();
-        }
-        else{
-            return null;
-        }
-    }
     public UserRole getUserRole(String email){
         return accountRepository.findByEmail(email).get().getPosition();
     }

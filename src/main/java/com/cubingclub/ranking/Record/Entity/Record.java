@@ -29,7 +29,7 @@ public class Record {
     @ManyToOne(fetch=FetchType.LAZY)
     @JoinColumn
     private Account account;
-    @ManyToOne(fetch=FetchType.LAZY)
+    @ManyToOne(fetch=FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn
     private Round round;
     @Column
