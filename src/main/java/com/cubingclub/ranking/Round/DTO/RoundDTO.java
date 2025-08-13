@@ -1,5 +1,6 @@
 package com.cubingclub.ranking.Round.DTO;
 
+import com.cubingclub.ranking.Competition.DTO.CompetitionDTO;
 import com.cubingclub.ranking.Competition.Entity.Competition;
 import com.cubingclub.ranking.CubeEvent.Entity.CubeEvent;
 import com.cubingclub.ranking.Round.Entity.Round;
@@ -18,27 +19,29 @@ import java.util.List;
 @AllArgsConstructor
 public class RoundDTO {
     private Integer idx;
-    private Competition comp;
+    private CompetitionDTO comp; // 엔티티 대신 DTO 사용
     private CubeEvent cubeEvent;
     private String roundName;
     private LocalDateTime eventStart;
     private LocalDateTime eventEnd;
     private List<RoundGroup> roundGroup;
     private Integer advance;
+
     public RoundDTO(Round entity){
-        this.idx=entity.getIdx();
-        this.comp=entity.getComp();
-        this.cubeEvent=entity.getCubeEvent();
-        this.roundName=entity.getRoundName();
-        this.eventStart=entity.getEventStart();
-        this.eventEnd=entity.getEventEnd();
-        this.roundGroup=entity.getRoundGroup();
-        this.advance=entity.getAdvance();
+        this.idx = entity.getIdx();
+        this.comp = new CompetitionDTO(entity.getComp()); // DTO 변환
+        this.cubeEvent = entity.getCubeEvent();
+        this.roundName = entity.getRoundName();
+        this.eventStart = entity.getEventStart();
+        this.eventEnd = entity.getEventEnd();
+        this.roundGroup = entity.getRoundGroup();
+        this.advance = entity.getAdvance();
     }
+
     public Round toEntity(List<RoundGroup> roundGroup){
         return Round.builder()
                 .Idx(idx)
-                .Comp(comp)
+                .Comp(comp.toEntity()) // DTO → 엔티티 변환
                 .cubeEvent(cubeEvent)
                 .RoundName(roundName)
                 .EventStart(eventStart)
@@ -48,3 +51,4 @@ public class RoundDTO {
                 .build();
     }
 }
+

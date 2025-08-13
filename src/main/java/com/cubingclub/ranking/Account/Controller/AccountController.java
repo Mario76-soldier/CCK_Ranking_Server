@@ -8,11 +8,14 @@ import com.cubingclub.ranking.Mail.Service.MailSendService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.*;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestTemplate;
 
 @Slf4j
 @RestController
@@ -21,6 +24,34 @@ import org.springframework.web.bind.annotation.*;
 public class AccountController {
     private final AccountService accountService;
     private final MailSendService mailSendService;
+    @Value("${spring.oauth.client.uri}")
+    private String tokenUrl;
+    @Value("${spring.oauth.client.id}")
+    private String clientId;
+    @Value("${spring.oauth.client.secret}")
+    private String clientSecret;
+    @Value("${spring.oauth.client.redirect-uri}")
+    private String clientRedirect;
+
+    private final RestTemplate restTemplate = new RestTemplate();
+
+    @PostMapping("/token")
+    public ResponseEntity<?> ExchangeTokenForRanking(@RequestParam(name = "code")String code){
+        HttpHeaders headers=new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+        headers.setBasicAuth(clientId, clientSecret);
+
+        MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
+        body.add("grant_type", "authorization_code");
+        body.add("code", code);
+        body.add("redirect_uri", clientRedirect);
+
+        HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(body, headers);
+
+        ResponseEntity<String> response = restTemplate.postForEntity(tokenUrl, request, String.class);
+
+        return ResponseEntity.ok(response.getBody());
+    }
     @PostMapping("/join")
     public ResponseEntity<?> AddJoin(@Valid @RequestBody AccountJoinDTO accountJoinDTO){
         try {
