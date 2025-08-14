@@ -7,6 +7,7 @@ import com.cubingclub.ranking.RsaKeys.Repository.RsaKeysRepository;
 import com.cubingclub.ranking.RsaKeys.Service.RsaKeysService;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -17,6 +18,11 @@ public class RsaKeysInitializer {
     private final OAuthClientService oAuthClientService;
     private final RsaKeysRepository rsaKeysRepository;
     private final RsaKeysService rsaKeysService;
+
+    @Value("${spring.oauth.client.secret}")
+    private String clientSecret;
+    @Value("${spring.oauth.client.redirect-uri}")
+    private String clientRedirect;
 
     @PostConstruct
     public void initiator() throws Exception {
@@ -30,12 +36,12 @@ public class RsaKeysInitializer {
         // 2. OAuth Client
         String clientId = "cck_ranking";
         if(oAuthClientRepository.findByClientId(clientId).isEmpty()) {
-            oAuthClientService.saveOAuthClient(clientId, "{noop}secret", "http://localhost:3000/login/confirm", "http://localhost:8080/", ClientType.NORMAL);
+            oAuthClientService.saveOAuthClient(clientId, clientSecret, clientRedirect, "https://test.ranking.cubingclub.com", ClientType.NORMAL);
             System.out.println("✅ OAuth Client created: " + clientId);
         }
         clientId = "cck_recorder";
         if(oAuthClientRepository.findByClientId(clientId).isEmpty()) {
-            oAuthClientService.saveOAuthClient(clientId, "{noop}secret", "", "", ClientType.IOT);
+            oAuthClientService.saveOAuthClient(clientId, clientSecret, "", "", ClientType.IOT);
             System.out.println("✅ OAuth Client created: " + clientId);
         }
     }

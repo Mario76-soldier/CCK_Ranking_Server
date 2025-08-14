@@ -29,8 +29,6 @@ import java.util.Map;
 public class CompetitionService {
     private final AccountRepository accountRepository;
     private final CompetitionRepository competitionRepository;
-    private final RoundRepository roundRepository;
-    private final RecordRepository recordRepository;
     private final CompetitorRepository competitorRepository;
     private final RFIDRepository rfidRepository;
     public Integer create(CompetitionDTO comp){
