@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -19,10 +20,41 @@ public class AccountService {
     private final AccountRepository accountRepository;
     private final BCryptPasswordEncoder encoder;
 
+    public String generateCckId(String enName) {
+        String cckIdMid = reorderAndUpperFirst4(enName);
+        String cckIdFront = "CCK" + getYearSuffix() + cckIdMid;
+        long count = accountRepository.countByCckIdStartingWith(cckIdFront);
+        String countStr = String.format("%02d", count + 1);
+
+        return cckIdFront + countStr;
+    }
+
+    private String reorderAndUpperFirst4(String input) {
+        if (input == null || !input.contains(" ")) {
+            return input != null && input.length() >= 4
+                    ? input.toUpperCase().substring(0, 4)
+                    : input != null ? input.toUpperCase() : null;
+        }
+
+        int firstSpaceIndex = input.indexOf(" ");
+        String firstWord = input.substring(0, firstSpaceIndex);
+        String rest = input.substring(firstSpaceIndex + 1);
+
+        String reordered = (rest + firstWord).toUpperCase();
+        return reordered.length() >= 4 ? reordered.substring(0, 4) : reordered;
+    }
+
+    private String getYearSuffix() {
+        int year = java.time.LocalDate.now().getYear();
+        return String.valueOf(year).substring(2); // 뒤 2자리
+    }
+
     public boolean checkEmailDuplicate(String email){
         return accountRepository.existsByEmail(email);
     }
     public Account join(AccountJoinDTO accountJoinDTO){
+        String cckId=generateCckId(accountJoinDTO.getEnName());
+        accountJoinDTO.setCckId(cckId);
         return accountRepository.save(accountJoinDTO.toEntity(encoder.encode(accountJoinDTO.getPassword())));
     }
     public UserRole getUserRole(String email){

@@ -25,4 +25,6 @@ public interface AccountRepository extends JpaRepository<Account, Integer> {
     @Modifying
     @Query("UPDATE Account a SET a.password=:password WHERE a.email=:email")
     void updateAccountPassword(@Param(value="password")String password, @Param(value = "email")String email);
+
+    long countByCckIdStartingWith(String prefix);
 }
