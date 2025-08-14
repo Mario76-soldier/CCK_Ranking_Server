@@ -15,13 +15,8 @@ public class Scrambler {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column
     private Integer idx;
-    @ManyToOne(fetch=FetchType.LAZY, cascade = CascadeType.ALL)
-    @JoinColumn(
-            foreignKey = @ForeignKey(
-                    name = "fk_scrambler_round",
-                    foreignKeyDefinition = "FOREIGN KEY (round_idx) REFERENCES Round(idx) ON DELETE CASCADE"
-            )
-    )
+    @ManyToOne(fetch=FetchType.LAZY)
+    @JoinColumn
     private Round round;
     @Column
     private String roundGroup;

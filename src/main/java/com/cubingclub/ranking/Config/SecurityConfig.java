@@ -94,6 +94,19 @@ public class SecurityConfig{
                         .requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll()
                         .anyRequest().permitAll()
                 )
+                .logout(logout -> logout
+                        .logoutUrl("/logout")
+                        .invalidateHttpSession(true)
+                        .deleteCookies("JSESSIONID") // 필요시 다른 쿠키도 삭제
+                        .logoutSuccessHandler((request, response, authentication) -> {
+                            // redirect_uri 처리
+                            String redirectUrl = request.getParameter("redirect_uri");
+                            if (redirectUrl == null || redirectUrl.isEmpty()) {
+                                redirectUrl = "/login"; // 기본 프론트 URL
+                            }
+                            response.sendRedirect(redirectUrl);
+                        })
+                )
                 .cors(corsCustomizer -> corsCustomizer.configurationSource(new CorsConfigurationSource() {
                     @Override
                     public CorsConfiguration getCorsConfiguration(HttpServletRequest request) {

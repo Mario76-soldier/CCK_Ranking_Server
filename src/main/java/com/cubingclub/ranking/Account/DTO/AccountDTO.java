@@ -2,6 +2,7 @@ package com.cubingclub.ranking.Account.DTO;
 
 import com.cubingclub.ranking.Account.Entity.Account;
 import com.cubingclub.ranking.Account.Entity.Gender;
+import com.cubingclub.ranking.Account.Entity.UserRole;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -20,6 +21,7 @@ public class AccountDTO {
     private String enName;
     @DateTimeFormat(pattern="yyyy-MM-dd")
     private LocalDate birthDate;
+    private UserRole position;
     private String state;
     private Gender gender;
     public AccountDTO(Account entity){
@@ -29,6 +31,7 @@ public class AccountDTO {
         this.birthDate=entity.getBirthDate();
         this.state=entity.getState();
         this.gender=entity.getGender();
+        this.position=entity.getPosition();
     }
     public static AccountDTO from(Account entity) {
         if (entity == null) {
