@@ -14,7 +14,7 @@
 각 서비스별로 인증을 원하신다면 **CCK Ranking**에서 Client 등록을 해야 합니다.  
 
 인증 방식은 **세션 쿠키(Session Cookie)** 기반 인증을 사용합니다.  
-브라우저 또는 클라이언트에서 요청 시 `withCredentials: true` 옵션을 반드시 설정해야 합니다.
+인증이 필요한 경우, 브라우저 또는 클라이언트에서 요청 시 `withCredentials: true` 옵션을 반드시 설정해야 합니다.
 
 **Axios 예시**
 ```javascript
@@ -49,24 +49,24 @@ axios.get('https://ranking.cubingclub.com/api/auth/info', {
 
 
 ## Competition
-| Method     | Path                              | Description                 |
-|------------|-----------------------------------|-----------------------------|
-| GET        | `/api/comps`                      | past, now, future 대회 리스트 반환 |
-| GET        | `/api/comp/{compIdx}`             | 특정 대회 정보 조회                 |
-| **POST**   | `/api/comp`                       | **대회 생성 및 수정**              |
-| **DELETE** | `/api/comp/{compIdx}`             | **대회 삭제(cascade)**          |
-| **GET**    | `/api/competitor/{compIdx}`       | **특정 대회의 선수 목록 조회**         |
-| **POST**   | `/api/competitor/{compIdx}/{uid}` | **카드 태그로 선수 참여 확인**         |
+| Method     | Path                                                                                                        | Description                 |
+|------------|-------------------------------------------------------------------------------------------------------------|-----------------------------|
+| GET        | [`/api/comps`](src/main/java/com/cubingclub/ranking/Competition/README.md#1-대회-목록-조회)                       | past, now, future 대회 리스트 반환 |
+| GET        | [`/api/comp/{compIdx}`](src/main/java/com/cubingclub/ranking/Competition/README.md#2-대회-단일-조회)              | 특정 대회 정보 조회                 |
+| **POST**   | [`/api/comp`](src/main/java/com/cubingclub/ranking/Competition/README.md#3-대회-생성수정)                         | **대회 생성 및 수정**              |
+| **DELETE** | [`/api/comp/{compIdx}`](src/main/java/com/cubingclub/ranking/Competition/README.md#4-대회-삭제)                 | **대회 삭제(cascade)**          |
+| **GET**    | [`/api/competitor/{compIdx}`](src/main/java/com/cubingclub/ranking/Competition/README.md#5-참가자-목록-조회)       | **특정 대회의 선수 목록 조회**         |
+| **POST**   | [`/api/competitor/{compIdx}/{uid}`](src/main/java/com/cubingclub/ranking/Competition/README.md#6-참가자-출석-처리) | **카드 태그로 선수 참여 확인**         |
 
 ## Round
-| Method     | Path                                | Description                         |
-|------------|-------------------------------------|-------------------------------------|
-| GET        | `/api/rounds/{compIdx}`             | 특정 대회의 past, now, future 라운드 리스트 반환 |
-| GET        | `/api/round/{roundIdx}`             | 특정 라운드 정보 조회                        |
-| **POST**   | `/api/round`                        | **라운드 생성 및 수정**                     |
-| **DELETE** | `/api/round/{roundIdx}`             | **라운드 삭제(cascade)**                 |
-| **PUT**    | `/api/advance/{roundIdx}/{advance}` | **다음 라운드 진출 인원 조정**                 |
-| GET        | `/api/group/{roundIdx}`             | 라운드 그룹 리스트 확인                       |
+| Method     | Path                                                                                                     | Description                         |
+|------------|----------------------------------------------------------------------------------------------------------|-------------------------------------|
+| GET        | [`/api/rounds/{compIdx}`](src/main/java/com/cubingclub/ranking/Round/README.md#1-대회-라운드-목록-조회)           | 특정 대회의 past, now, future 라운드 리스트 반환 |
+| GET        | [`/api/round/{roundIdx}`](src/main/java/com/cubingclub/ranking/Round/README.md#2-특정-라운드-조회)              | 특정 라운드 정보 조회                        |
+| **POST**   | [`/api/round`](src/main/java/com/cubingclub/ranking/Round/README.md#3-라운드-생성수정)                          | **라운드 생성 및 수정**                     |
+| **DELETE** | [`/api/round/{roundIdx}`](src/main/java/com/cubingclub/ranking/Round/README.md#4-라운드-삭제)                 | **라운드 삭제(cascade)**                 |
+| **PUT**    | [`/api/advance/{roundIdx}/{advance}`](src/main/java/com/cubingclub/ranking/Round/README.md#5-어드밴스-인원-수정) | **다음 라운드 진출 인원 조정**                 |
+| GET        | [`/api/group/{roundIdx}`](src/main/java/com/cubingclub/ranking/Round/README.md#6-라운드-그룹-목록-조회)           | 라운드 그룹 리스트 확인                       |
 
 ## CubeEvent
 | Method     | Path         | Description |
