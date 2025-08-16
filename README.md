@@ -27,6 +27,8 @@ axios.get('https://ranking.cubingclub.com/api/auth/info', {
     .catch(err => console.error(err));
 ```
 
+## ER Diagram
+
 ## Endpoints Summary
 **굵은 글씨는 개인 혹은 관리자 인증 필요**  
 각 Path마다 상세정보 링크 설정됨
@@ -74,32 +76,32 @@ axios.get('https://ranking.cubingclub.com/api/auth/info', {
 | GET        | `/api/event` | 종목 리스트 조회   |
 
 ## Record
-| Method     | Path                              | Description           |
-|------------|-----------------------------------|-----------------------|
-| GET        | `/api/records/{roundIdx}`         | 특정 라운드의 전체 기록 리스트 반환  |
-| **POST**   | `/api/record`                     | **특정 기록 수정**          |
-| **DELETE** | `/api/record/{idx}`               | **특정 기록 삭제**          |
-| **DELETE** | `/api/record/quit`                | **선택한 기록 리스트 모두 삭제**  |
-| **POST**   | `/api/participate`                | **선수(기록) 추가**         |
-| **POST**   | `/api/extra`                      | **특정 기록에 대한 엑스트라 추가** |
-| **POST**   | `/api/extra/{partIdx}/{extraNum}` | **특정 엑스트라 삭제**        |
+| Method     | Path                                                                                                  | Description           |
+|------------|-------------------------------------------------------------------------------------------------------|-----------------------|
+| GET        | [`/api/records/{roundIdx}`](src/main/java/com/cubingclub/ranking/Record/README.md#1-라운드-기록-목록-조회)     | 특정 라운드의 전체 기록 리스트 반환  |
+| **POST**   | [`/api/record`](src/main/java/com/cubingclub/ranking/Record/README.md#2-기록-수정)                        | **특정 기록 수정**          |
+| **DELETE** | [`/api/record/{idx}`](src/main/java/com/cubingclub/ranking/Record/README.md#3-기록-삭제)                  | **특정 기록 삭제**          |
+| **DELETE** | [`/api/record/quit`](src/main/java/com/cubingclub/ranking/Record/README.md#4-참가자-기권-처리)               | **선택한 기록 리스트 모두 삭제**  |
+| **POST**   | [`/api/participate`](src/main/java/com/cubingclub/ranking/Record/README.md#5-참가자-추가)                  | **선수(기록) 추가**         |
+| **POST**   | [`/api/extra`](src/main/java/com/cubingclub/ranking/Record/README.md#6-엑스트라-사유-등록)                    | **특정 기록에 대한 엑스트라 추가** |
+| **POST**   | [`/api/extra/{partIdx}/{extraNum}`](src/main/java/com/cubingclub/ranking/Record/README.md#7-추가-기록-삭제) | **특정 엑스트라 삭제**        |
 
 ## Recorder(IoT전용)
 ### 권한: RECORDER(독자 인증 방식 사용)
-| Method   | Path                                     | Description             |
-|----------|------------------------------------------|-------------------------|
-| **GET**  | `/api/recorder/comp`                     | **현재 진행중인 대회 리스트 반환**   |
-| **GET**  | `/api/recorder/info/{uid}`               | **카드 태그 후 해당 선수 정보 반환** |
-| **GET**  | `/api/recorder/record/{email}/{compIdx}` | **특정 선수의 진행상황 반환**      |
-| **POST** | `/api/recorder/record`                   | **선수가 시도한 기록 입력**       |
+| Method   | Path                                                                                                                       | Description             |
+|----------|----------------------------------------------------------------------------------------------------------------------------|-------------------------|
+| **GET**  | [`/api/recorder/comp`](src/main/java/com/cubingclub/ranking/Record/README_Recorder.md#1-당일-대회-조회)                          | **현재 진행중인 대회 리스트 반환**   |
+| **GET**  | [`/api/recorder/info/{uid}`](src/main/java/com/cubingclub/ranking/Record/README_Recorder.md#2-참가자-정보-조회)                   | **카드 태그 후 해당 선수 정보 반환** |
+| **GET**  | [`/api/recorder/record/{email}/{compIdx}`](src/main/java/com/cubingclub/ranking/Record/README_Recorder.md#3-시도해야-하는-기록-조회) | **특정 선수의 진행상황 반환**      |
+| **POST** | [`/api/recorder/record`](src/main/java/com/cubingclub/ranking/Record/README_Recorder.md#4-기록-업로드)                          | **선수가 시도한 기록 입력**       |
 
 ## Scrambler
 ### 권한: SCRAMBLER, ROOT
-| Method   | Path                            | Description            |
-|----------|---------------------------------|------------------------|
-| **GET**  | `/api/scramble/{compIdx}/{uid}` | **특정 선수의 스크램블 정보 반환**  |
-| **GET**  | `/api/scrambles/{roundIdx}`     | **특정 라운드 스크램블 리스트 반환** |
-| **POST** | `/api/scrambler`                | **스크램블러 승인 입력**        |
+| Method   | Path                                                                                                        | Description            |
+|----------|-------------------------------------------------------------------------------------------------------------|------------------------|
+| **GET**  | [`/api/scramble/{compIdx}/{uid}`](src/main/java/com/cubingclub/ranking/Scrambler/README.md#1-특정-선수-스크램블-조회) | **특정 선수의 스크램블 정보 반환**  |
+| **GET**  | [`/api/scrambles/{roundIdx}`](src/main/java/com/cubingclub/ranking/Scrambler/README.md#2-스크램블-리스트-조회)       | **특정 라운드 스크램블 리스트 반환** |
+| **POST** | [`/api/scrambler`](src/main/java/com/cubingclub/ranking/Scrambler/README.md#3-스크램블러-사인)                     | **스크램블러 승인 입력**        |
 
 ## 기술 스택
 
