@@ -19,7 +19,6 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @Transactional
 public class PersonalRecordService {
-    private final AccountRepository accountRepository;
     private final PersonalRecordRepository personalRecordRepository;
 
     public PersonalRecordDTO getPersonalRecord(String identifier) {
