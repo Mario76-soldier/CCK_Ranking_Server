@@ -1,10 +1,13 @@
 package com.cubingclub.ranking.OAuthClient.Entity;
 
+import com.cubingclub.ranking.Account.Entity.Account;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+
+import java.time.LocalDateTime;
 
 @Entity
 @Getter
@@ -17,11 +20,21 @@ public class OAuthClient {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column
     private Long id;
-    @Column
+    @Column(unique = true)
     private String clientId;
     @Lob
     @Column(columnDefinition = "TEXT")
     private String clientSecret;
+    @ManyToOne
+    @JoinColumn
+    private Account clientOwner;
+    @Column
+    private String clientName;
+    @Column
+    private String clientUri;
+    @Lob
+    @Column(columnDefinition = "TEXT")
+    private String clientDescription;
     @Column
     private String redirectUri;
     @Column
@@ -31,4 +44,12 @@ public class OAuthClient {
     @Enumerated(EnumType.STRING)
     @Column
     private ClientType clientType;  // 추가 필드
+    @Column
+    private LocalDateTime clientSecretExpiresAt;
+    @Column
+    private LocalDateTime createdAt;
+    @Column
+    private LocalDateTime updatedAt;
+    @Column
+    private boolean isActive;
 }
