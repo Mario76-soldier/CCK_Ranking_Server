@@ -1,5 +1,6 @@
 package com.cubingclub.ranking.Config;
 
+import com.cubingclub.ranking.OAuthClient.DTO.OAuthClientRequestDTO;
 import com.cubingclub.ranking.OAuthClient.Entity.ClientType;
 import com.cubingclub.ranking.OAuthClient.Repository.OAuthClientRepository;
 import com.cubingclub.ranking.OAuthClient.Service.OAuthClientService;
@@ -36,12 +37,31 @@ public class RsaKeysInitializer {
         // 2. OAuth Client
         String clientId = "cck_ranking";
         if(oAuthClientRepository.findByClientId(clientId).isEmpty()) {
-            oAuthClientService.saveOAuthClient(clientId, clientSecret, clientRedirect, "https://test.ranking.cubingclub.com", ClientType.NORMAL);
+            OAuthClientRequestDTO rankingRequest=new OAuthClientRequestDTO();
+            rankingRequest.setClientId(clientId);
+            rankingRequest.setClientName(clientId);
+            rankingRequest.setClientDescription("CCK competition's record uploader, viewer");
+            rankingRequest.setClientUri("https://ranking.cubingclub.com");
+            rankingRequest.setRedirectUri(clientRedirect);
+            rankingRequest.setPostLogoutRedirectUri("https://ranking.cubingclub.com");
+            rankingRequest.setRequireAuthorizationConsent(true);
+            rankingRequest.setClientType(ClientType.NORMAL);
+            oAuthClientService.saveOAuthClient(rankingRequest, "cubingclubkorea@gmail.com");
+            oAuthClientService.updateSecretDefault(clientId, clientSecret, 365);
             System.out.println("✅ OAuth Client created: " + clientId);
         }
         clientId = "cck_recorder";
         if(oAuthClientRepository.findByClientId(clientId).isEmpty()) {
-            oAuthClientService.saveOAuthClient(clientId, clientSecret, "", "", ClientType.IOT);
+            OAuthClientRequestDTO recorderRequest=new OAuthClientRequestDTO();
+            recorderRequest.setClientId(clientId);
+            recorderRequest.setClientName(clientId);
+            recorderRequest.setClientDescription("CCK record upload IoT object");
+            recorderRequest.setClientUri("");
+            recorderRequest.setPostLogoutRedirectUri("");
+            recorderRequest.setRequireAuthorizationConsent(true);
+            recorderRequest.setClientType(ClientType.IOT);
+            oAuthClientService.saveOAuthClient(recorderRequest, "cubingclubkorea@gmail.com");
+            oAuthClientService.updateSecretDefault(clientId, clientSecret, 365);
             System.out.println("✅ OAuth Client created: " + clientId);
         }
     }

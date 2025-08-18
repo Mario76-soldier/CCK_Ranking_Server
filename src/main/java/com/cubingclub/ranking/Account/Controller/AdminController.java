@@ -4,6 +4,8 @@ import com.cubingclub.ranking.Account.DTO.RoleUpdateDTO;
 import com.cubingclub.ranking.Account.Entity.UserRole;
 import com.cubingclub.ranking.Account.Service.AccountService;
 import com.cubingclub.ranking.Account.Service.AdminService;
+import com.cubingclub.ranking.OAuthClient.DTO.OAuthClientInfoDTO;
+import com.cubingclub.ranking.OAuthClient.Service.OAuthClientService;
 import com.cubingclub.ranking.Record.Service.RecordService;
 import com.cubingclub.ranking.RFID.DTO.RFIDCreateDTO;
 import com.cubingclub.ranking.RFID.Service.RFIDService;
@@ -15,6 +17,9 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
+import java.util.List;
+
 @Slf4j
 @RestController
 @RequiredArgsConstructor
@@ -23,6 +28,7 @@ public class AdminController {
     private final AccountService accountService;
     private final AdminService adminService;
     private final RFIDService rfidService;
+    private final OAuthClientService oAuthClientService;
 
     @GetMapping("/list")
     public ResponseEntity<?> UserList(){
@@ -66,5 +72,22 @@ public class AdminController {
         catch(Exception e){
             return ResponseEntity.badRequest().body(e);
         }
+    }
+
+    @GetMapping("/client")
+    public ResponseEntity<?> GetClientList(){
+        return ResponseEntity.ok(oAuthClientService.findForAdmin(LocalDate.now()));
+    }
+
+    @PostMapping("/client/confirm/{id}")
+    public ResponseEntity<?> ConfirmClient(@PathVariable(name="id")Long id){
+        oAuthClientService.updateConfirm(id);
+        return ResponseEntity.ok().build();
+    }
+
+    @DeleteMapping("/client/confirm/{id}")
+    public ResponseEntity<?> DenyClient(@PathVariable(name="id")Long id){
+        oAuthClientService.deleteOAuthClient(id);
+        return ResponseEntity.ok().build();
     }
 }
