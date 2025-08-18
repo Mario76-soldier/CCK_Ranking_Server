@@ -147,6 +147,8 @@ java -jar build/libs/com.cubingclub.ranking-{version}.jar
 docker network create my_network #첫 실행 시 네트워크 생성 필요, 이후에는 할 필요 없음
 docker-compose up -d #백그라운드로 실행
 ```
+## [SSO 인증](README_SSO.md)
+
 ## 프로젝트 구조
 
 ```
