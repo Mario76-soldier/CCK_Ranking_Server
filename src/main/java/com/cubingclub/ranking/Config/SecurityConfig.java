@@ -60,7 +60,10 @@ public class SecurityConfig{
     public SecurityFilterChain authServerSecurityFilterChain(HttpSecurity http) throws Exception {
         OAuth2AuthorizationServerConfiguration.applyDefaultSecurity(http);
         http.getConfigurer(OAuth2AuthorizationServerConfigurer.class)
-                .oidc(Customizer.withDefaults());	// Enable OpenID Connect 1.0
+                .oidc(Customizer.withDefaults())	// Enable OpenID Connect 1.0
+                .authorizationEndpoint(authorizationEndpoint ->
+                        authorizationEndpoint.consentPage("/consent")
+                );
         http
                 // authorization endpoint
                 .exceptionHandling((exceptions) -> exceptions
