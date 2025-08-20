@@ -52,7 +52,7 @@ public class RecordController {
     @PostMapping("/extra")
     public ResponseEntity<?> AddExtra(@RequestBody ExtraDTO extraDTO){
         Authentication authentication= SecurityContextHolder.getContext().getAuthentication();
-        AccountDTO accountDTO=accountService.getAccountInfo(authentication.getName());
+        AccountDTO accountDTO=accountService.getAccountInfoWithCCKId(authentication.getName());
         try{
             participateService.addExtra(extraDTO, accountDTO);
             return ResponseEntity.ok().build();

@@ -60,6 +60,9 @@ public class AccountService {
     public UserRole getUserRole(String email){
         return accountRepository.findByEmail(email).get().getPosition();
     }
+    public UserRole getUserRoleWithCCKId(String cckId){
+        return accountRepository.findByCckId(cckId).get().getPosition();
+    }
     public int updateUser(AccountEditDTO accountEditDTO){
         Optional<Account> account=accountRepository.findByEmail(accountEditDTO.getEmail());
         if(account.isEmpty()){
@@ -84,6 +87,9 @@ public class AccountService {
     }
     public AccountDTO getAccountInfo(String email){
         return new AccountDTO(accountRepository.findByEmail(email).get());
+    }
+    public AccountDTO getAccountInfoWithCCKId(String cckId){
+        return new AccountDTO(accountRepository.findByCckId(cckId).get());
     }
 
     public boolean updatePassword(String email, String password){

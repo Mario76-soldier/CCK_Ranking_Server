@@ -24,7 +24,7 @@ public class OAuthController {
     @GetMapping("/")
     public ResponseEntity<?> GetClientList(){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        return ResponseEntity.ok(oAuthClientService.findByClientEmail(authentication.getName()));
+        return ResponseEntity.ok(oAuthClientService.findByClientCCKId(authentication.getName()));
     }
     @PostMapping("/")
     public ResponseEntity<?> CreateClient(@RequestBody OAuthClientRequestDTO oAuthClientRequestDTO){

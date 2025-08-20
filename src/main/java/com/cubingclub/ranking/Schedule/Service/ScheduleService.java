@@ -38,7 +38,7 @@ public class ScheduleService {
         scheduleCreateDTO.setCompetition(competition);
         List<RecordRequestDTO> recordRequestDTOList=new ArrayList<>();
         for(SchedulePartDTO schedulePartDTO:scheduleRequestDTO.getGroups()){
-            scheduleCreateDTO.setAccount(accountRepository.findByCckId(schedulePartDTO.getCckId()));
+            scheduleCreateDTO.setAccount(accountRepository.findByCckId(schedulePartDTO.getCckId()).orElseThrow());
             scheduleCreateDTO.setRoundGroup(roundGroupRepository.findByRound_IdxAndGroupName(schedulePartDTO.getRoundIdx(), schedulePartDTO.getGroupName()));
             scheduleCreateDTO.setPlayType(schedulePartDTO.getPlayType());
             if(schedulePartDTO.getIdx()==null){

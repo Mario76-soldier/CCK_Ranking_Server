@@ -13,7 +13,7 @@ import java.util.Optional;
 public interface AccountRepository extends JpaRepository<Account, Integer> {
     Boolean existsByEmail(String email);
     Optional<Account> findByEmail(String email);
-    Account findByCckId(String cckId);
+    Optional<Account> findByCckId(String cckId);
     @Query("SELECT a.email as email, a.name as name, a.enName as enName, a.birthDate as birthDate, a.state as state, a.gender as gender, a.position as position FROM Account a")
     List<AccountListDTO> findAllList();
     @Query("SELECT a.email as email, a.name as name, a.enName as enName, a.birthDate as birthDate, a.state as state, a.gender as gender, a.position as position FROM Account a " +

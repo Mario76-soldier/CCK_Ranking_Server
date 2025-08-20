@@ -89,6 +89,7 @@ public class SecurityConfig{
                 .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED))
                 .authorizeHttpRequests(request -> request
                         .requestMatchers("/api/recorder/**").hasAuthority("SCOPE_limited.read")
+                        .requestMatchers("/api/auth/info", "/api/auth/edit").authenticated()
                         .requestMatchers("/api/scramble/**", "/api/scrambler/**").hasAnyRole("ROOT", "SCRAMBLER")
                         .requestMatchers(HttpMethod.GET,"/api/admin/**", "/api/competitor/**", "/api/scrambles/**").hasAnyRole("ROOT","ADMIN")
                         .requestMatchers(HttpMethod.POST,"/api/comp/**","/api/round","/api/advance/**","/api/record/**","/api/admin/**", "/api/competitor/**").hasAnyRole("ROOT","ADMIN")

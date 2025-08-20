@@ -3,6 +3,7 @@ package com.cubingclub.ranking.Account.DTO;
 import com.cubingclub.ranking.Account.Entity.Account;
 import com.cubingclub.ranking.Account.Entity.Gender;
 import com.cubingclub.ranking.Account.Entity.UserRole;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -14,6 +15,7 @@ import java.time.LocalDate;
 @Getter
 @Setter
 @NoArgsConstructor
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class AccountDTO {
     @NotBlank
     private String email;

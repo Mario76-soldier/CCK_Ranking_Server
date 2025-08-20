@@ -48,8 +48,8 @@ public class OAuthClientService {
         return loadClientByResult(result);
     }
 
-    public List<OAuthClientInfoDTO> findByClientEmail(String email){
-        List<OAuthClient> oAuthClientList=oAuthClientRepository.findByClientOwner_Email(email);
+    public List<OAuthClientInfoDTO> findByClientCCKId(String cckId){
+        List<OAuthClient> oAuthClientList=oAuthClientRepository.findByClientOwner_CckId(cckId);
         List<OAuthClientInfoDTO> oAuthClientInfoDTOList=new ArrayList<>();
         for(OAuthClient oAuthClient:oAuthClientList){
             oAuthClientInfoDTOList.add(new OAuthClientInfoDTO(oAuthClient));
@@ -87,12 +87,12 @@ public class OAuthClientService {
         return pw.toString();
     }
 
-    public OAuthClientResponseDTO updateSecret(String clientId, String email, Integer expireDays) throws IllegalAccessException {
+    public OAuthClientResponseDTO updateSecret(String clientId, String cckId, Integer expireDays) throws IllegalAccessException {
         OAuthClient oldClient=oAuthClientRepository.findByClientId(clientId).orElseThrow();
         if (!oldClient.isActive()) {
             throw new IllegalStateException("Client should be activated: " + oldClient.getClientId());
         }
-        if(!oldClient.getClientOwner().getEmail().equals(email)){
+        if(!oldClient.getClientOwner().getCckId().equals(cckId)){
             throw new IllegalAccessException("Forbidden: Owner not match");
         }
         String newSecret=makePassword();
@@ -163,14 +163,14 @@ public class OAuthClientService {
         return new OAuthClientResponseDTO(oAuthClientRepository.save(updatedClient));
     }
 
-    public OAuthClient saveOAuthClient(OAuthClientRequestDTO oAuthClientRequestDTO, String email){
+    public OAuthClient saveOAuthClient(OAuthClientRequestDTO oAuthClientRequestDTO, String cckId){
         if (oAuthClientRepository.findByClientId(oAuthClientRequestDTO.getClientId()).isEmpty()) {
             OAuthClient client = OAuthClient.builder()
                     .clientId(oAuthClientRequestDTO.getClientId())
                     .clientName(oAuthClientRequestDTO.getClientName())
                     .clientUri(oAuthClientRequestDTO.getClientUri())
                     .clientDescription(oAuthClientRequestDTO.getClientDescription())
-                    .clientOwner(accountRepository.findByEmail(email).orElseThrow())
+                    .clientOwner(accountRepository.findByCckId(cckId).orElseThrow())
                     .redirectUri(oAuthClientRequestDTO.getRedirectUri())
                     .postLogoutRedirectUri(oAuthClientRequestDTO.getPostLogoutRedirectUri())
                     .requireAuthorizationConsent(oAuthClientRequestDTO.isRequireAuthorizationConsent())
