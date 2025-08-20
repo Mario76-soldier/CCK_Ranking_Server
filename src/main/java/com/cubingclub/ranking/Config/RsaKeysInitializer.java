@@ -2,6 +2,7 @@ package com.cubingclub.ranking.Config;
 
 import com.cubingclub.ranking.OAuthClient.DTO.OAuthClientRequestDTO;
 import com.cubingclub.ranking.OAuthClient.Entity.ClientType;
+import com.cubingclub.ranking.OAuthClient.Entity.OAuthScopes;
 import com.cubingclub.ranking.OAuthClient.Repository.OAuthClientRepository;
 import com.cubingclub.ranking.OAuthClient.Service.OAuthClientService;
 import com.cubingclub.ranking.RsaKeys.Repository.RsaKeysRepository;
@@ -10,6 +11,9 @@ import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Component
 @RequiredArgsConstructor
@@ -46,6 +50,7 @@ public class RsaKeysInitializer {
             rankingRequest.setPostLogoutRedirectUri("https://ranking.cubingclub.com");
             rankingRequest.setRequireAuthorizationConsent(true);
             rankingRequest.setClientType(ClientType.NORMAL);
+            rankingRequest.setScopes(List.of("openid", "profile", "email")); // 한 번에 scope 설정
             oAuthClientService.saveOAuthClient(rankingRequest, "cubingclubkorea@gmail.com");
             oAuthClientService.updateSecretDefault(clientId, clientSecret, 365);
             System.out.println("✅ OAuth Client created: " + clientId);

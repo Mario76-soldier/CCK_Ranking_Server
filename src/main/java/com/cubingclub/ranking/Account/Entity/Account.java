@@ -37,7 +37,7 @@ public class Account {
     private String state;
     @Column
     private Gender gender;
-    @Column
+    @Column(unique = true)
     private String cckId;
 
     public Account roleUpdate(UserRole position){

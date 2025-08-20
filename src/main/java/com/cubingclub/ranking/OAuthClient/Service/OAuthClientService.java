@@ -8,6 +8,7 @@ import com.cubingclub.ranking.OAuthClient.DTO.OAuthClientRequestDTO;
 import com.cubingclub.ranking.OAuthClient.DTO.OAuthClientResponseDTO;
 import com.cubingclub.ranking.OAuthClient.Entity.ClientType;
 import com.cubingclub.ranking.OAuthClient.Entity.OAuthClient;
+import com.cubingclub.ranking.OAuthClient.Entity.OAuthScopes;
 import com.cubingclub.ranking.OAuthClient.Repository.OAuthClientRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -105,6 +106,7 @@ public class OAuthClientService {
                 .clientOwner(oldClient.getClientOwner())
                 .redirectUri(oldClient.getRedirectUri())
                 .postLogoutRedirectUri(oldClient.getPostLogoutRedirectUri())
+                .scopes(oldClient.getScopes())
                 .requireAuthorizationConsent(oldClient.isRequireAuthorizationConsent())
                 .clientType(oldClient.getClientType())
                 .clientSecretExpiresAt(LocalDateTime.now().plusDays(expireDays)) // 새 만료일
@@ -128,6 +130,7 @@ public class OAuthClientService {
                 .clientOwner(oldClient.getClientOwner())
                 .redirectUri(oldClient.getRedirectUri())
                 .postLogoutRedirectUri(oldClient.getPostLogoutRedirectUri())
+                .scopes(oldClient.getScopes())
                 .requireAuthorizationConsent(oldClient.isRequireAuthorizationConsent())
                 .clientType(oldClient.getClientType())
                 .clientSecretExpiresAt(LocalDateTime.now().plusDays(expireDays)) // 새 만료일
@@ -150,6 +153,7 @@ public class OAuthClientService {
                 .clientOwner(oldClient.getClientOwner())
                 .redirectUri(oldClient.getRedirectUri())
                 .postLogoutRedirectUri(oldClient.getPostLogoutRedirectUri())
+                .scopes(oldClient.getScopes())
                 .requireAuthorizationConsent(oldClient.isRequireAuthorizationConsent())
                 .clientType(oldClient.getClientType())
                 .createdAt(oldClient.getCreatedAt())
@@ -160,7 +164,6 @@ public class OAuthClientService {
     }
 
     public OAuthClient saveOAuthClient(OAuthClientRequestDTO oAuthClientRequestDTO, String email){
-        log.info(email);
         if (oAuthClientRepository.findByClientId(oAuthClientRequestDTO.getClientId()).isEmpty()) {
             OAuthClient client = OAuthClient.builder()
                     .clientId(oAuthClientRequestDTO.getClientId())
@@ -176,6 +179,15 @@ public class OAuthClientService {
                     .updatedAt(LocalDateTime.now())
                     .isActive(false)
                     .build();
+            if(oAuthClientRequestDTO.getScopes()!=null) {
+                for (String s : oAuthClientRequestDTO.getScopes()) {
+                    OAuthScopes scope = OAuthScopes.builder()
+                            .oAuthClient(client)
+                            .scope(s)
+                            .build();
+                    client.getScopes().add(scope);
+                }
+            }
             return oAuthClientRepository.save(client);
         }
         return null;
@@ -211,11 +223,11 @@ public class OAuthClientService {
                     .authorizationGrantType(AuthorizationGrantType.REFRESH_TOKEN)
                     .redirectUri(result.getRedirectUri())
                     .postLogoutRedirectUri(result.getPostLogoutRedirectUri())
-                    .scope(OidcScopes.OPENID)
-                    .scope(OidcScopes.PROFILE)
                     .clientSettings(ClientSettings.builder()
-                            .requireAuthorizationConsent(result.isRequireAuthorizationConsent())
-                            .build());
+                    .requireAuthorizationConsent(result.isRequireAuthorizationConsent()).build());
+            for(OAuthScopes s : result.getScopes()){
+                builder.scope(s.getScope());
+            }
         }
         return builder.build();
     }

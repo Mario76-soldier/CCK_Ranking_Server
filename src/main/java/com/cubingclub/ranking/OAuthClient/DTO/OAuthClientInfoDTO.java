@@ -2,11 +2,13 @@ package com.cubingclub.ranking.OAuthClient.DTO;
 
 import com.cubingclub.ranking.OAuthClient.Entity.ClientType;
 import com.cubingclub.ranking.OAuthClient.Entity.OAuthClient;
+import com.cubingclub.ranking.OAuthClient.Entity.OAuthScopes;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Getter
 @Setter
@@ -20,6 +22,7 @@ public class OAuthClientInfoDTO {
     private String clientOwner;
     private String redirectUri;
     private String postLogoutRedirectUri;
+    private List<OAuthScopes> scopes;
     private ClientType clientType;  // 추가 필드
     private LocalDateTime clientSecretExpiresAt;
     private LocalDateTime createdAt;
@@ -33,6 +36,7 @@ public class OAuthClientInfoDTO {
         this.clientDescription=entity.getClientDescription();
         this.redirectUri=entity.getRedirectUri();
         this.postLogoutRedirectUri=entity.getPostLogoutRedirectUri();
+        this.scopes=entity.getScopes();
         this.clientType=entity.getClientType();
         this.clientSecretExpiresAt=entity.getClientSecretExpiresAt();
         this.createdAt=entity.getCreatedAt();
