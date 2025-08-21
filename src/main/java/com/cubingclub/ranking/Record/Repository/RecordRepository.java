@@ -1,7 +1,6 @@
 package com.cubingclub.ranking.Record.Repository;
 
 import com.cubingclub.ranking.Record.DTO.BestResult;
-import com.cubingclub.ranking.Record.DTO.RecordForUserDTO;
 import com.cubingclub.ranking.Record.Entity.Record;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -13,7 +12,6 @@ import java.util.List;
 import java.util.Optional;
 
 public interface RecordRepository extends JpaRepository<Record, Integer> {
-    void deleteByRound_Comp_Idx(Integer compIdx);
     @Query("select p from Record p join fetch p.account a join fetch p.round r join fetch r.cubeEvent ce join fetch r.comp c where r.idx=:roundIdx order by (case when p.ranking is null or p.ranking=0 then 1 else 0 end) asc, p.ranking asc")
     List<Record> findByRound_Idx(@Param(value="roundIdx")Integer roundIdx);
     @Query("select p from Record p join fetch p.account a join fetch p.round r join fetch r.cubeEvent ce join fetch r.comp c where r.idx=:roundIdx and p.single is not null and p.average is not null and p.single!=0 " +
@@ -70,7 +68,6 @@ public interface RecordRepository extends JpaRepository<Record, Integer> {
     @Query("SELECT r FROM Record r WHERE r.idx = :idx")
     Record findByIdx(Integer idx);
     void deleteByIdx(Integer idx);
-    void deleteByRound_Idx(Integer idx);
     @Query("SELECT r.idx, COUNT(*) FROM Record p JOIN p.round r GROUP BY r.idx")
     List<Object[]> findAllRoundParticipantCounts();
     //@Query("select count(p.idx) from Record p join fetch Scrambler r where p.round.idx=:roundIdx and p.email.")

@@ -1,6 +1,7 @@
 package com.cubingclub.ranking.Record.Service;
 
 import com.cubingclub.ranking.Account.DTO.AccountDTO;
+import com.cubingclub.ranking.Account.DTO.MaskedAccountDTO;
 import com.cubingclub.ranking.Account.Entity.Account;
 import com.cubingclub.ranking.Record.DTO.*;
 import com.cubingclub.ranking.Record.Entity.Attempt;
@@ -85,13 +86,13 @@ public class RecordService {
     public void updateRecordOne(Integer idx, BigDecimal record, String judgeEmail) {
         AttemptDTO lastAttempt=new AttemptDTO(attemptRepository.findByIdx(idx));
         lastAttempt.setTime(record);
-        lastAttempt.setJudge(new AccountDTO(accountRepository.findByEmail(judgeEmail).orElseThrow()));
+        lastAttempt.setJudge(new MaskedAccountDTO(accountRepository.findByEmail(judgeEmail).orElseThrow()));
         attemptRepository.save(lastAttempt.toEntity(recordRepository, accountRepository));
         Record record1 = recordRepository.findByIdx(lastAttempt.getRecordIdx());
         applyRecordUpdate(record1);
     }
 
-    public void addExtra(ExtraDTO extraDTO, AccountDTO delegate){
+    public void addExtra(ExtraDTO extraDTO, MaskedAccountDTO delegate){
         RecordDTO recordDTO =new RecordDTO(recordRepository.findByIdx(extraDTO.getPartIdx()));
         AttemptDTO attemptDTO=recordDTO.getAttempts().get(extraDTO.getExtraTry()-1);
         attemptDTO.setExtra(extraDTO.getExtraNum());
@@ -156,7 +157,7 @@ public class RecordService {
             return -1;
         }
         AttemptDTO attemptDTO=new AttemptDTO(attempt);
-        AccountDTO accountDTO=new AccountDTO(accountRepository.findByEmail(email).orElseThrow(null));
+        MaskedAccountDTO accountDTO=new MaskedAccountDTO(accountRepository.findByEmail(email).orElseThrow(null));
         if(exNumber==null || exNumber.equals(0)){
             attemptDTO.setScrambler(accountDTO);
         }
@@ -250,9 +251,9 @@ public class RecordService {
         }
     }
 
-    /**public Integer addAdvance(Integer pastRoundIdx, Integer advanceRoundIdx){
-        Scrambler pastRound=roundRepository.findByIdx(pastRoundIdx);
-        List<RecordForUserDTO> participateList=getParticipateForUser(pastRoundIdx);
+    public Integer addAdvance(Integer pastRoundIdx, Integer advanceRoundIdx){
+        Round pastRound=roundRepository.findByIdx(pastRoundIdx);
+        List<RecordDTO> participateList=getParticipate(pastRoundIdx);
         List<Record> advanceList=new ArrayList<>();
         for(int i=0; i<pastRound.getAdvance(); i++){
             RecordDTO advanceParticipate=participateList.get(i);
@@ -260,7 +261,7 @@ public class RecordService {
             advanceList.add(advanceParticipate.toEntity(accountRepository));
         }
         return recordRepository.saveAll(advanceList).size();
-    }**/
+    }
 
     public Integer addParticipate(List<RecordRequestDTO> participates) {
         List<Record> recordList =new ArrayList<>();

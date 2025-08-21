@@ -1,6 +1,7 @@
 package com.cubingclub.ranking.Record.Controller;
 
 import com.cubingclub.ranking.Account.DTO.AccountDTO;
+import com.cubingclub.ranking.Account.DTO.MaskedAccountDTO;
 import com.cubingclub.ranking.Account.Service.AccountService;
 import com.cubingclub.ranking.Record.DTO.*;
 import com.cubingclub.ranking.Record.Service.RecordService;
@@ -39,10 +40,10 @@ public class RecordController {
         participateService.quitParticipate(partList);
         return ResponseEntity.ok().build();
     }
-    /**@PostMapping("/advance/{pastRoundIdx}/{advanceRoundIdx}")//기록에서 어드밴스 인원 다음 라운드로 넘기는 콜
+    @PostMapping("/advance/{pastRoundIdx}/{advanceRoundIdx}")//기록에서 어드밴스 인원 다음 라운드로 넘기는 콜
     public ResponseEntity<Integer> Advance(@PathVariable(value="pastRoundIdx")Integer pastRoundIdx, @PathVariable(value="advanceRoundIdx")Integer advanceRoundIdx){
         return ResponseEntity.ok(participateService.addAdvance(pastRoundIdx, advanceRoundIdx));
-    }**/
+    }
 
     @PostMapping("/participate")//선수 추가 콜
     public ResponseEntity<Integer> AddParticipate(@RequestBody List<RecordRequestDTO> participates){
@@ -52,7 +53,7 @@ public class RecordController {
     @PostMapping("/extra")
     public ResponseEntity<?> AddExtra(@RequestBody ExtraDTO extraDTO){
         Authentication authentication= SecurityContextHolder.getContext().getAuthentication();
-        AccountDTO accountDTO=accountService.getAccountInfoWithCCKId(authentication.getName());
+        MaskedAccountDTO accountDTO=accountService.getMaskedAccountInfoWithCCKId(authentication.getName());
         try{
             participateService.addExtra(extraDTO, accountDTO);
             return ResponseEntity.ok().build();

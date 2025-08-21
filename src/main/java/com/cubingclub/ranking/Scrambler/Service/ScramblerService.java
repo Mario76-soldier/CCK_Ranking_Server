@@ -1,5 +1,6 @@
 package com.cubingclub.ranking.Scrambler.Service;
 
+import com.cubingclub.ranking.Account.DTO.MaskedAccountDTO;
 import com.cubingclub.ranking.Account.Entity.Account;
 import com.cubingclub.ranking.Account.Repository.AccountRepository;
 import com.cubingclub.ranking.Record.DTO.AttemptDTO;
@@ -265,7 +266,7 @@ public class ScramblerService {
             }
         }
         ScramblerResponseDTO scramblerDTO=new ScramblerResponseDTO(scramblerRepository.findByRound_IdxAndRoundGroupAndSeq(recordDTO.getRound().getIdx(), recordDTO.getRoundGroup(), seq));
-        scramblerDTO.setAccount(account);
+        scramblerDTO.setAccountDTO(new MaskedAccountDTO(account));
         scramblerDTO.setAttemptIdx(record.getAttemptIdx());
         return scramblerDTO;
     }

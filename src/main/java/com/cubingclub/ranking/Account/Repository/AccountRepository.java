@@ -14,10 +14,8 @@ public interface AccountRepository extends JpaRepository<Account, Integer> {
     Boolean existsByEmail(String email);
     Optional<Account> findByEmail(String email);
     Optional<Account> findByCckId(String cckId);
-    @Query("SELECT a.email as email, a.name as name, a.enName as enName, a.position as position, a.birthDate as birthDate, a.state as state, a.gender as gender, a.cckId as cckId, a.wcaId as wcaId, a.phoneNum as phoneNum FROM Account a")
-    List<AccountListDTO> findAllList();
-    @Query("SELECT a.email as email, a.name as name, a.enName as enName, a.position as position, a.birthDate as birthDate, a.state as state, a.gender as gender, a.cckId as cckId, a.wcaId as wcaId, a.phoneNum as phoneNum FROM Account a " +
-            "where a.name like %:searchTerm% or a.enName like %:searchTerm% or a.email like %:searchTerm%")
+    @Query("SELECT a.name as name, a.enName as enName, a.state as state, a.gender as gender, a.cckId as cckId, a.wcaId as wcaId FROM Account a " +
+            "where a.name like %:searchTerm% or a.enName like %:searchTerm% or a.cckId like %:searchTerm%")
     List<AccountListDTO> findByName(@Param(value="searchTerm")String searchTerm);
     @Modifying
     @Query("UPDATE Account a SET a.state=:state WHERE a.cckId=:cckId")

@@ -1,6 +1,7 @@
 package com.cubingclub.ranking.Record.DTO;
 
 import com.cubingclub.ranking.Account.DTO.AccountDTO;
+import com.cubingclub.ranking.Account.DTO.MaskedAccountDTO;
 import com.cubingclub.ranking.Account.Entity.Account;
 import com.cubingclub.ranking.Account.Repository.AccountRepository;
 import com.cubingclub.ranking.Record.Entity.Attempt;
@@ -20,21 +21,21 @@ public class AttemptDTO {
     private Integer recordIdx;
     private Integer attemptTry;
     private BigDecimal time;
-    private AccountDTO scrambler;
-    private AccountDTO judge;
+    private MaskedAccountDTO scrambler;
+    private MaskedAccountDTO judge;
     private Integer extra;
     private String exReason;
-    private AccountDTO delegate;
-    private AccountDTO exScrambler;
+    private MaskedAccountDTO delegate;
+    private MaskedAccountDTO exScrambler;
     public AttemptDTO(Attempt entity) {
         this.idx = entity.getIdx();
         this.recordIdx=entity.getRecord().getIdx();
         this.attemptTry = entity.getAttemptTry();
         this.time = entity.getTime();
-        this.scrambler = entity.getScrambler() != null ? new AccountDTO(entity.getScrambler()) : null;
-        this.judge = entity.getJudge() != null ? new AccountDTO(entity.getJudge()) : null;
-        this.delegate = entity.getDelegate() != null ? new AccountDTO(entity.getDelegate()) : null;
-        this.exScrambler = entity.getExScrambler() != null ? new AccountDTO(entity.getExScrambler()) : null;
+        this.scrambler = entity.getScrambler() != null ? new MaskedAccountDTO(entity.getScrambler()) : null;
+        this.judge = entity.getJudge() != null ? new MaskedAccountDTO(entity.getJudge()) : null;
+        this.delegate = entity.getDelegate() != null ? new MaskedAccountDTO(entity.getDelegate()) : null;
+        this.exScrambler = entity.getExScrambler() != null ? new MaskedAccountDTO(entity.getExScrambler()) : null;
         this.extra = entity.getExtra(); // isExtra
         this.exReason = entity.getExReason();
     }
@@ -54,12 +55,12 @@ public class AttemptDTO {
                 .record(recordRepository.findByIdx(recordIdx))
                 .attemptTry(attemptTry)
                 .time(time)
-                .scrambler(scrambler != null ? accountRepository.findByEmail(scrambler.getEmail()).orElse(null) : null)
-                .judge(judge != null ? accountRepository.findByEmail(judge.getEmail()).orElse(null) : null)
+                .scrambler(scrambler != null ? accountRepository.findByCckId(scrambler.getCckId()).orElse(null) : null)
+                .judge(judge != null ? accountRepository.findByCckId(judge.getCckId()).orElse(null) : null)
                 .extra(extra)
                 .exReason(exReason)
-                .delegate(delegate != null ? accountRepository.findByEmail(delegate.getEmail()).orElse(null) : null)
-                .exScrambler(exScrambler != null ? accountRepository.findByEmail(exScrambler.getEmail()).orElse(null) : null)
+                .delegate(delegate != null ? accountRepository.findByCckId(delegate.getCckId()).orElse(null) : null)
+                .exScrambler(exScrambler != null ? accountRepository.findByCckId(exScrambler.getCckId()).orElse(null) : null)
                 .build();
     }
 }
