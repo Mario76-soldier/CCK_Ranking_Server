@@ -83,7 +83,7 @@ public class AccountController {
     public ResponseEntity<?> Edit(@RequestBody AccountEditDTO accountEditDTO){
         try {
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-            accountEditDTO.setEmail(authentication.getName());
+            accountEditDTO.setCckId(authentication.getName());
             if(accountService.updateUser(accountEditDTO)==0) {
                 return ResponseEntity.ok().build();
             }
@@ -107,9 +107,9 @@ public class AccountController {
             if(!scopes.contains("email")){
                 accountDTO.setEmail(null);
             }
-            //if(!scopes.contains("phone")){
-            //    accountDTO.setPhoneNum(null);
-            //}
+            if(!scopes.contains("phone")){
+                accountDTO.setPhoneNum(null);
+            }
             return ResponseEntity.ok(accountDTO);
         }
         catch(Exception e){

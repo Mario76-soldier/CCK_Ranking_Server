@@ -64,7 +64,7 @@ public class AccountService {
         return accountRepository.findByCckId(cckId).get().getPosition();
     }
     public int updateUser(AccountEditDTO accountEditDTO){
-        Optional<Account> account=accountRepository.findByEmail(accountEditDTO.getEmail());
+        Optional<Account> account=accountRepository.findByCckId(accountEditDTO.getCckId());
         if(account.isEmpty()){
             return -1;
         }
@@ -72,12 +72,12 @@ public class AccountService {
             return -1;
         }
         if(accountEditDTO.getNewPassword()==null){
-            accountRepository.updateAccountInfo(accountEditDTO.getState(), accountEditDTO.getEmail());
+            accountRepository.updateAccountInfo(accountEditDTO.getState(), accountEditDTO.getCckId());
             return 0;
         }
         else{
             if(accountEditDTO.getNewPassword().equals(accountEditDTO.getNewPasswordCheck())) {
-                accountRepository.updateAccountPassword(encoder.encode(accountEditDTO.getNewPassword()), accountEditDTO.getEmail());
+                accountRepository.updateAccountPassword(encoder.encode(accountEditDTO.getNewPassword()), accountEditDTO.getCckId());
                 return 0;
             }
             else{

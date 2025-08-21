@@ -28,6 +28,8 @@ public class AccountJoinDTO {
     private Gender gender;
     private String authNum;
     private String cckId;
+    private String wcaId;
+    private String phoneNum;
     public Account toEntity(String encodedPassword){
         return Account.builder()
                 .email(this.email)
@@ -39,6 +41,8 @@ public class AccountJoinDTO {
                 .state(this.state)
                 .gender(this.gender)
                 .cckId(this.cckId)
+                .wcaId(this.wcaId)
+                .phoneNum(this.phoneNum)
                 .build();
     }
 }
