@@ -251,9 +251,9 @@ public class RecordService {
         }
     }
 
-    /**public Integer addAdvance(Integer pastRoundIdx, Integer advanceRoundIdx){
-        Scrambler pastRound=roundRepository.findByIdx(pastRoundIdx);
-        List<RecordForUserDTO> participateList=getParticipateForUser(pastRoundIdx);
+    public Integer addAdvance(Integer pastRoundIdx, Integer advanceRoundIdx){
+        Round pastRound=roundRepository.findByIdx(pastRoundIdx);
+        List<RecordDTO> participateList=getParticipate(pastRoundIdx);
         List<Record> advanceList=new ArrayList<>();
         for(int i=0; i<pastRound.getAdvance(); i++){
             RecordDTO advanceParticipate=participateList.get(i);
@@ -261,7 +261,7 @@ public class RecordService {
             advanceList.add(advanceParticipate.toEntity(accountRepository));
         }
         return recordRepository.saveAll(advanceList).size();
-    }**/
+    }
 
     public Integer addParticipate(List<RecordRequestDTO> participates) {
         List<Record> recordList =new ArrayList<>();

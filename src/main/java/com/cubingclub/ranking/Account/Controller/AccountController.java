@@ -12,6 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.jwt.Jwt;
@@ -20,6 +21,7 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 
+import java.util.Collection;
 import java.util.List;
 
 @Slf4j
@@ -96,20 +98,20 @@ public class AccountController {
         }
     }
     @GetMapping("/info")
-    public ResponseEntity<?> Info(@AuthenticationPrincipal Jwt jwt){
+    public ResponseEntity<?> Info(){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         try{
             AccountDTO accountDTO=accountService.getAccountInfoWithCCKId(authentication.getName());
-            List<String> scopes = jwt.getClaimAsStringList("scope");
-            if(!scopes.contains("profile")){
-                return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
-            }
-            if(!scopes.contains("email")){
-                accountDTO.setEmail(null);
-            }
-            if(!scopes.contains("phone")){
-                accountDTO.setPhoneNum(null);
-            }
+            //List<String> scopes = jwt.getClaimAsStringList("scope");
+            //if(!scopes.contains("profile")){
+            //    return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+            //}
+            //if(!scopes.contains("email")){
+            //    accountDTO.setEmail(null);
+            //}
+            //if(!scopes.contains("phone")){
+            //    accountDTO.setPhoneNum(null);
+            //}
             return ResponseEntity.ok(accountDTO);
         }
         catch(Exception e){

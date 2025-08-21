@@ -41,10 +41,7 @@ import org.springframework.web.cors.CorsConfigurationSource;
 
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 @RequiredArgsConstructor
 @Configuration
@@ -115,7 +112,7 @@ public class SecurityConfig{
                     @Override
                     public CorsConfiguration getCorsConfiguration(HttpServletRequest request) {
                         CorsConfiguration config = new CorsConfiguration();
-                        config.setAllowedOriginPatterns(Collections.singletonList("*"));
+                        config.setAllowedOrigins(Arrays.asList("http://localhost:3000", "https://ranking.cubingclub.com", "https://test.ranking.cubingclub.com"));
                         config.setAllowedMethods(Collections.singletonList("*"));
                         config.setAllowCredentials(true);
                         config.setAllowedHeaders(Collections.singletonList("*"));
