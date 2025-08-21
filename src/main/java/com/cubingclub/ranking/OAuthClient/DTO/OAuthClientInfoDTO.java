@@ -1,5 +1,6 @@
 package com.cubingclub.ranking.OAuthClient.DTO;
 
+import com.cubingclub.ranking.Account.Entity.Account;
 import com.cubingclub.ranking.OAuthClient.Entity.ClientType;
 import com.cubingclub.ranking.OAuthClient.Entity.OAuthClient;
 import com.cubingclub.ranking.OAuthClient.Entity.OAuthScopes;
@@ -19,7 +20,7 @@ public class OAuthClientInfoDTO {
     private String clientName;
     private String clientUri;
     private String clientDescription;
-    private String clientOwner;
+    private Account clientOwner;
     private String redirectUri;
     private String postLogoutRedirectUri;
     private List<OAuthScopes> scopes;
@@ -34,6 +35,7 @@ public class OAuthClientInfoDTO {
         this.clientName=entity.getClientName();
         this.clientUri=entity.getClientUri();
         this.clientDescription=entity.getClientDescription();
+        this.clientOwner=entity.getClientOwner();
         this.redirectUri=entity.getRedirectUri();
         this.postLogoutRedirectUri=entity.getPostLogoutRedirectUri();
         this.scopes=entity.getScopes();

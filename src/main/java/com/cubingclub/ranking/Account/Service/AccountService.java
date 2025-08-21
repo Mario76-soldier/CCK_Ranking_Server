@@ -91,6 +91,9 @@ public class AccountService {
     public AccountDTO getAccountInfoWithCCKId(String cckId){
         return new AccountDTO(accountRepository.findByCckId(cckId).get());
     }
+    public MaskedAccountDTO getMaskedAccountInfoWithCCKId(String cckId){
+        return new MaskedAccountDTO(accountRepository.findByCckId(cckId).get());
+    }
 
     public boolean updatePassword(String email, String password){
         if(accountRepository.existsByEmail(email)){

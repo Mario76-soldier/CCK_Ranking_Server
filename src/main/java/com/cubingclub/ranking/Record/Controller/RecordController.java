@@ -1,6 +1,7 @@
 package com.cubingclub.ranking.Record.Controller;
 
 import com.cubingclub.ranking.Account.DTO.AccountDTO;
+import com.cubingclub.ranking.Account.DTO.MaskedAccountDTO;
 import com.cubingclub.ranking.Account.Service.AccountService;
 import com.cubingclub.ranking.Record.DTO.*;
 import com.cubingclub.ranking.Record.Service.RecordService;
@@ -52,7 +53,7 @@ public class RecordController {
     @PostMapping("/extra")
     public ResponseEntity<?> AddExtra(@RequestBody ExtraDTO extraDTO){
         Authentication authentication= SecurityContextHolder.getContext().getAuthentication();
-        AccountDTO accountDTO=accountService.getAccountInfoWithCCKId(authentication.getName());
+        MaskedAccountDTO accountDTO=accountService.getMaskedAccountInfoWithCCKId(authentication.getName());
         try{
             participateService.addExtra(extraDTO, accountDTO);
             return ResponseEntity.ok().build();

@@ -1,6 +1,7 @@
 package com.cubingclub.ranking.Record.DTO;
 
 import com.cubingclub.ranking.Account.DTO.AccountDTO;
+import com.cubingclub.ranking.Account.DTO.MaskedAccountDTO;
 import com.cubingclub.ranking.Account.Entity.Account;
 import com.cubingclub.ranking.Record.Entity.Attempt;
 import com.cubingclub.ranking.Record.Entity.BestType;
@@ -22,7 +23,7 @@ import java.util.List;
 public class RecordDTO {
     private Integer idx;
     private Integer pdx;
-    private AccountDTO account;
+    private MaskedAccountDTO account;
     private Round round;
     private String roundGroup;
     private List<AttemptDTO> attempts;
@@ -35,7 +36,7 @@ public class RecordDTO {
     public RecordDTO(Record entity){
         this.idx=entity.getIdx();
         this.pdx=entity.getPdx();
-        this.account=new AccountDTO(entity.getAccount());
+        this.account=new MaskedAccountDTO(entity.getAccount());
         this.round=entity.getRound();
         this.roundGroup=entity.getRoundGroup();
         this.attempts=new ArrayList<>();
@@ -50,7 +51,7 @@ public class RecordDTO {
         this.averageBestType=entity.getAverageBestType();
     }
     public RecordDTO(Account account, Integer pdx, Round round, String roundGroup) {
-        this.account=new AccountDTO(account);
+        this.account=new MaskedAccountDTO(account);
         this.pdx=pdx;
         this.round=round;
         this.roundGroup=roundGroup;
@@ -58,7 +59,7 @@ public class RecordDTO {
     public Record toEntity(AccountRepository accountRepository){
         return Record.builder()
                 .pdx(pdx)
-                .account(accountRepository.findByEmail(account.getEmail()).orElse(null))
+                .account(accountRepository.findByCckId(account.getCckId()).orElse(null))
                 .round(round)
                 .roundGroup(roundGroup)
                 .build();
@@ -67,7 +68,7 @@ public class RecordDTO {
         return Record.builder()
                 .idx(idx)
                 .pdx(pdx)
-                .account(accountRepository.findByEmail(account.getEmail()).orElse(null))
+                .account(accountRepository.findByCckId(account.getCckId()).orElse(null))
                 .round(round)
                 .roundGroup(roundGroup)
                 .attempts(attempts)
