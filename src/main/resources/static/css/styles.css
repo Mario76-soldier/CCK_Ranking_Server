@@ -301,6 +301,39 @@ option[disabled] {
     filter: brightness(0.98);
 }
 
+.scope-list {
+    text-align: left;
+    margin: 20px 0;
+    border-top: 1px solid #e0e0e0;
+}
+
+.scope-list .scope-item {
+    display: flex;
+    align-items: center;
+    padding: 10px 0;
+    border-bottom: 1px solid #e0e0e0;
+    margin: 0; /* 기존 input-group margin 제거 */
+}
+
+.scope-list .scope-item:last-child {
+    border-bottom: 1px solid #e0e0e0; /* 마지막 항목에도 구분선 유지 */
+}
+
+.scope-item .dot {
+    margin-right: 10px;
+    color: #000000;
+    font-weight: bold;
+}
+.consent-buttons .login-btn {
+    margin-bottom: 10px;
+}
+.consent-buttons .login-btn.deny {
+    background-color: #aaa;
+}
+.consent-buttons .login-btn.deny:hover {
+    background-color: #888;
+}
+
 /* 반응형 */
 @media (max-width: 768px) {
     .login-box {
