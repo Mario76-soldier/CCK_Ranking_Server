@@ -151,18 +151,18 @@ public class RecordService {
         return String.format("%d:%02d.%02d", minutes, secs, millis);
     }
 
-    public int updateScrambler(Integer idx, String email, Integer exNumber){
+    public int updateScrambler(Integer idx, String email){
         Attempt attempt=attemptRepository.findByIdx(idx);
         if(attempt.getRecord().getAccount().getEmail().equals(email)){
             return -1;
         }
         AttemptDTO attemptDTO=new AttemptDTO(attempt);
         MaskedAccountDTO accountDTO=new MaskedAccountDTO(accountRepository.findByEmail(email).orElseThrow(null));
-        if(exNumber==null || exNumber.equals(0)){
+        if(attemptDTO.getExtra()==null || attemptDTO.getExtra().equals(0)){
             attemptDTO.setScrambler(accountDTO);
         }
         else {
-            attemptDTO.setScrambler(accountDTO);
+            attemptDTO.setExScrambler(accountDTO);
         }
         attemptRepository.save(attemptDTO.toEntity(recordRepository, accountRepository));
         return 0;

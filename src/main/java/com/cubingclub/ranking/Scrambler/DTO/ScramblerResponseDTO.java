@@ -17,7 +17,7 @@ import lombok.Setter;
 public class ScramblerResponseDTO {
     private Integer idx;
     private Integer attemptIdx;
-    private MaskedAccountDTO accountDTO;
+    private MaskedAccountDTO account;
     private RoundDTO round;
     private String roundGroup;
     private String seq;

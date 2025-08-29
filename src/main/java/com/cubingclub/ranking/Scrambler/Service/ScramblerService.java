@@ -266,7 +266,7 @@ public class ScramblerService {
             }
         }
         ScramblerResponseDTO scramblerDTO=new ScramblerResponseDTO(scramblerRepository.findByRound_IdxAndRoundGroupAndSeq(recordDTO.getRound().getIdx(), recordDTO.getRoundGroup(), seq));
-        scramblerDTO.setAccountDTO(new MaskedAccountDTO(account));
+        scramblerDTO.setAccount(new MaskedAccountDTO(account));
         scramblerDTO.setAttemptIdx(record.getAttemptIdx());
         return scramblerDTO;
     }
@@ -280,12 +280,12 @@ public class ScramblerService {
                 ));
     }
 
-    public int updateScrambler(Integer attemptIdx, String uid, Integer exNumber){
+    public int updateScrambler(Integer attemptIdx, String uid){
         String email=rfidRepository.findEmailByUid(uid);
         if(email==null){
             return -1;
         }
-        if(recordService.updateScrambler(attemptIdx, rfidRepository.findEmailByUid(uid), exNumber)==-1){
+        if(recordService.updateScrambler(attemptIdx, email)==-1){
             return -2;
         }
         return 0;
