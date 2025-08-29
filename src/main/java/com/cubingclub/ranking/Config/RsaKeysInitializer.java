@@ -51,7 +51,7 @@ public class RsaKeysInitializer {
             rankingRequest.setRequireAuthorizationConsent(true);
             rankingRequest.setClientType(ClientType.NORMAL);
             rankingRequest.setScopes(List.of("openid", "profile", "email")); // 한 번에 scope 설정
-            oAuthClientService.saveOAuthClient(rankingRequest, "cubingclubkorea@gmail.com");
+            oAuthClientService.saveOAuthClient(rankingRequest, "5d000a56-7eac-11f0-ae2c-0242ac120002");
             oAuthClientService.updateSecretDefault(clientId, clientSecret, 365);
             System.out.println("✅ OAuth Client created: " + clientId);
         }
@@ -65,7 +65,7 @@ public class RsaKeysInitializer {
             recorderRequest.setPostLogoutRedirectUri("");
             recorderRequest.setRequireAuthorizationConsent(true);
             recorderRequest.setClientType(ClientType.IOT);
-            oAuthClientService.saveOAuthClient(recorderRequest, "cubingclubkorea@gmail.com");
+            oAuthClientService.saveOAuthClient(recorderRequest, "5d000a56-7eac-11f0-ae2c-0242ac120002");
             oAuthClientService.updateSecretDefault(clientId, clientSecret, 365);
             System.out.println("✅ OAuth Client created: " + clientId);
         }

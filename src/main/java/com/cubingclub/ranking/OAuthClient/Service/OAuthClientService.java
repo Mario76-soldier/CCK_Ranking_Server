@@ -1,8 +1,6 @@
 package com.cubingclub.ranking.OAuthClient.Service;
 
 import com.cubingclub.ranking.Account.Repository.AccountRepository;
-import com.cubingclub.ranking.Competition.DTO.CompetitionDTO;
-import com.cubingclub.ranking.Competition.Entity.Competition;
 import com.cubingclub.ranking.OAuthClient.DTO.OAuthClientInfoDTO;
 import com.cubingclub.ranking.OAuthClient.DTO.OAuthClientRequestDTO;
 import com.cubingclub.ranking.OAuthClient.DTO.OAuthClientResponseDTO;
@@ -15,7 +13,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.oauth2.core.AuthorizationGrantType;
 import org.springframework.security.oauth2.core.ClientAuthenticationMethod;
-import org.springframework.security.oauth2.core.oidc.OidcScopes;
 import org.springframework.security.oauth2.server.authorization.client.RegisteredClient;
 import org.springframework.security.oauth2.server.authorization.settings.ClientSettings;
 import org.springframework.stereotype.Service;
@@ -158,12 +155,12 @@ public class OAuthClientService {
                 .clientType(oldClient.getClientType())
                 .createdAt(oldClient.getCreatedAt())
                 .updatedAt(LocalDateTime.now()) // 갱신 시간
-                .isActive(true)
+                .isActive(!oldClient.isActive())
                 .build();
         return new OAuthClientResponseDTO(oAuthClientRepository.save(updatedClient));
     }
 
-    public OAuthClient saveOAuthClient(OAuthClientRequestDTO oAuthClientRequestDTO, String cckId){
+    public OAuthClientResponseDTO saveOAuthClient(OAuthClientRequestDTO oAuthClientRequestDTO, String cckId){
         if (oAuthClientRepository.findByClientId(oAuthClientRequestDTO.getClientId()).isEmpty()) {
             OAuthClient client = OAuthClient.builder()
                     .clientId(oAuthClientRequestDTO.getClientId())
@@ -188,7 +185,7 @@ public class OAuthClientService {
                     client.getScopes().add(scope);
                 }
             }
-            return oAuthClientRepository.save(client);
+            return new OAuthClientResponseDTO(oAuthClientRepository.save(client));
         }
         return null;
     }
