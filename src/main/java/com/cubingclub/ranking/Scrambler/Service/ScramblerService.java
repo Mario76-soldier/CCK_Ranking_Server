@@ -37,7 +37,6 @@ import java.util.stream.Collectors;
 @Transactional
 public class ScramblerService {
     private final RFIDRepository rfidRepository;
-    private final RecordRepository recordRepository;
     private final AccountRepository accountRepository;
     private final AttemptRepository attemptRepository;
     private final RoundRepository roundRepository;

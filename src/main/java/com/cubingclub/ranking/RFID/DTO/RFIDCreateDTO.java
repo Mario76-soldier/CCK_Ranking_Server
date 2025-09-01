@@ -16,12 +16,12 @@ import java.time.LocalDate;
 @Setter
 @NoArgsConstructor
 public class RFIDCreateDTO {
-    private String email;
+    private String cckId;
     private String uid;
     public RFID toEntity(AccountRepository accountRepository){
         return RFID
                 .builder()
-                .account(accountRepository.findByEmail(email).orElseThrow())
+                .account(accountRepository.findByCckId(cckId).orElseThrow())
                 .uid(uid)
                 .build();
     }

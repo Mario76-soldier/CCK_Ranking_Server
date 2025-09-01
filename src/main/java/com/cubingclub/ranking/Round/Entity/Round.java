@@ -2,7 +2,10 @@ package com.cubingclub.ranking.Round.Entity;
 
 import com.cubingclub.ranking.Competition.Entity.Competition;
 import com.cubingclub.ranking.CubeEvent.Entity.CubeEvent;
+import com.cubingclub.ranking.CubeEvent.Repository.CubeEventRepository;
 import com.cubingclub.ranking.Record.Entity.Record;
+import com.cubingclub.ranking.Round.DTO.CreateRoundDTO;
+import com.cubingclub.ranking.Round.Repository.RoundGroupRepository;
 import com.cubingclub.ranking.Scrambler.Entity.Scrambler;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
@@ -55,5 +58,32 @@ public class Round {
         this.eventEnd=EventEnd;
         this.roundGroup=roundGroup;
         this.advance=Advance;
+    }
+    public void update(CreateRoundDTO createRoundDTO, CubeEventRepository cubeEventRepository, RoundGroupRepository roundGroupRepository) {
+        // competition은 절대 건드리지 않음
+        this.cubeEvent = cubeEventRepository.findByEventName(createRoundDTO.getCubeEvent());
+        this.roundName = createRoundDTO.getRoundName();
+        this.eventStart = createRoundDTO.getEventStart();
+        this.eventEnd = createRoundDTO.getEventEnd();
+        this.advance = createRoundDTO.getAdvance();
+
+        // RoundGroup 처리
+        List<String> newGroups = createRoundDTO.getGroupList();
+
+        // 기존 그룹 삭제
+        this.roundGroup.removeIf(rg -> !newGroups.contains(rg.getGroupName()));
+
+        // 새로운 그룹 추가
+        for (String groupName : newGroups) {
+            boolean exists = this.roundGroup.stream()
+                    .anyMatch(rg -> rg.getGroupName().equals(groupName));
+            if (!exists) {
+                RoundGroup newRg = RoundGroup.builder()
+                        .round(this)
+                        .groupName(groupName)
+                        .build();
+                this.roundGroup.add(newRg);
+            }
+        }
     }
 }
