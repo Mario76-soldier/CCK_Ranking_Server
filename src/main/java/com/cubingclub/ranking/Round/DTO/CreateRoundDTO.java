@@ -33,14 +33,4 @@ public class CreateRoundDTO {
                 .Advance(advance)
                 .build();
     }
-    public Round toEntityNoIdx(CompetitionRepository competitionRepository, CubeEventRepository cubeEventRepository){
-        return Round.builder()
-                .Comp(competitionRepository.findByIdx(comp))
-                .cubeEvent(cubeEventRepository.findByEventName(cubeEvent))
-                .RoundName(roundName)
-                .EventStart(eventStart)
-                .EventEnd(eventEnd)
-                .Advance(advance)
-                .build();
-    }
 }

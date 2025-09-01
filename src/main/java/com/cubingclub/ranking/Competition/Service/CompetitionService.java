@@ -33,9 +33,11 @@ public class CompetitionService {
     private final RFIDRepository rfidRepository;
     public Integer create(CompetitionDTO comp){
         if(comp.getIdx()!=null){
-            return competitionRepository.save(comp.toEntity()).getIdx();
+            Competition competition=competitionRepository.findByIdx(comp.getIdx());
+            competition.update(comp);
+            return comp.getIdx();
         }
-        return competitionRepository.save(comp.toEntityNoIdx()).getIdx();
+        return competitionRepository.save(comp.toEntity()).getIdx();
     }
     public CompetitionDTO getOne(Integer idx){
         return new CompetitionDTO(competitionRepository.findByIdx(idx));

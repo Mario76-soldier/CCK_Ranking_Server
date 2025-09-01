@@ -1,5 +1,6 @@
 package com.cubingclub.ranking.Competition.Entity;
 
+import com.cubingclub.ranking.Competition.DTO.CompetitionDTO;
 import com.cubingclub.ranking.Round.Entity.Round;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
@@ -48,5 +49,14 @@ public class Competition {
         this.joinDateStart=JoinDateStart;
         this.joinDateEnd=JoinDateEnd;
         this.maxParticipate=MaxParticipate;
+    }
+
+    public void update(CompetitionDTO competitionDTO){
+        this.compName=competitionDTO.getCompName();
+        this.compDateStart = competitionDTO.getCompDateStart();
+        this.compDateEnd = competitionDTO.getCompDateEnd();
+        this.joinDateStart = competitionDTO.getJoinDateStart();
+        this.joinDateEnd = competitionDTO.getJoinDateEnd();
+        this.maxParticipate = competitionDTO.getMaxParticipate();
     }
 }
