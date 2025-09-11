@@ -97,7 +97,8 @@ public class AccountService {
 
     public boolean updatePassword(String email, String password){
         if(accountRepository.existsByEmail(email)){
-            accountRepository.updateAccountPassword(encoder.encode(password), email);
+            String cckId=accountRepository.findByEmail(email).orElseThrow().getCckId();
+            accountRepository.updateAccountPassword(encoder.encode(password), cckId);
             return true;
         }
         return false;
