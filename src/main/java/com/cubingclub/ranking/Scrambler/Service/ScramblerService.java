@@ -187,11 +187,23 @@ public class ScramblerService {
             }
         }
         switch (round.getCubeEvent().getAvgCalc()){
+            case "ao50"->{
+                count=50;
+            }
+            case "ao25"->{
+                count=25;
+            }
+            case "ao12"->{
+                count=12;
+            }
             case "ao5"->{
                 count=5;
             }
-            case "mo3"->{
+            case "mo3", "bo3"->{
                 count=3;
+            }
+            case "bo2"->{
+                count=2;
             }
             case "single"->{
                 count=1;

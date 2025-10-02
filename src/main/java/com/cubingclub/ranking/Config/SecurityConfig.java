@@ -89,7 +89,7 @@ public class SecurityConfig{
                         .requestMatchers("/api/auth/info", "/api/auth/edit").authenticated()
                         .requestMatchers("/api/scramble/**", "/api/scrambler/**").hasAnyRole("ROOT", "SCRAMBLER")
                         .requestMatchers(HttpMethod.GET,"/api/admin/**", "/api/competitor/**", "/api/scrambles/**").hasAnyRole("ROOT","ADMIN")
-                        .requestMatchers(HttpMethod.POST,"/api/comp/**","/api/round","/api/advance/**","/api/record/**","/api/admin/**", "/api/competitor/**").hasAnyRole("ROOT","ADMIN")
+                        .requestMatchers(HttpMethod.POST,"/api/comp/**", "/api/event/**","/api/round","/api/advance/**","/api/record/**","/api/admin/**", "/api/competitor/**").hasAnyRole("ROOT","ADMIN")
                         .requestMatchers(HttpMethod.DELETE,"/api/comp/**","/api/round/**","/api/record/**").hasAnyRole("ROOT","ADMIN")
                         .requestMatchers(HttpMethod.PUT,"/api/advance/**","/api/checker/**").hasAnyRole("ROOT","ADMIN")
                         .requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll()

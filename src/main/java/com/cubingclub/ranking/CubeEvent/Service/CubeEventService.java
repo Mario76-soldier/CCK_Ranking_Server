@@ -25,4 +25,7 @@ public class CubeEventService {
         }
         return listDTO;
     }
+    public CubeEvent setCubeEvent(CubeEventDTO cubeEventDTO){
+        return cubeEventRepository.save(cubeEventDTO.toEntity());
+    }
 }
