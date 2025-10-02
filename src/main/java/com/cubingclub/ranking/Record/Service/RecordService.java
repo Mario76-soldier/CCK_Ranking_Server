@@ -113,28 +113,51 @@ public class RecordService {
         attemptRepository.save(attemptDTO.toEntity(recordRepository, accountRepository));
     }
 
-    public SingleAverageDTO calculateExpectation(Integer idx){
+    public SingleAverageDTO calculateExpectation(Integer idx) {
         Record record = recordRepository.findByIdx(idx);
-        if(!record.getRound().getCubeEvent().getAvgCalc().equals("ao5")){
+        String avgCalc = record.getRound().getCubeEvent().getAvgCalc();
+
+        // "ao" 로 시작하지 않으면 null 리턴
+        if (!avgCalc.startsWith("ao")) {
             return null;
         }
+
+        // "ao" 뒤 숫자 추출
+        int aoCount = Integer.parseInt(avgCalc.substring(2)); // "ao12" → 12
+
         List<Attempt> attemptList = record.getAttempts();
-            if(attemptList.get(3).getTime()!=null || attemptList.get(3).getTime().compareTo(BigDecimal.ZERO)!=0) {
-                List<BigDecimal> best = Arrays.asList(
-                        attemptList.get(0).getTime(), attemptList.get(1).getTime(), attemptList.get(2).getTime(),
-                        attemptList.get(3).getTime(), BigDecimal.valueOf(0.01)
-                );
-                List<BigDecimal> worst = Arrays.asList(
-                        attemptList.get(0).getTime(), attemptList.get(1).getTime(), attemptList.get(2).getTime(),
-                        attemptList.get(3).getTime(), BigDecimal.valueOf(-1)
-                );
-                SingleAverageDTO expectedBestWorstDTO = new SingleAverageDTO();
-                expectedBestWorstDTO.setSingle(formatSeconds(calculateAo5Average(best)));
-                expectedBestWorstDTO.setAverage(formatSeconds(calculateAo5Average(worst)));
-                return expectedBestWorstDTO;
-            }
-        return null;
+        if (attemptList.size() < aoCount) {
+            return null; // 시도 개수가 부족하면 계산 불가
+        }
+
+        // 아직 시도 중이면 기대값 계산
+        // 마지막 시도가 비어 있거나 0보다 크면
+        Attempt lastAttempt = attemptList.get(Math.min(aoCount - 1, attemptList.size() - 1));
+        if (lastAttempt.getTime() == null || lastAttempt.getTime().compareTo(BigDecimal.ZERO) == 0) {
+            return null;
+        }
+
+        // Best/Worst 가정용 리스트 구성
+        List<BigDecimal> bestList = new ArrayList<>();
+        List<BigDecimal> worstList = new ArrayList<>();
+
+        for (int i = 0; i < aoCount - 1; i++) {
+            bestList.add(attemptList.get(i).getTime());
+            worstList.add(attemptList.get(i).getTime());
+        }
+
+        // 남은 한 시도를 최소/최대 값으로 가정
+        bestList.add(BigDecimal.valueOf(0.01));  // 매우 좋은 기록
+        worstList.add(BigDecimal.valueOf(-1));  // 매우 나쁜 기록
+
+        // 평균 계산
+        SingleAverageDTO expectedDTO = new SingleAverageDTO();
+        expectedDTO.setSingle(formatSeconds(calculateAoXAverage(bestList)));
+        expectedDTO.setAverage(formatSeconds(calculateAoXAverage(worstList)));
+
+        return expectedDTO;
     }
+
     public String formatSeconds(BigDecimal seconds) {
         if(seconds.equals(BigDecimal.valueOf(-1))){
             return "DNF";
@@ -180,10 +203,10 @@ public class RecordService {
                 isZero=true;
             }
         }
-        switch (calcType) {
-            case "ao5" -> {
-                if(attemptList.size()==5 && !isZero) {
-                    recordDTO.setAverage(calculateAo5Average(times));
+        switch (calcType.substring(0,2)) {
+            case "ao" -> {
+                if(attemptList.size()==Integer.parseInt(calcType.substring(2)) && !isZero) {
+                    recordDTO.setAverage(calculateAoXAverage(times));
                     recordDTO.setSingle(calculateSingle(times));
                 }
                 else{
@@ -192,7 +215,7 @@ public class RecordService {
                     recordDTO.setRanking(null);
                 }
             }
-            case "mo3" -> {
+            case "mo" -> {
                 if(attemptList.size()==3 && !isZero) {
                     recordDTO.setAverage(calculateMo3Average(times.subList(0, 3)));
                     recordDTO.setSingle(calculateSingle(times.subList(0, 3)));
@@ -203,7 +226,16 @@ public class RecordService {
                     recordDTO.setRanking(null);
                 }
             }
-            case "single" -> {
+            case "bo" -> {
+                if(attemptList.size()==Integer.parseInt(calcType.substring(2)) && !isZero) {
+                    recordDTO.setSingle(calculateSingle(times));
+                }
+                else{
+                    recordDTO.setSingle(BigDecimal.ZERO);
+                    recordDTO.setRanking(null);
+                }
+            }
+            case "si" -> {
                 if(attemptList.size()==1 && !isZero) {
                     recordDTO.setSingle(times.get(0));
                     recordDTO.setAverage(times.get(0));
@@ -270,27 +302,18 @@ public class RecordService {
         }
         List<Record> records=recordRepository.saveAll(recordList);
         for(Record record:records){
-            log.info(record.getRound().getCubeEvent().getAvgCalc());
-            switch (record.getRound().getCubeEvent().getAvgCalc()){
-                case "ao5"->{
-                    for(int i=1; i<=5; i++){
-                        attemptRepository.save(new AttemptDTO(record, i).toInitialEntity(recordRepository));
-                    }
-                }
-                case "mo3"->{
-                    for(int i=1; i<=3; i++){
-                        attemptRepository.save(new AttemptDTO(record, i).toInitialEntity(recordRepository));
-                    }
-                }
-                case "single"->{
-                    attemptRepository.save(new AttemptDTO(record, 1).toInitialEntity(recordRepository));
+            if (record.getRound().getCubeEvent().getAvgCalc().equals("single")) {
+                attemptRepository.save(new AttemptDTO(record, 1).toInitialEntity(recordRepository));
+            } else {
+                for (int i = 1; i <= Integer.parseInt(record.getRound().getCubeEvent().getAvgCalc().substring(2)); i++) {
+                    attemptRepository.save(new AttemptDTO(record, i).toInitialEntity(recordRepository));
                 }
             }
         }
         return records.size();
     }
 
-    private static BigDecimal calculateAo5Average(List<BigDecimal> times) {
+    private static BigDecimal calculateAoXAverage(List<BigDecimal> times) {
         List<BigDecimal> valid = new ArrayList<>();
         int penaltyCount = 0;
 
@@ -302,17 +325,17 @@ public class RecordService {
         if (penaltyCount >= 2) return DNF;
 
         // 하나라도 DNF/DNS 있으면 Integer.MAX_VALUE처럼 처리
-        while (valid.size() < 5) {
+        while (valid.size() < times.size()) {
             valid.add(BigDecimal.valueOf(Long.MAX_VALUE));
         }
 
         valid.sort(Comparator.naturalOrder());
-        List<BigDecimal> middleThree = valid.subList(1, 4);
+        List<BigDecimal> middleThree = valid.subList(1, times.size()-1);
 
         BigDecimal sum = middleThree.stream()
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
-        return sum.divide(BigDecimal.valueOf(3), 2, RoundingMode.HALF_UP);
+        return sum.divide(BigDecimal.valueOf(times.size()-2), 2, RoundingMode.HALF_UP);
     }
 
     private static BigDecimal calculateMo3Average(List<BigDecimal> times) {

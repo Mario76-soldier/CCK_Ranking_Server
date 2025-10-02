@@ -105,7 +105,6 @@ public class ScramblerService {
     public void saveScramble(Integer roundIdx, List<String> groups) {
         Round round=roundRepository.findByIdx(roundIdx);
         Map<String, String> body;
-        String puzzleId;
         int count=0;
         switch (round.getCubeEvent().getColorType()){
             case cube-> {
@@ -130,62 +129,41 @@ public class ScramblerService {
                 body = null;
             }
         }
-        switch (round.getCubeEvent().getEventName()){
-            case "2x2x2"->{
-                puzzleId="222";
-            }
-            case "3x3x3"->{
-                puzzleId="333";
-            }
-            case "4x4x4"->{
-                puzzleId="444";
-            }
-            case "5x5x5"->{
-                puzzleId="555";
-            }
-            case "6x6x6"->{
-                puzzleId="666";
-            }
-            case "7x7x7"->{
-                puzzleId="777";
-            }
-            case "3x3x3 BLD"->{
-                puzzleId="333bf";
-            }
-            case "3x3x3 FMC"->{
-                puzzleId="333fm";
-            }
-            case "3x3x3 OH"->{
-                puzzleId="333oh";
-            }
-            case "Clock"->{
-                puzzleId="clock";
-            }
-            case "Megaminx"->{
-                puzzleId="minx";
-            }
-            case "Pyraminx"->{
-                puzzleId="pyram";
-            }
-            case "Skewb"->{
-                puzzleId="skewb";
-            }
-            case "Square-1"->{
-                puzzleId="sq1";
-            }
-            case "4x4x4 BLD"->{
-                puzzleId="444bf";
-            }
-            case "5x5x5 BLD"->{
-                puzzleId="555bf";
-            }
-            case "3x3x3 MULTBLD"->{
-                puzzleId="333mbf";
-            }
-            default ->{
-                puzzleId=null;
-            }
+        String eventName = round.getCubeEvent().getEventName(); // ex: "3x3x3 Ao12"
+        String baseEvent;
+        String option = "";
+
+        if (eventName.contains(" ")) {
+            String[] parts = eventName.split(" ", 2);
+            baseEvent = parts[0]; // "3x3x3"
+            option = parts[1];    // "Ao12"
+        } else {
+            baseEvent = eventName;
         }
+        Map<String, String> baseMap = Map.ofEntries(
+                Map.entry("2x2x2", "222"),
+                Map.entry("3x3x3", "333"),
+                Map.entry("4x4x4", "444"),
+                Map.entry("5x5x5", "555"),
+                Map.entry("6x6x6", "666"),
+                Map.entry("7x7x7", "777"),
+                Map.entry("Clock", "clock"),
+                Map.entry("Megaminx", "minx"),
+                Map.entry("Pyraminx", "pyram"),
+                Map.entry("Skewb", "skewb"),
+                Map.entry("Square-1", "sq1")
+        );
+        String puzzleId = baseMap.getOrDefault(baseEvent, null);
+        if (option.startsWith("BLD")) {
+            puzzleId += "bf";        // Blindfolded
+        } else if (option.startsWith("FMC")) {
+            puzzleId += "fm";        // FMC
+        } else if (option.startsWith("OH")) {
+            puzzleId += "oh";        // One-handed
+        } else if (option.startsWith("MULTBLD")) {
+            puzzleId += "mbf";       // Multi BLD
+        }
+
         switch (round.getCubeEvent().getAvgCalc()){
             case "ao50"->{
                 count=50;
@@ -209,6 +187,8 @@ public class ScramblerService {
                 count=1;
             }
         }
+        log.info(puzzleId);
+        log.info(body.toString());
         if(puzzleId==null || body==null){
             return;
         }
@@ -220,6 +200,7 @@ public class ScramblerService {
                 continue;
             }
             scramblerDTO.setRoundGroup(group);
+
             for (int i = 1; i <= count; i++) {
                 JsonNode response = webClient.post()
                         .uri("/frontend/puzzle/" + puzzleId + "/scramble")
