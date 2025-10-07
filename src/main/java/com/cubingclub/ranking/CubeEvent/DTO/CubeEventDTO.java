@@ -5,8 +5,10 @@ import com.cubingclub.ranking.CubeEvent.Entity.ColorType;
 import com.cubingclub.ranking.CubeEvent.Entity.CubeEvent;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Getter
+@Setter
 @NoArgsConstructor
 public class CubeEventDTO {
     private String EventName;
@@ -16,5 +18,12 @@ public class CubeEventDTO {
         this.EventName=entity.getEventName();
         this.AvgCalc=entity.getAvgCalc();
         this.colorType=entity.getColorType();
+    }
+    public CubeEvent toEntity(){
+        return CubeEvent.builder()
+                .EventName(EventName)
+                .AvgCalc(AvgCalc)
+                .colorType(colorType)
+                .build();
     }
 }
