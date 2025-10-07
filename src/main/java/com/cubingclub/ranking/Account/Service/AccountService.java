@@ -6,6 +6,7 @@ import com.cubingclub.ranking.Account.Entity.UserRole;
 import com.cubingclub.ranking.Account.Repository.AccountRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -16,6 +17,7 @@ import java.util.Optional;
 @Service
 @RequiredArgsConstructor
 @Transactional
+@Slf4j
 public class AccountService {
     private final AccountRepository accountRepository;
     private final BCryptPasswordEncoder encoder;
@@ -23,8 +25,9 @@ public class AccountService {
     public String generateCckId(String enName) {
         String cckIdMid = reorderAndUpperFirst4(enName);
         String cckIdFront = "CCK" + getYearSuffix() + cckIdMid;
-        long count = accountRepository.countByCckIdStartingWith(cckIdFront);
-        String countStr = String.format("%02d", count + 1);
+        int backNum=accountRepository.findBiggestNum(cckIdFront).orElse(0);
+        log.info(String.valueOf(backNum));
+        String countStr = String.format("%02d", backNum + 1);
 
         return cckIdFront + countStr;
     }
