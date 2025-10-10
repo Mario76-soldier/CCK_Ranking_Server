@@ -37,9 +37,12 @@ public class Account {
     private String state;
     @Column
     private Gender gender;
-    @Column
+    @Column(unique = true)
     private String cckId;
-
+    @Column
+    private String wcaId;
+    @Column
+    private String phoneNum;
     public Account roleUpdate(UserRole position){
         this.position=position;
         return this;

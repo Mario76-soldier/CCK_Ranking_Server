@@ -2,11 +2,14 @@ package com.cubingclub.ranking.OAuthClient.DTO;
 
 import com.cubingclub.ranking.OAuthClient.Entity.ClientType;
 import com.cubingclub.ranking.OAuthClient.Entity.OAuthClient;
+import com.cubingclub.ranking.OAuthClient.Entity.OAuthScopes;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Getter
 @Setter
@@ -18,6 +21,7 @@ public class OAuthClientResponseDTO {
     private String clientUri;
     private String redirectUri;
     private String postLogoutRedirectUri;
+    private List<String> scopes;
     private ClientType clientType;
     private LocalDateTime clientSecretExpiresAt;
 
@@ -27,6 +31,9 @@ public class OAuthClientResponseDTO {
         this.clientUri=entity.getClientUri();
         this.redirectUri=entity.getRedirectUri();
         this.postLogoutRedirectUri=entity.getPostLogoutRedirectUri();
+        this.scopes = entity.getScopes().stream()
+                .map(OAuthScopes::getScope) // 문자열로 변환
+                .collect(Collectors.toList());
         this.clientType=entity.getClientType();
         this.clientSecretExpiresAt=entity.getClientSecretExpiresAt();
     }
@@ -37,6 +44,9 @@ public class OAuthClientResponseDTO {
         this.clientUri=entity.getClientUri();
         this.redirectUri=entity.getRedirectUri();
         this.postLogoutRedirectUri=entity.getPostLogoutRedirectUri();
+        this.scopes = entity.getScopes().stream()
+                .map(OAuthScopes::getScope) // 문자열로 변환
+                .collect(Collectors.toList());
         this.clientType=entity.getClientType();
         this.clientSecretExpiresAt=entity.getClientSecretExpiresAt();
     }

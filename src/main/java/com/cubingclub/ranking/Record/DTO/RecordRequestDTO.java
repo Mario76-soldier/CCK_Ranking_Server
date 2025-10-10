@@ -12,14 +12,14 @@ import lombok.Setter;
 @AllArgsConstructor
 public class RecordRequestDTO {
     private Integer pdx;
-    private String email;
+    private String cckId;
     private Integer round;
     private String roundGroup;
     public Record toEntity(AccountRepository accountRepository, RoundRepository roundRepository){
         return Record
                 .builder()
                 .pdx(pdx)
-                .account(accountRepository.findByEmail(email).orElseThrow(null))
+                .account(accountRepository.findByCckId(cckId).orElseThrow(null))
                 .round(roundRepository.findByIdx(round))
                 .roundGroup(roundGroup)
                 .build();

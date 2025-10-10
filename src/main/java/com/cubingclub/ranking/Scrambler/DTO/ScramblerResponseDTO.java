@@ -1,5 +1,6 @@
 package com.cubingclub.ranking.Scrambler.DTO;
 
+import com.cubingclub.ranking.Account.DTO.MaskedAccountDTO;
 import com.cubingclub.ranking.Account.Entity.Account;
 import com.cubingclub.ranking.Round.DTO.RoundDTO;
 import com.cubingclub.ranking.Round.Entity.Round;
@@ -16,7 +17,7 @@ import lombok.Setter;
 public class ScramblerResponseDTO {
     private Integer idx;
     private Integer attemptIdx;
-    private Account account;
+    private MaskedAccountDTO account;
     private RoundDTO round;
     private String roundGroup;
     private String seq;

@@ -14,15 +14,15 @@
             </div>
             <h2>로그인</h2>
             <div th:if="${param.error}" class="alert error">
-                이메일 또는 비밀번호가 올바르지 않습니다.
+                이메일/CCK ID 또는 비밀번호가 올바르지 않습니다.
             </div>
             <div th:if="${param.logout}" class="alert success">
                 로그아웃 되었습니다.
             </div>
             <form th:action="@{/login}" method="post">
                 <div class="input-group">
-                    <input type="email" name="username" placeholder=" ">
-                    <label>이메일</label>
+                    <input type="text" name="username" placeholder=" ">
+                    <label>이메일/CCK ID</label>
                 </div>
                 <div class="input-group password">
                     <input type="password" name="password" placeholder=" " id="password">

@@ -1,5 +1,6 @@
 package com.cubingclub.ranking.CubeEvent.Controller;
 
+import com.cubingclub.ranking.CubeEvent.DTO.CubeEventDTO;
 import com.cubingclub.ranking.CubeEvent.Service.CubeEventService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -15,5 +16,9 @@ public class CubeEventController {
     @GetMapping("/event")
     public ResponseEntity<?> EventList(){
         return ResponseEntity.ok(cubeEventService.getCubeEvent());
+    }
+    @PostMapping("/event")
+    public ResponseEntity<?> AdjustEvent(@RequestBody CubeEventDTO cubeEventDTO){
+        return ResponseEntity.ok(cubeEventService.setCubeEvent(cubeEventDTO));
     }
 }

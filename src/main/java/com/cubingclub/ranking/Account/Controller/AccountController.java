@@ -1,5 +1,6 @@
 package com.cubingclub.ranking.Account.Controller;
 
+import com.cubingclub.ranking.Account.DTO.AccountDTO;
 import com.cubingclub.ranking.Account.DTO.AccountJoinDTO;
 import com.cubingclub.ranking.Account.DTO.AccountEditDTO;
 import com.cubingclub.ranking.Account.Entity.Account;
@@ -11,11 +12,17 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
+
+import java.util.Collection;
+import java.util.List;
 
 @Slf4j
 @RestController
@@ -78,7 +85,7 @@ public class AccountController {
     public ResponseEntity<?> Edit(@RequestBody AccountEditDTO accountEditDTO){
         try {
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-            accountEditDTO.setEmail(authentication.getName());
+            accountEditDTO.setCckId(authentication.getName());
             if(accountService.updateUser(accountEditDTO)==0) {
                 return ResponseEntity.ok().build();
             }
@@ -94,7 +101,18 @@ public class AccountController {
     public ResponseEntity<?> Info(){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         try{
-            return ResponseEntity.ok(accountService.getAccountInfo(authentication.getName()));
+            AccountDTO accountDTO=accountService.getAccountInfoWithCCKId(authentication.getName());
+            //List<String> scopes = jwt.getClaimAsStringList("scope");
+            //if(!scopes.contains("profile")){
+            //    return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+            //}
+            //if(!scopes.contains("email")){
+            //    accountDTO.setEmail(null);
+            //}
+            //if(!scopes.contains("phone")){
+            //    accountDTO.setPhoneNum(null);
+            //}
+            return ResponseEntity.ok(accountDTO);
         }
         catch(Exception e){
             return ResponseEntity.badRequest().body(e);

@@ -6,8 +6,11 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.security.oauth2.core.oidc.OidcScopes;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
@@ -39,6 +42,9 @@ public class OAuthClient {
     private String redirectUri;
     @Column
     private String postLogoutRedirectUri;
+    @Builder.Default
+    @OneToMany(mappedBy = "oAuthClient", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
+    private List<OAuthScopes> scopes = new ArrayList<>();
     @Column
     private boolean requireAuthorizationConsent;
     @Enumerated(EnumType.STRING)

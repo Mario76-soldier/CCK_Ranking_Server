@@ -2,6 +2,7 @@ package com.cubingclub.ranking.Config;
 
 import com.cubingclub.ranking.OAuthClient.DTO.OAuthClientRequestDTO;
 import com.cubingclub.ranking.OAuthClient.Entity.ClientType;
+import com.cubingclub.ranking.OAuthClient.Entity.OAuthScopes;
 import com.cubingclub.ranking.OAuthClient.Repository.OAuthClientRepository;
 import com.cubingclub.ranking.OAuthClient.Service.OAuthClientService;
 import com.cubingclub.ranking.RsaKeys.Repository.RsaKeysRepository;
@@ -10,6 +11,9 @@ import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Component
 @RequiredArgsConstructor
@@ -46,7 +50,8 @@ public class RsaKeysInitializer {
             rankingRequest.setPostLogoutRedirectUri("https://ranking.cubingclub.com");
             rankingRequest.setRequireAuthorizationConsent(true);
             rankingRequest.setClientType(ClientType.NORMAL);
-            oAuthClientService.saveOAuthClient(rankingRequest, "cubingclubkorea@gmail.com");
+            rankingRequest.setScopes(List.of("openid", "profile", "email")); // 한 번에 scope 설정
+            oAuthClientService.saveOAuthClient(rankingRequest, "5d000a56-7eac-11f0-ae2c-0242ac120002");
             oAuthClientService.updateSecretDefault(clientId, clientSecret, 365);
             System.out.println("✅ OAuth Client created: " + clientId);
         }
@@ -60,7 +65,7 @@ public class RsaKeysInitializer {
             recorderRequest.setPostLogoutRedirectUri("");
             recorderRequest.setRequireAuthorizationConsent(true);
             recorderRequest.setClientType(ClientType.IOT);
-            oAuthClientService.saveOAuthClient(recorderRequest, "cubingclubkorea@gmail.com");
+            oAuthClientService.saveOAuthClient(recorderRequest, "5d000a56-7eac-11f0-ae2c-0242ac120002");
             oAuthClientService.updateSecretDefault(clientId, clientSecret, 365);
             System.out.println("✅ OAuth Client created: " + clientId);
         }

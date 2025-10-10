@@ -41,7 +41,7 @@ public class AdminController {
     @PostMapping("/role")
     public ResponseEntity<?> ChangeRole(@RequestBody RoleUpdateDTO roleUpdateDTO){
         Authentication authentication= SecurityContextHolder.getContext().getAuthentication();
-        UserRole myPosition=accountService.getUserRole(authentication.getName());
+        UserRole myPosition=accountService.getUserRoleWithCCKId(authentication.getName());
         UserRole targetPosition=accountService.getUserRole(roleUpdateDTO.getEmail());
         if (myPosition == UserRole.CUSTOMER || myPosition == UserRole.ADMIN || roleUpdateDTO.getPosition() == UserRole.ROOT) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();

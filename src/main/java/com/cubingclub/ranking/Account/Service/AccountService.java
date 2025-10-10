@@ -6,6 +6,7 @@ import com.cubingclub.ranking.Account.Entity.UserRole;
 import com.cubingclub.ranking.Account.Repository.AccountRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -16,6 +17,7 @@ import java.util.Optional;
 @Service
 @RequiredArgsConstructor
 @Transactional
+@Slf4j
 public class AccountService {
     private final AccountRepository accountRepository;
     private final BCryptPasswordEncoder encoder;
@@ -23,8 +25,9 @@ public class AccountService {
     public String generateCckId(String enName) {
         String cckIdMid = reorderAndUpperFirst4(enName);
         String cckIdFront = "CCK" + getYearSuffix() + cckIdMid;
-        long count = accountRepository.countByCckIdStartingWith(cckIdFront);
-        String countStr = String.format("%02d", count + 1);
+        int backNum=accountRepository.findBiggestNum(cckIdFront).orElse(0);
+        log.info(String.valueOf(backNum));
+        String countStr = String.format("%02d", backNum + 1);
 
         return cckIdFront + countStr;
     }
@@ -60,8 +63,11 @@ public class AccountService {
     public UserRole getUserRole(String email){
         return accountRepository.findByEmail(email).get().getPosition();
     }
+    public UserRole getUserRoleWithCCKId(String cckId){
+        return accountRepository.findByCckId(cckId).get().getPosition();
+    }
     public int updateUser(AccountEditDTO accountEditDTO){
-        Optional<Account> account=accountRepository.findByEmail(accountEditDTO.getEmail());
+        Optional<Account> account=accountRepository.findByCckId(accountEditDTO.getCckId());
         if(account.isEmpty()){
             return -1;
         }
@@ -69,12 +75,12 @@ public class AccountService {
             return -1;
         }
         if(accountEditDTO.getNewPassword()==null){
-            accountRepository.updateAccountInfo(accountEditDTO.getState(), accountEditDTO.getEmail());
+            accountRepository.updateAccountInfo(accountEditDTO.getState(), accountEditDTO.getCckId());
             return 0;
         }
         else{
             if(accountEditDTO.getNewPassword().equals(accountEditDTO.getNewPasswordCheck())) {
-                accountRepository.updateAccountPassword(encoder.encode(accountEditDTO.getNewPassword()), accountEditDTO.getEmail());
+                accountRepository.updateAccountPassword(encoder.encode(accountEditDTO.getNewPassword()), accountEditDTO.getCckId());
                 return 0;
             }
             else{
@@ -85,10 +91,17 @@ public class AccountService {
     public AccountDTO getAccountInfo(String email){
         return new AccountDTO(accountRepository.findByEmail(email).get());
     }
+    public AccountDTO getAccountInfoWithCCKId(String cckId){
+        return new AccountDTO(accountRepository.findByCckId(cckId).get());
+    }
+    public MaskedAccountDTO getMaskedAccountInfoWithCCKId(String cckId){
+        return new MaskedAccountDTO(accountRepository.findByCckId(cckId).get());
+    }
 
     public boolean updatePassword(String email, String password){
         if(accountRepository.existsByEmail(email)){
-            accountRepository.updateAccountPassword(encoder.encode(password), email);
+            String cckId=accountRepository.findByEmail(email).orElseThrow().getCckId();
+            accountRepository.updateAccountPassword(encoder.encode(password), cckId);
             return true;
         }
         return false;
