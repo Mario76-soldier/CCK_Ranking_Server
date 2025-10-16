@@ -49,4 +49,6 @@ public class Record {
     private BestType singleBestType;
     @Column
     private BestType averageBestType;
+    @Column
+    private String note;
 }

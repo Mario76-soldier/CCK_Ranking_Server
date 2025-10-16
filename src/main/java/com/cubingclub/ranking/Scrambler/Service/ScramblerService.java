@@ -187,11 +187,6 @@ public class ScramblerService {
                 count=1;
             }
         }
-        log.info(puzzleId);
-        log.info(body.toString());
-        if(puzzleId==null || body==null){
-            return;
-        }
         ScramblerDTO scramblerDTO = new ScramblerDTO();
         scramblerDTO.setRound(round);
         String svg;
@@ -200,38 +195,45 @@ public class ScramblerService {
                 continue;
             }
             scramblerDTO.setRoundGroup(group);
-
-            for (int i = 1; i <= count; i++) {
-                JsonNode response = webClient.post()
-                        .uri("/frontend/puzzle/" + puzzleId + "/scramble")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .bodyValue(body)
-                        .retrieve()
-                        .bodyToMono(JsonNode.class)
-                        .block();
-                scramblerDTO.setSeq(String.valueOf(i));
-                scramblerDTO.setScramble(response.get("scramble").asText());
-                svg=response.get("svgImage").asText();
-                svg = svg.replaceFirst("<svg([^>]*)\\swidth=\"[^\"]+\"", "<svg$1");
-                svg = svg.replaceFirst("<svg([^>]*)\\sheight=\"[^\"]+\"", "<svg$1");
-                scramblerDTO.setSvg(svg);
-                scramblerRepository.save(scramblerDTO.toEntity());
+            if(puzzleId==null || body==null){
+                for (int i = 1; i <= count; i++) {
+                    scramblerDTO.setSeq(String.valueOf(i));
+                    scramblerRepository.save(scramblerDTO.toEntity());
+                }
             }
-            for (int i = 1; i <= 2; i++) {
-                JsonNode response = webClient.post()
-                        .uri("/frontend/puzzle/" + puzzleId + "/scramble")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .bodyValue(body)
-                        .retrieve()
-                        .bodyToMono(JsonNode.class)
-                        .block();
-                scramblerDTO.setSeq("ex"+i);
-                scramblerDTO.setScramble(response.get("scramble").asText());
-                svg=response.get("svgImage").asText();
-                svg = svg.replaceFirst("<svg([^>]*)\\swidth=\"[^\"]+\"", "<svg$1");
-                svg = svg.replaceFirst("<svg([^>]*)\\sheight=\"[^\"]+\"", "<svg$1");
-                scramblerDTO.setSvg(svg);
-                scramblerRepository.save(scramblerDTO.toEntity());
+            else {
+                for (int i = 1; i <= count; i++) {
+                    JsonNode response = webClient.post()
+                            .uri("/frontend/puzzle/" + puzzleId + "/scramble")
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .bodyValue(body)
+                            .retrieve()
+                            .bodyToMono(JsonNode.class)
+                            .block();
+
+                    scramblerDTO.setScramble(response.get("scramble").asText());
+                    svg = response.get("svgImage").asText();
+                    svg = svg.replaceFirst("<svg([^>]*)\\swidth=\"[^\"]+\"", "<svg$1");
+                    svg = svg.replaceFirst("<svg([^>]*)\\sheight=\"[^\"]+\"", "<svg$1");
+                    scramblerDTO.setSvg(svg);
+                    scramblerRepository.save(scramblerDTO.toEntity());
+                }
+                for (int i = 1; i <= 2; i++) {
+                    JsonNode response = webClient.post()
+                            .uri("/frontend/puzzle/" + puzzleId + "/scramble")
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .bodyValue(body)
+                            .retrieve()
+                            .bodyToMono(JsonNode.class)
+                            .block();
+                    scramblerDTO.setSeq("ex" + i);
+                    scramblerDTO.setScramble(response.get("scramble").asText());
+                    svg = response.get("svgImage").asText();
+                    svg = svg.replaceFirst("<svg([^>]*)\\swidth=\"[^\"]+\"", "<svg$1");
+                    svg = svg.replaceFirst("<svg([^>]*)\\sheight=\"[^\"]+\"", "<svg$1");
+                    scramblerDTO.setSvg(svg);
+                    scramblerRepository.save(scramblerDTO.toEntity());
+                }
             }
         }
     }
