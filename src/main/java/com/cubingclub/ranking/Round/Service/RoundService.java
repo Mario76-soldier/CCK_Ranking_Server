@@ -39,7 +39,7 @@ public class RoundService {
             Round round;
             if (createRoundDTO.getIdx() != null) { // Update
                 round = roundRepository.findByIdx(createRoundDTO.getIdx());
-                round.update(createRoundDTO, cubeEventRepository, roundGroupRepository);
+                round.update(createRoundDTO, cubeEventRepository);
                 list.add(round.getIdx());
                 scramblerService.saveScramble(round.getIdx(), createRoundDTO.getGroupList());
             } else { // Create

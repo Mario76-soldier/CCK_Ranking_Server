@@ -13,6 +13,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -40,6 +41,10 @@ public class Round {
     private LocalDateTime eventEnd;
     @OneToMany(mappedBy = "round", cascade = CascadeType.ALL)
     private List<RoundGroup> roundGroup;
+    @Column(precision = 10, scale=2)
+    private BigDecimal cutoff;
+    @Column(precision = 10, scale=2)
+    private BigDecimal timeLimit;
     @Column
     private Integer advance;
     @OneToMany(mappedBy = "round", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
@@ -49,7 +54,9 @@ public class Round {
     @JsonIgnore
     private List<Scrambler> scramblers = new ArrayList<>();
     @Builder
-    public Round(Integer Idx, Competition Comp, CubeEvent cubeEvent, String RoundName, LocalDateTime EventStart, LocalDateTime EventEnd, List<RoundGroup> roundGroup, Integer Advance){
+    public Round(Integer Idx, Competition Comp, CubeEvent cubeEvent, String RoundName,
+                 LocalDateTime EventStart, LocalDateTime EventEnd, List<RoundGroup> roundGroup,
+                 BigDecimal cutoff, BigDecimal timeLimit, Integer Advance){
         this.idx=Idx;
         this.comp=Comp;
         this.cubeEvent=cubeEvent;
@@ -57,14 +64,18 @@ public class Round {
         this.eventStart=EventStart;
         this.eventEnd=EventEnd;
         this.roundGroup=roundGroup;
+        this.cutoff=cutoff;
+        this.timeLimit=timeLimit;
         this.advance=Advance;
     }
-    public void update(CreateRoundDTO createRoundDTO, CubeEventRepository cubeEventRepository, RoundGroupRepository roundGroupRepository) {
+    public void update(CreateRoundDTO createRoundDTO, CubeEventRepository cubeEventRepository) {
         // competition은 절대 건드리지 않음
         this.cubeEvent = cubeEventRepository.findByEventName(createRoundDTO.getCubeEvent());
         this.roundName = createRoundDTO.getRoundName();
         this.eventStart = createRoundDTO.getEventStart();
         this.eventEnd = createRoundDTO.getEventEnd();
+        this.cutoff=createRoundDTO.getCutoff();
+        this.timeLimit=createRoundDTO.getTimeLimit();
         this.advance = createRoundDTO.getAdvance();
 
         // RoundGroup 처리

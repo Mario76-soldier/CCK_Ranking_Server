@@ -72,14 +72,47 @@ public class RecordService {
         return null;
     }
     public void updateRecord(ParticipateRecordDTO p) {
-        Record record=recordRepository.findByIdx(p.getIdx());
-        List<Attempt> attemptList=record.getAttempts();
-        for(int i=0; i<attemptList.size(); i++){
-            AttemptDTO attemptDTO=new AttemptDTO(attemptList.get(i));
-            attemptDTO.setTime(p.getTimes().get(i));
+        Record record = recordRepository.findByIdx(p.getIdx());
+        List<Attempt> attemptList = record.getAttempts();
+        int attemptCount = attemptList.size();
+        BigDecimal timeLimit = record.getRound().getTimeLimit();
+        BigDecimal cutoff = record.getRound().getCutoff();
+        boolean isCut = false;
+        int cutoffFailCount = 0;
+        // 컷오프 기준 시도 인덱스 계산
+        int cutoffIndex = -1;
+        if (cutoff != null) {
+            if (attemptCount == 3) cutoffIndex = 0; // 1번째 시도
+            else if (attemptCount >= 5) cutoffIndex = 1; // 2번째 시도
+        }
+
+        for (int i = 0; i < attemptCount; i++) {
+            AttemptDTO attemptDTO = new AttemptDTO(attemptList.get(i));
+            BigDecimal time = p.getTimes().get(i);
+
+            // 이미 컷오프가 발동된 경우 → 이후 시도 모두 DNS 처리
+            if (isCut) {
+                attemptDTO.setTime(DNS);
+            }
+            // 타임리밋 초과 → DNF 처리
+            else if (timeLimit != null && time.compareTo(timeLimit) > 0) {
+                attemptDTO.setTime(DNF);
+            }
+            // 컷오프 조건 확인
+            else {
+                attemptDTO.setTime(time);
+                if (cutoff != null && i <= cutoffIndex && time.compareTo(cutoff) > 0) {
+                    cutoffFailCount++;
+                    // 컷오프가 5시도 기준이라면 2회 모두 초과해야 발동
+                    if (attemptCount == 3 || cutoffFailCount >= 2) {
+                        isCut = true;
+                    }
+                }
+            }
+
             attemptRepository.save(attemptDTO.toEntity(recordRepository, accountRepository));
         }
-        record=recordRepository.findByIdx(p.getIdx());
+        record = recordRepository.findByIdx(p.getIdx());
         applyRecordUpdate(record);
     }
 
@@ -212,6 +245,8 @@ public class RecordService {
                 else{
                     recordDTO.setAverage(BigDecimal.ZERO);
                     recordDTO.setSingle(BigDecimal.ZERO);
+                    recordDTO.setSingleBestType(null);
+                    recordDTO.setAverageBestType(null);
                     recordDTO.setRanking(null);
                 }
             }
@@ -223,15 +258,20 @@ public class RecordService {
                 else{
                     recordDTO.setAverage(BigDecimal.ZERO);
                     recordDTO.setSingle(BigDecimal.ZERO);
+                    recordDTO.setSingleBestType(null);
+                    recordDTO.setAverageBestType(null);
                     recordDTO.setRanking(null);
                 }
             }
             case "bo" -> {
                 if(attemptList.size()==Integer.parseInt(calcType.substring(2)) && !isZero) {
                     recordDTO.setSingle(calculateSingle(times));
+                    recordDTO.setAverage(calculateSingle(times));
                 }
                 else{
                     recordDTO.setSingle(BigDecimal.ZERO);
+                    recordDTO.setSingleBestType(null);
+                    recordDTO.setAverageBestType(null);
                     recordDTO.setRanking(null);
                 }
             }
@@ -242,6 +282,8 @@ public class RecordService {
                 }
                 else{
                     recordDTO.setSingle(BigDecimal.ZERO);
+                    recordDTO.setSingleBestType(null);
+                    recordDTO.setAverageBestType(null);
                     recordDTO.setRanking(null);
                 }
             }
@@ -292,15 +334,18 @@ public class RecordService {
             advanceParticipate.setRound(roundRepository.findByIdx(advanceRoundIdx));
             advanceList.add(advanceParticipate.toEntity(accountRepository));
         }
-        return recordRepository.saveAll(advanceList).size();
+        return addAttempts(recordRepository.saveAll(advanceList));
     }
 
     public Integer addParticipate(List<RecordRequestDTO> participates) {
         List<Record> recordList =new ArrayList<>();
-        for(RecordRequestDTO recordRequestDTO :participates){
+        for(RecordRequestDTO recordRequestDTO:participates){
             recordList.add(recordRequestDTO.toEntity(accountRepository, roundRepository));
         }
-        List<Record> records=recordRepository.saveAll(recordList);
+        return addAttempts(recordRepository.saveAll(recordList));
+    }
+
+    public Integer addAttempts(List<Record> records){
         for(Record record:records){
             if (record.getRound().getCubeEvent().getAvgCalc().equals("single")) {
                 attemptRepository.save(new AttemptDTO(record, 1).toInitialEntity(recordRepository));

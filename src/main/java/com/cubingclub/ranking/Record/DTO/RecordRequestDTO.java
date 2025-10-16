@@ -15,6 +15,7 @@ public class RecordRequestDTO {
     private String cckId;
     private Integer round;
     private String roundGroup;
+    private String note;
     public Record toEntity(AccountRepository accountRepository, RoundRepository roundRepository){
         return Record
                 .builder()
@@ -22,6 +23,7 @@ public class RecordRequestDTO {
                 .account(accountRepository.findByCckId(cckId).orElseThrow(null))
                 .round(roundRepository.findByIdx(round))
                 .roundGroup(roundGroup)
+                .note(note)
                 .build();
     }
 }
