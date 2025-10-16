@@ -44,7 +44,7 @@ public class ScheduleService {
             if(schedulePartDTO.getIdx()==null){
                 scheduleRepository.save(scheduleCreateDTO.toCreateEntity());
                 if(scheduleCreateDTO.getPlayType().equals(PlayType.PLAYER)){
-                    RecordRequestDTO recordRequestDTO=new RecordRequestDTO(0,scheduleCreateDTO.getAccount().getEmail(), schedulePartDTO.getRoundIdx(), schedulePartDTO.getGroupName());
+                    RecordRequestDTO recordRequestDTO=new RecordRequestDTO(0,scheduleCreateDTO.getAccount().getEmail(), schedulePartDTO.getRoundIdx(), schedulePartDTO.getGroupName(), null);
                     recordRequestDTOList.add(recordRequestDTO);
                 }
             }

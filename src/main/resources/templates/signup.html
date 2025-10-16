@@ -20,9 +20,15 @@
             <label>이름</label>
         </div>
 
-        <div class="input-group">
-            <input type="text" placeholder=" " id="enName">
-            <label>영어이름</label>
+        <div class="input-row">
+            <div class="input-group">
+                <input type="text" placeholder=" " id="enFirstName">
+                <label>영어 성</label>
+            </div>
+            <div class="input-group">
+                <input type="text" placeholder=" " id="enLastName">
+                <label>영어 이름</label>
+            </div>
         </div>
 
         <div class="input-group">
@@ -204,13 +210,15 @@
         // 입력값 가져오기
         const email = document.getElementById('email').value.trim();
         const name = document.getElementById('name').value.trim();
-        const enName = document.getElementById('enName').value.trim();
+        const enFirstName = document.getElementById('enFirstName').value.replace(/\s+/g, '');
+        const enLastName = document.getElementById('enLastName').value.replace(/\s+/g, '');
         const password = document.getElementById('password').value;
         const passwordCheck = document.getElementById('passwordCheck').value;
         const birthDate = document.getElementById('birthdate').value;
         const state = document.getElementById('region').value;
         const gender = document.getElementById('gender').value;
         const authNum = document.getElementById('verifyCode').value.trim();
+        const enName=`${enLastName} ${enFirstName}`.trim();
         // 요청 바디 생성
         const data = {
             email,

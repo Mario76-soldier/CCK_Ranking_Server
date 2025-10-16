@@ -68,8 +68,8 @@ public interface RecordRepository extends JpaRepository<Record, Integer> {
     @Query("SELECT r FROM Record r WHERE r.idx = :idx")
     Record findByIdx(Integer idx);
     void deleteByIdx(Integer idx);
-    @Query("SELECT r.idx, COUNT(*) FROM Record p JOIN p.round r GROUP BY r.idx")
-    List<Object[]> findAllRoundParticipantCounts();
+    //@Query("SELECT r.idx, COUNT(*) FROM Record p JOIN p.round r GROUP BY r.idx")
+    //List<Object[]> findAllRoundParticipantCounts();
     //@Query("select count(p.idx) from Record p join fetch Scrambler r where p.round.idx=:roundIdx and p.email.")
     //Integer countParticipateByRoundState(@Param(value="roundIdx")Integer roundIdx);
 }

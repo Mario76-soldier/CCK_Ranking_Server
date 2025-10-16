@@ -33,6 +33,7 @@ public class RecordDTO {
     private Integer stateRanking;
     private BestType singleBestType;
     private BestType averageBestType;
+    private String note;
     public RecordDTO(Record entity){
         this.idx=entity.getIdx();
         this.pdx=entity.getPdx();
@@ -49,12 +50,14 @@ public class RecordDTO {
         this.stateRanking=entity.getStateRanking();
         this.singleBestType=entity.getSingleBestType();
         this.averageBestType=entity.getAverageBestType();
+        this.note=entity.getNote();
     }
-    public RecordDTO(Account account, Integer pdx, Round round, String roundGroup) {
+    public RecordDTO(Account account, Integer pdx, Round round, String roundGroup, String note) {
         this.account=new MaskedAccountDTO(account);
         this.pdx=pdx;
         this.round=round;
         this.roundGroup=roundGroup;
+        this.note=note;
     }
     public Record toEntity(AccountRepository accountRepository){
         return Record.builder()
@@ -62,6 +65,7 @@ public class RecordDTO {
                 .account(accountRepository.findByCckId(account.getCckId()).orElse(null))
                 .round(round)
                 .roundGroup(roundGroup)
+                .note(note)
                 .build();
     }
     public Record toEntityFull(AccountRepository accountRepository, List<Attempt> attempts) {
@@ -78,6 +82,7 @@ public class RecordDTO {
                 .stateRanking(stateRanking)
                 .singleBestType(singleBestType)
                 .averageBestType(averageBestType)
+                .note(note)
                 .build();
     }
 
