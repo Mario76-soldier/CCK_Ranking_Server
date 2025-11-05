@@ -1,15 +1,18 @@
 package com.cubingclub.ranking.Competition.Service;
 
 import com.cubingclub.ranking.Account.Repository.AccountRepository;
+import com.cubingclub.ranking.Competition.DTO.CompetitionCreateDTO;
 import com.cubingclub.ranking.Competition.DTO.CompetitionDTO;
 import com.cubingclub.ranking.Competition.DTO.CompetitorDTO;
+import com.cubingclub.ranking.Competition.DTO.EventFeeDTO;
 import com.cubingclub.ranking.Competition.Entity.Competitor;
+import com.cubingclub.ranking.Competition.Entity.EventFee;
 import com.cubingclub.ranking.Competition.Repository.CompetitionRepository;
 import com.cubingclub.ranking.Competition.Entity.Competition;
 import com.cubingclub.ranking.Competition.Repository.CompetitorRepository;
-import com.cubingclub.ranking.Record.Repository.RecordRepository;
+import com.cubingclub.ranking.CubeEvent.Entity.CubeEvent;
+import com.cubingclub.ranking.CubeEvent.Repository.CubeEventRepository;
 import com.cubingclub.ranking.RFID.Repository.RFIDRepository;
-import com.cubingclub.ranking.Round.Repository.RoundRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -30,14 +33,30 @@ public class CompetitionService {
     private final AccountRepository accountRepository;
     private final CompetitionRepository competitionRepository;
     private final CompetitorRepository competitorRepository;
+    private final CubeEventRepository cubeEventRepository;
     private final RFIDRepository rfidRepository;
-    public Integer create(CompetitionDTO comp){
-        if(comp.getIdx()!=null){
-            Competition competition=competitionRepository.findByIdx(comp.getIdx());
-            competition.update(comp);
-            return comp.getIdx();
+    public Integer create(CompetitionCreateDTO compDTO) {
+        Competition competition;
+
+        if (compDTO.getIdx() != null) {
+            competition = competitionRepository.findByIdx(compDTO.getIdx());
+            competition.update(compDTO);
+            competition.getEventFees().clear();
+        } else {
+            compDTO.setCreatedAt(LocalDateTime.now());
+            compDTO.setUpdatedAt(LocalDateTime.now());
+            competition = compDTO.toEntity();
         }
-        return competitionRepository.save(comp.toEntity()).getIdx();
+
+        if (compDTO.getEventFeeList() != null) {
+            for (EventFeeDTO feeDTO : compDTO.getEventFeeList()) {
+                CubeEvent cubeEvent = cubeEventRepository.findByEventName(feeDTO.getEventName());
+                EventFee feeEntity = feeDTO.toEntity(competition, cubeEvent);
+                competition.getEventFees().add(feeEntity);
+            }
+        }
+
+        return competitionRepository.save(competition).getIdx();
     }
     public CompetitionDTO getOne(Integer idx){
         return new CompetitionDTO(competitionRepository.findByIdx(idx));
@@ -70,14 +89,6 @@ public class CompetitionService {
         for(Competition c : list){
             listDTO.add(new CompetitionDTO(c));
 
-        }
-        return listDTO;
-    }
-    public List<CompetitionDTO> getListJoin(LocalDateTime date){
-        List<Competition> list=competitionRepository.findByJoinDateEndAfterAndJoinDateStartBefore(date, date);
-        List<CompetitionDTO> listDTO=new ArrayList<>();
-        for (Competition join:list) {
-            listDTO.add(new CompetitionDTO(join));
         }
         return listDTO;
     }

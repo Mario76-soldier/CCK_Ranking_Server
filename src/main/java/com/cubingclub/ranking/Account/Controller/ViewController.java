@@ -25,6 +25,8 @@ public class ViewController {
     public String joinPage(){ return "signup"; }
     @GetMapping("/password-reset")
     public String passwordPage(){ return "password"; }
+    @GetMapping("/notice")
+    public String noticePage(){ return "notice"; }
     @GetMapping("/consent")
     public String consent(Principal principal, Model model,
                           @RequestParam("client_id") String clientId,

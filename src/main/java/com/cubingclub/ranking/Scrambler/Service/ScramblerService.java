@@ -215,6 +215,7 @@ public class ScramblerService {
                     svg = response.get("svgImage").asText();
                     svg = svg.replaceFirst("<svg([^>]*)\\swidth=\"[^\"]+\"", "<svg$1");
                     svg = svg.replaceFirst("<svg([^>]*)\\sheight=\"[^\"]+\"", "<svg$1");
+                    scramblerDTO.setSeq(String.valueOf(i));
                     scramblerDTO.setSvg(svg);
                     scramblerRepository.save(scramblerDTO.toEntity());
                 }

@@ -1,5 +1,6 @@
 package com.cubingclub.ranking.Competition.Controller;
 
+import com.cubingclub.ranking.Competition.DTO.CompetitionCreateDTO;
 import com.cubingclub.ranking.Competition.DTO.CompetitionDTO;
 import com.cubingclub.ranking.Competition.DTO.CompetitorDTO;
 import com.cubingclub.ranking.Competition.Service.CompetitionService;
@@ -28,7 +29,7 @@ public class CompetitionController {
         return ResponseEntity.ok(competitionService.getOne(compIdx));
     }
     @PostMapping("/comp")
-    public ResponseEntity<Integer> MakeComp(@RequestBody CompetitionDTO compList){
+    public ResponseEntity<Integer> MakeComp(@RequestBody CompetitionCreateDTO compList){
         return ResponseEntity.ok(competitionService.create(compList));
     }
     @DeleteMapping("/comp/{compIdx}")

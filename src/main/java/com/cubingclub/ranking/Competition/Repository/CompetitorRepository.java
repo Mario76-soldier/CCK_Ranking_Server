@@ -13,6 +13,4 @@ public interface CompetitorRepository extends JpaRepository<Competitor, Integer>
     List<Competitor> findByCompetition_Idx(Integer compIdx);
     Competitor findByCompetition_IdxAndAccount_email(Integer compIdx, String email);
     Competitor findByIdx(Integer idx);
-    void deleteByIdx(Integer idx);
-
 }
