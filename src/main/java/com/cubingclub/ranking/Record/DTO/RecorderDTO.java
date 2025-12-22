@@ -9,6 +9,6 @@ import java.math.BigDecimal;
 @Setter
 public class RecorderDTO {
     Integer attemptIdx;
-    String judgeEmail;
+    String judgeCckId;
     BigDecimal record;
 }

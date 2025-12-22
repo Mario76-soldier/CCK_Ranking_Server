@@ -1,7 +1,7 @@
 package com.cubingclub.ranking.Scrambler.Controller;
 
-import com.cubingclub.ranking.Account.DTO.AccountDTO;
-import com.cubingclub.ranking.RFID.Service.RFIDService;
+import com.cubingclub.ranking.Auth.DTO.JudgeInfo;
+import com.cubingclub.ranking.Auth.Service.AuthService;
 import com.cubingclub.ranking.Scrambler.DTO.ScramblerDTO;
 import com.cubingclub.ranking.Scrambler.DTO.ScramblerResponseDTO;
 import com.cubingclub.ranking.Scrambler.DTO.ScramblerUpdateDTO;
@@ -21,11 +21,12 @@ import java.util.Map;
 @RequestMapping("/api")
 public class ScramblerController {
     private final ScramblerService scramblerService;
-    private final RFIDService rfidService;
+    private final AuthService authService;
     @GetMapping("/scramble/check/{uid}")
-    public ResponseEntity<AccountDTO> GetAccountInfo(@PathVariable(name="uid")String uid){
-        AccountDTO accountDTO=rfidService.getAccountInfo(uid);
-        if(accountDTO==null){
+    public ResponseEntity<JudgeInfo> GetAccountInfo(@PathVariable(name="uid")String uid, @RequestHeader("Authorization")String authHeader){
+        String token = authHeader.substring(7);
+        JudgeInfo judgeInfo=authService.getRFIDInfo(token, uid).orElse(null);
+        if(judgeInfo==null){
             return ResponseEntity.noContent().build();
         }
         return ResponseEntity.ok().build();
@@ -35,12 +36,13 @@ public class ScramblerController {
         return ResponseEntity.ok(scramblerService.getScrambleList(roundIdx));
     }
     @PostMapping("/scrambler")
-    public ResponseEntity<?> SetScrambler(@RequestBody ScramblerUpdateDTO scramblerUpdateDTO){
-        ScramblerResponseDTO scramblerDTO=scramblerService.getScramble(scramblerUpdateDTO.getCompIdx(), scramblerUpdateDTO.getPlayerUid());
+    public ResponseEntity<?> SetScrambler(@RequestBody ScramblerUpdateDTO scramblerUpdateDTO, @RequestHeader("Authorization")String authHeader){
+        String token = authHeader.substring(7);
+        ScramblerResponseDTO scramblerDTO=scramblerService.getScramble(scramblerUpdateDTO.getCompIdx(), scramblerUpdateDTO.getPlayerUid(), token);
         if(scramblerDTO==null){
             return ResponseEntity.noContent().build();
         }
-        int code=scramblerService.updateScrambler(scramblerDTO.getAttemptIdx(), scramblerUpdateDTO.getScramblerUid());
+        int code=scramblerService.updateScrambler(scramblerDTO.getAttemptIdx(), scramblerUpdateDTO.getScramblerUid(), token);
         if(code==-1){
             return ResponseEntity.noContent().build();
         }

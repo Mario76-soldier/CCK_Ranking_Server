@@ -1,6 +1,5 @@
 package com.cubingclub.ranking.CubeEvent.Controller;
 
-import com.cubingclub.ranking.CubeEvent.DTO.CubeEventDTO;
 import com.cubingclub.ranking.CubeEvent.Entity.ColorType;
 import com.cubingclub.ranking.CubeEvent.Entity.CubeEvent;
 import com.cubingclub.ranking.CubeEvent.Service.CubeEventService;

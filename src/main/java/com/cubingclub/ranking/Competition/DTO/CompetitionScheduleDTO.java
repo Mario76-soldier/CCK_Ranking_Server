@@ -1,6 +1,7 @@
 package com.cubingclub.ranking.Competition.DTO;
 
 
+import com.cubingclub.ranking.Competition.Entity.Competition;
 import com.cubingclub.ranking.Round.DTO.RoundScheduleDTO;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -18,4 +19,10 @@ public class CompetitionScheduleDTO {
     private LocalDate compDateStart;
     private LocalDate compDateEnd;
     private List<RoundScheduleDTO> roundSchedules;
+    public CompetitionScheduleDTO(Competition entity){
+        this.idx=entity.getIdx();
+        this.compName=entity.getCompName();
+        this.compDateStart=entity.getCompDateStart();
+        this.compDateEnd=entity.getCompDateEnd();
+    }
 }

@@ -21,6 +21,7 @@ public class CompetitionDTO {
     private LocalDateTime joinDateStart;
     private LocalDateTime joinDateEnd;
     private Integer baseFee;
+    private String location;
     private Integer maxParticipate;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
@@ -33,6 +34,7 @@ public class CompetitionDTO {
         this.joinDateStart=entity.getJoinDateStart();
         this.joinDateEnd=entity.getJoinDateEnd();
         this.baseFee=entity.getBaseFee();
+        this.location=entity.getLocation();
         this.maxParticipate=entity.getMaxParticipate();
         this.createdAt=entity.getCreatedAt();
         this.updatedAt=entity.getUpdatedAt();
@@ -46,6 +48,7 @@ public class CompetitionDTO {
                 .JoinDateStart(joinDateStart)
                 .JoinDateEnd(joinDateEnd)
                 .baseFee(baseFee)
+                .location(location)
                 .MaxParticipate(maxParticipate)
                 .createdAt(createdAt)
                 .updatedAt(updatedAt)

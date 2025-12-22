@@ -21,6 +21,7 @@ public class CompetitionCreateDTO {
     private LocalDateTime joinDateStart;
     private LocalDateTime joinDateEnd;
     private Integer baseFee;
+    private String location;
     private Integer maxParticipate;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
@@ -33,6 +34,7 @@ public class CompetitionCreateDTO {
                 .JoinDateStart(joinDateStart)
                 .JoinDateEnd(joinDateEnd)
                 .baseFee(baseFee)
+                .location(location)
                 .MaxParticipate(maxParticipate)
                 .createdAt(createdAt)
                 .updatedAt(updatedAt)

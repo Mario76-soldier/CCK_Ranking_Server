@@ -1,11 +1,11 @@
 package com.cubingclub.ranking.Record.Controller;
 
-import com.cubingclub.ranking.Account.DTO.AccountDTO;
+import com.cubingclub.ranking.Auth.DTO.JudgeInfo;
+import com.cubingclub.ranking.Auth.Service.AuthService;
 import com.cubingclub.ranking.Competition.DTO.CompetitionDTO;
 import com.cubingclub.ranking.Record.DTO.*;
 import com.cubingclub.ranking.Competition.Service.CompetitionService;
 import com.cubingclub.ranking.Record.Service.RecordService;
-import com.cubingclub.ranking.RFID.Service.RFIDService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -22,30 +22,38 @@ import java.util.List;
 public class RecorderController {
     private final CompetitionService competitionService;
     private final RecordService recordService;
-    private final RFIDService rfidService;
+    private final AuthService authService;
     @GetMapping("/comp")
     public ResponseEntity<List<CompetitionDTO>> CompIdx(){
         return ResponseEntity.ok(competitionService.getCompListToday(LocalDate.now()));
     }
     @GetMapping("/info/{uid}")
-    public ResponseEntity<AccountDTO> GetAccountInfo(@PathVariable(name="uid")String uid){
-        AccountDTO accountDTO=rfidService.getAccountInfo(uid);
-        if(accountDTO==null){
-            return ResponseEntity.noContent().build();
+    public ResponseEntity<JudgeInfo> GetAccountInfo(@PathVariable(name="uid")String uid, @RequestHeader("Authorization")String authHeader){
+        String token = authHeader.substring(7);
+        try {
+            JudgeInfo judgeInfo = authService.getRFIDInfo(token, uid).orElse(null);
+            if (judgeInfo == null) {
+                return ResponseEntity.noContent().build();
+            }
+            return ResponseEntity.ok(judgeInfo);
         }
-        return ResponseEntity.ok(accountDTO);
+        catch (Exception e){
+            return ResponseEntity.badRequest().build();
+        }
     }
-    @GetMapping("/record/{email}/{compIdx}")
-    public ResponseEntity<RecorderResponseDTO> CurrentRecord(@PathVariable String email, @PathVariable Integer compIdx){
-        RecorderResponseDTO recorderResponseDTO=recordService.getForRecorder(email, compIdx);
+    @GetMapping("/record/{cckId}/{compIdx}")
+    public ResponseEntity<RecorderResponseDTO> CurrentRecord(@PathVariable String cckId, @PathVariable Integer compIdx){
+        RecorderResponseDTO recorderResponseDTO=recordService.getForRecorder(cckId, compIdx);
         if(recorderResponseDTO==null){
             return ResponseEntity.noContent().build();
         }
         return ResponseEntity.ok(recorderResponseDTO);
     }
     @PostMapping("/record")
-    public ResponseEntity<?> Record(@RequestBody RecorderDTO recorderDTO){
-        recordService.updateRecordOne(recorderDTO.getAttemptIdx(), recorderDTO.getRecord(), recorderDTO.getJudgeEmail());
+    public ResponseEntity<?> Record(@RequestBody RecorderDTO recorderDTO, @RequestHeader("Authorization")String authHeader){
+        String token = authHeader.substring(7);
+        JudgeInfo judgeInfo=authService.getJudgeInfo(token, recorderDTO.getJudgeCckId());
+        recordService.updateRecordOne(recorderDTO.getAttemptIdx(), recorderDTO.getRecord(), judgeInfo);
         AttemptDTO attemptDTO=recordService.getAttempt(recorderDTO.getAttemptIdx());
         RecordDTO recordDTO=recordService.getParticipateOne(attemptDTO.getRecordIdx());
         String avgCalc=recordDTO.getRound().getCubeEvent().getAvgCalc();
