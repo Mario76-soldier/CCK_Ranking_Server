@@ -1,15 +1,12 @@
 package com.cubingclub.ranking.Record.Controller;
 
-import com.cubingclub.ranking.Account.DTO.AccountDTO;
-import com.cubingclub.ranking.Account.DTO.MaskedAccountDTO;
-import com.cubingclub.ranking.Account.Service.AccountService;
+import com.cubingclub.ranking.Auth.DTO.JudgeInfo;
+import com.cubingclub.ranking.Auth.Service.AuthService;
 import com.cubingclub.ranking.Record.DTO.*;
 import com.cubingclub.ranking.Record.Service.RecordService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -20,7 +17,7 @@ import java.util.List;
 @RequestMapping("/api")
 public class RecordController {
     private final RecordService participateService;
-    private final AccountService accountService;
+    private final AuthService authService;
     @GetMapping("/records/{roundIdx}")
     public ResponseEntity<List<RecordDTO>> RecordList(@PathVariable(value="roundIdx") Integer roundIdx){
         return ResponseEntity.ok(participateService.getParticipate(roundIdx));
@@ -51,11 +48,11 @@ public class RecordController {
     }
 
     @PostMapping("/extra")
-    public ResponseEntity<?> AddExtra(@RequestBody ExtraDTO extraDTO){
-        Authentication authentication= SecurityContextHolder.getContext().getAuthentication();
-        MaskedAccountDTO accountDTO=accountService.getMaskedAccountInfoWithCCKId(authentication.getName());
+    public ResponseEntity<?> AddExtra(@RequestBody ExtraDTO extraDTO, @RequestHeader("Authorization")String authHeader){
+        String token = authHeader.substring(7);
+        JudgeInfo judgeInfo=authService.getJudgeInfo(token);
         try{
-            participateService.addExtra(extraDTO, accountDTO);
+            participateService.addExtra(extraDTO, judgeInfo);
             return ResponseEntity.ok().build();
         }
         catch(Exception e){

@@ -1,16 +1,12 @@
 package com.cubingclub.ranking.Record.Service;
 
-import com.cubingclub.ranking.Account.DTO.AccountDTO;
-import com.cubingclub.ranking.Account.DTO.MaskedAccountDTO;
-import com.cubingclub.ranking.Account.Entity.Account;
+import com.cubingclub.ranking.Auth.DTO.JudgeInfo;
 import com.cubingclub.ranking.Record.DTO.*;
 import com.cubingclub.ranking.Record.Entity.Attempt;
 import com.cubingclub.ranking.Record.Entity.BestType;
-import com.cubingclub.ranking.Account.Repository.AccountRepository;
 import com.cubingclub.ranking.Record.Entity.Record;
 import com.cubingclub.ranking.Record.Repository.AttemptRepository;
 import com.cubingclub.ranking.Record.Repository.RecordRepository;
-import com.cubingclub.ranking.RFID.Repository.RFIDRepository;
 import com.cubingclub.ranking.Round.Entity.Round;
 import com.cubingclub.ranking.Round.Repository.RoundRepository;
 import jakarta.persistence.EntityManager;
@@ -31,7 +27,6 @@ public class RecordService {
     private final RoundRepository roundRepository;
     private final RecordRepository recordRepository;
     private final AttemptRepository attemptRepository;
-    private final AccountRepository accountRepository;
     private final EntityManager em;
 
     private static final BigDecimal DNF = BigDecimal.valueOf(-1);
@@ -53,13 +48,12 @@ public class RecordService {
         return new RecordDTO(recordRepository.findByIdx(idx));
     }
 
-    public RecorderResponseDTO getForRecorder(String email, Integer compIdx) {
-        if(accountRepository.findByEmail(email).isPresent()) {
-            List<Record> list = recordRepository.findByAccount_EmailAndRound_Comp_IdxOrderByRound_EventStart(email, compIdx);
+    public RecorderResponseDTO getForRecorder(String cckId, Integer compIdx) {
+            List<Record> list = recordRepository.findByCckIdAndRound_Comp_IdxOrderByRound_EventStart(cckId, compIdx);
             for (Record p : list) {
-                String name = p.getAccount().getEnName();
+                String name = p.getName();
                 String roundName = p.getRound().getCubeEvent().getEventName() + " " + p.getRound().getRoundName();
-                String state=p.getAccount().getState();
+                String state=p.getState();
                 List<Attempt> attemptList=p.getAttempts();
 
                 for(Attempt attempt: attemptList){
@@ -68,7 +62,6 @@ public class RecordService {
                     }
                 }
             }
-        }
         return null;
     }
     public void updateRecord(ParticipateRecordDTO p) {
@@ -110,28 +103,30 @@ public class RecordService {
                 }
             }
 
-            attemptRepository.save(attemptDTO.toEntity(recordRepository, accountRepository));
+            attemptRepository.save(attemptDTO.toEntity(recordRepository));
         }
         record = recordRepository.findByIdx(p.getIdx());
         applyRecordUpdate(record);
     }
 
-    public void updateRecordOne(Integer idx, BigDecimal record, String judgeEmail) {
+    public void updateRecordOne(Integer idx, BigDecimal record, JudgeInfo judgeInfo) {
         AttemptDTO lastAttempt=new AttemptDTO(attemptRepository.findByIdx(idx));
         lastAttempt.setTime(record);
-        lastAttempt.setJudge(new MaskedAccountDTO(accountRepository.findByEmail(judgeEmail).orElseThrow()));
-        attemptRepository.save(lastAttempt.toEntity(recordRepository, accountRepository));
+        lastAttempt.setJudgeName(judgeInfo.getName());
+        lastAttempt.setJudgeCckId(judgeInfo.getCckId());
+        attemptRepository.save(lastAttempt.toEntity(recordRepository));
         Record record1 = recordRepository.findByIdx(lastAttempt.getRecordIdx());
         applyRecordUpdate(record1);
     }
 
-    public void addExtra(ExtraDTO extraDTO, MaskedAccountDTO delegate){
+    public void addExtra(ExtraDTO extraDTO, JudgeInfo delegateInfo){
         RecordDTO recordDTO =new RecordDTO(recordRepository.findByIdx(extraDTO.getPartIdx()));
         AttemptDTO attemptDTO=recordDTO.getAttempts().get(extraDTO.getExtraTry()-1);
         attemptDTO.setExtra(extraDTO.getExtraNum());
         attemptDTO.setExReason(extraDTO.getExtraReason());
-        attemptDTO.setDelegate(delegate);
-        attemptRepository.save(attemptDTO.toEntity(recordRepository, accountRepository));
+        attemptDTO.setDelegateName(delegateInfo.getName());
+        attemptDTO.setDelegateCckId(delegateInfo.getCckId());
+        attemptRepository.save(attemptDTO.toEntity(recordRepository));
     }
     public void deleteExtra(Integer partIdx, Integer extraNum){
         Attempt attempt=attemptRepository.findByRecord_IdxAndExtra(partIdx, extraNum);
@@ -141,9 +136,11 @@ public class RecordService {
         AttemptDTO attemptDTO=new AttemptDTO(attempt);
         attemptDTO.setExtra(null);
         attemptDTO.setExReason(null);
-        attemptDTO.setDelegate(null);
-        attemptDTO.setScrambler(null);
-        attemptRepository.save(attemptDTO.toEntity(recordRepository, accountRepository));
+        attemptDTO.setDelegateName(null);
+        attemptDTO.setDelegateCckId(null);
+        attemptDTO.setScramblerName(null);
+        attemptDTO.setScramblerCckId(null);
+        attemptRepository.save(attemptDTO.toEntity(recordRepository));
     }
 
     public SingleAverageDTO calculateExpectation(Integer idx) {
@@ -207,20 +204,21 @@ public class RecordService {
         return String.format("%d:%02d.%02d", minutes, secs, millis);
     }
 
-    public int updateScrambler(Integer idx, String email){
+    public int updateScrambler(Integer idx, JudgeInfo scramblerInfo){
         Attempt attempt=attemptRepository.findByIdx(idx);
-        if(attempt.getRecord().getAccount().getEmail().equals(email)){
+        if(attempt.getRecord().getCckId().equals(scramblerInfo.getCckId())){
             return -1;
         }
         AttemptDTO attemptDTO=new AttemptDTO(attempt);
-        MaskedAccountDTO accountDTO=new MaskedAccountDTO(accountRepository.findByEmail(email).orElseThrow(null));
         if(attemptDTO.getExtra()==null || attemptDTO.getExtra().equals(0)){
-            attemptDTO.setScrambler(accountDTO);
+            attemptDTO.setScramblerName(scramblerInfo.getName());
+            attemptDTO.setScramblerCckId(scramblerInfo.getCckId());
         }
         else {
-            attemptDTO.setExScrambler(accountDTO);
+            attemptDTO.setExScramblerName(scramblerInfo.getName());
+            attemptDTO.setExScramblerCckId(scramblerInfo.getCckId());
         }
-        attemptRepository.save(attemptDTO.toEntity(recordRepository, accountRepository));
+        attemptRepository.save(attemptDTO.toEntity(recordRepository));
         return 0;
     }
 
@@ -240,6 +238,19 @@ public class RecordService {
             case "ao" -> {
                 if(attemptList.size()==Integer.parseInt(calcType.substring(2)) && !isZero) {
                     recordDTO.setAverage(calculateAoXAverage(times));
+                    recordDTO.setSingle(calculateSingle(times));
+                }
+                else{
+                    recordDTO.setAverage(BigDecimal.ZERO);
+                    recordDTO.setSingle(BigDecimal.ZERO);
+                    recordDTO.setSingleBestType(null);
+                    recordDTO.setAverageBestType(null);
+                    recordDTO.setRanking(null);
+                }
+            }
+            case "ba" -> {
+                if(attemptList.size()==Integer.parseInt(calcType.substring(2)) && !isZero) {
+                    recordDTO.setAverage(calculateBAoXAverage(times));
                     recordDTO.setSingle(calculateSingle(times));
                 }
                 else{
@@ -288,7 +299,7 @@ public class RecordService {
                 }
             }
         }
-        recordRepository.save(recordDTO.toEntityFull(accountRepository, attemptList));
+        recordRepository.save(recordDTO.toEntityFull(attemptList));
         recordRepository.setRankOnRound(recordDTO.getRound().getIdx());
         em.clear();
         List<Record> recordList = recordRepository.findByRound_IdxForBestType(recordDTO.getRound().getIdx());
@@ -299,15 +310,15 @@ public class RecordService {
             RecordDTO eachRecordDTO =new RecordDTO(r);
             Map<String, BestType> bestTypeMap = calculateBestType(
                     r.getIdx(),
-                    r.getAccount().getEmail(),
-                    r.getAccount().getState(),
+                    r.getCckId(),
+                    r.getState(),
                     r.getRound().getCubeEvent().getEventName(),
                     r.getSingle(),
                     r.getAverage()
             );
             eachRecordDTO.setSingleBestType(bestTypeMap.get("single"));
             eachRecordDTO.setAverageBestType(bestTypeMap.get("average"));
-            recordRepository.save(eachRecordDTO.toEntityFull(accountRepository, r.getAttempts()));
+            recordRepository.save(eachRecordDTO.toEntityFull(r.getAttempts()));
         }
         recordRepository.flush();
     }
@@ -332,7 +343,7 @@ public class RecordService {
         for(int i=0; i<pastRound.getAdvance(); i++){
             RecordDTO advanceParticipate=participateList.get(i);
             advanceParticipate.setRound(roundRepository.findByIdx(advanceRoundIdx));
-            advanceList.add(advanceParticipate.toEntity(accountRepository));
+            advanceList.add(advanceParticipate.toEntity());
         }
         return addAttempts(recordRepository.saveAll(advanceList));
     }
@@ -340,7 +351,7 @@ public class RecordService {
     public Integer addParticipate(List<RecordRequestDTO> participates) {
         List<Record> recordList =new ArrayList<>();
         for(RecordRequestDTO recordRequestDTO:participates){
-            recordList.add(recordRequestDTO.toEntity(accountRepository, roundRepository));
+            recordList.add(recordRequestDTO.toEntity(roundRepository));
         }
         return addAttempts(recordRepository.saveAll(recordList));
     }
@@ -383,6 +394,31 @@ public class RecordService {
         return sum.divide(BigDecimal.valueOf(times.size()-2), 2, RoundingMode.HALF_UP);
     }
 
+    private static BigDecimal calculateBAoXAverage(List<BigDecimal> times) {
+        List<BigDecimal> valid = new ArrayList<>();
+        int penaltyCount = 0;
+
+        for (BigDecimal t : times) {
+            if (t.compareTo(BigDecimal.ZERO) < 0) penaltyCount++;
+            else valid.add(t);
+        }
+
+        if (penaltyCount >= 3) return DNF;
+
+        // 하나라도 DNF/DNS 있으면 Integer.MAX_VALUE처럼 처리
+        while (valid.size() < times.size()) {
+            valid.add(BigDecimal.valueOf(Long.MAX_VALUE));
+        }
+
+        valid.sort(Comparator.naturalOrder());
+        List<BigDecimal> middleThree = valid.subList(0, times.size()-2);
+
+        BigDecimal sum = middleThree.stream()
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        return sum.divide(BigDecimal.valueOf(times.size()-2), 2, RoundingMode.HALF_UP);
+    }
+
     private static BigDecimal calculateMo3Average(List<BigDecimal> times) {
         if (times.stream().anyMatch(t -> t.compareTo(BigDecimal.ZERO) < 0)) return DNF;
 
@@ -399,9 +435,9 @@ public class RecordService {
                 .orElse(DNF);
     }
 
-    private Map<String, BestType> calculateBestType(Integer idx, String email, String state, String eventName, BigDecimal single, BigDecimal average){
+    private Map<String, BestType> calculateBestType(Integer idx, String cckId, String state, String eventName, BigDecimal single, BigDecimal average){
         Map<String, BestType> best=new HashMap<>();
-        BestResult personalSingleBest= recordRepository.findPersonalSingleBest(email, eventName);
+        BestResult personalSingleBest= recordRepository.findPersonalSingleBest(cckId, eventName);
         if(single.compareTo(BigDecimal.ZERO)>0) {
             if (personalSingleBest == null || personalSingleBest.getBest().compareTo(single) > 0 || (personalSingleBest.getIdx().equals(idx) && personalSingleBest.getBest().compareTo(single) >= 0)) {
                 BestResult stateSingleBest = recordRepository.findStateSingleBest(state, eventName);
@@ -419,7 +455,7 @@ public class RecordService {
                 best.put("single", null);
             }
         }
-        BestResult personalAverageBest= recordRepository.findPersonalAverageBest(email, eventName);
+        BestResult personalAverageBest= recordRepository.findPersonalAverageBest(cckId, eventName);
         if(average.compareTo(BigDecimal.ZERO)>0) {
             if (personalAverageBest == null || personalAverageBest.getBest().compareTo(average) > 0 || (personalAverageBest.getIdx().equals(idx) && personalAverageBest.getBest().compareTo(single) >= 0)) {
                 BestResult stateAverageBest = recordRepository.findStateAverageBest(state, eventName);

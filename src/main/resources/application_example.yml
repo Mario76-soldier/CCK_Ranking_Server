@@ -1,8 +1,8 @@
 spring:
   datasource:
-    url: jdbc:mysql://{YOUR_DB_URL}/{YOUR_DB}?autoReconnect=true
-    username: {YOUR_DB_USERNAME}
-    password: {YOUR_DB_PASSWORD}
+    url: jdbc:mysql://test.ranking.cubingclub.com:3307/cck?autoReconnect=true
+    username: keonhee
+    password: 13245768
     driver-class-name: com.mysql.cj.jdbc.Driver
   jpa:
     database: mysql

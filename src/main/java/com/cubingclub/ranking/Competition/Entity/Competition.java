@@ -1,5 +1,6 @@
 package com.cubingclub.ranking.Competition.Entity;
 
+import com.cubingclub.ranking.Competition.DTO.CompetitionCreateDTO;
 import com.cubingclub.ranking.Competition.DTO.CompetitionDTO;
 import com.cubingclub.ranking.Round.Entity.Round;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -36,27 +37,44 @@ public class Competition {
     @Column
     private LocalDateTime joinDateEnd;
     @Column
+    private Integer baseFee;
+    @Column
+    private String location;
+    @Column
     private Integer maxParticipate;
+    @Column
+    private LocalDateTime createdAt;
+    @Column
+    private LocalDateTime updatedAt;
+    @OneToMany(mappedBy = "comp", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    private List<EventFee> eventFees = new ArrayList<>();
     @OneToMany(mappedBy = "comp", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     @JsonIgnore
     private List<Round> rounds = new ArrayList<>();
     @Builder
-    public Competition(Integer Idx, String CompName, LocalDate CompDateStart, LocalDate CompDateEnd, LocalDateTime JoinDateStart, LocalDateTime JoinDateEnd, Integer MaxParticipate){
+    public Competition(Integer Idx, String CompName, LocalDate CompDateStart, LocalDate CompDateEnd, LocalDateTime JoinDateStart, LocalDateTime JoinDateEnd, Integer baseFee, String location, Integer MaxParticipate, LocalDateTime createdAt, LocalDateTime updatedAt){
         this.idx=Idx;
         this.compName=CompName;
         this.compDateStart=CompDateStart;
         this.compDateEnd=CompDateEnd;
         this.joinDateStart=JoinDateStart;
         this.joinDateEnd=JoinDateEnd;
+        this.baseFee=baseFee;
+        this.location=location;
         this.maxParticipate=MaxParticipate;
+        this.createdAt=createdAt;
+        this.updatedAt=updatedAt;
     }
 
-    public void update(CompetitionDTO competitionDTO){
+    public void update(CompetitionCreateDTO competitionDTO){
         this.compName=competitionDTO.getCompName();
         this.compDateStart = competitionDTO.getCompDateStart();
         this.compDateEnd = competitionDTO.getCompDateEnd();
         this.joinDateStart = competitionDTO.getJoinDateStart();
         this.joinDateEnd = competitionDTO.getJoinDateEnd();
+        this.location=competitionDTO.getLocation();
+        this.baseFee=competitionDTO.getBaseFee();
         this.maxParticipate = competitionDTO.getMaxParticipate();
+        this.updatedAt=LocalDateTime.now();
     }
 }

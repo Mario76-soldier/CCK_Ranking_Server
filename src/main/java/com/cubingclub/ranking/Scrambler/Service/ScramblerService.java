@@ -1,17 +1,12 @@
 package com.cubingclub.ranking.Scrambler.Service;
 
-import com.cubingclub.ranking.Account.DTO.MaskedAccountDTO;
-import com.cubingclub.ranking.Account.Entity.Account;
-import com.cubingclub.ranking.Account.Repository.AccountRepository;
-import com.cubingclub.ranking.Record.DTO.AttemptDTO;
+import com.cubingclub.ranking.Auth.DTO.JudgeInfo;
+import com.cubingclub.ranking.Auth.Service.AuthService;
 import com.cubingclub.ranking.Record.DTO.RecordDTO;
 import com.cubingclub.ranking.Record.DTO.RecorderResponseDTO;
 import com.cubingclub.ranking.Record.Entity.Attempt;
-import com.cubingclub.ranking.Record.Entity.Record;
 import com.cubingclub.ranking.Record.Repository.AttemptRepository;
-import com.cubingclub.ranking.Record.Repository.RecordRepository;
 import com.cubingclub.ranking.Record.Service.RecordService;
-import com.cubingclub.ranking.RFID.Repository.RFIDRepository;
 import com.cubingclub.ranking.Round.Repository.RoundRepository;
 import com.cubingclub.ranking.Round.Entity.Round;
 import com.cubingclub.ranking.Scrambler.DTO.ScramblerDTO;
@@ -36,11 +31,10 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @Transactional
 public class ScramblerService {
-    private final RFIDRepository rfidRepository;
-    private final AccountRepository accountRepository;
     private final AttemptRepository attemptRepository;
     private final RoundRepository roundRepository;
     private final ScramblerRepository scramblerRepository;
+    private final AuthService authService;
     private final WebClient webClient;
     private final RecordService recordService;
     private final Map<String, String> cube=Map.of(
@@ -215,6 +209,7 @@ public class ScramblerService {
                     svg = response.get("svgImage").asText();
                     svg = svg.replaceFirst("<svg([^>]*)\\swidth=\"[^\"]+\"", "<svg$1");
                     svg = svg.replaceFirst("<svg([^>]*)\\sheight=\"[^\"]+\"", "<svg$1");
+                    scramblerDTO.setSeq(String.valueOf(i));
                     scramblerDTO.setSvg(svg);
                     scramblerRepository.save(scramblerDTO.toEntity());
                 }
@@ -238,14 +233,16 @@ public class ScramblerService {
         }
     }
 
-    public ScramblerResponseDTO getScramble(Integer compIdx, String uid){
-        String email=rfidRepository.findEmailByUid(uid);
-        RecorderResponseDTO record=recordService.getForRecorder(email, compIdx);
+    public ScramblerResponseDTO getScramble(Integer compIdx, String uid, String token){
+        JudgeInfo playerInfo=authService.getRFIDInfo(token, uid).orElse(null);
+        if(playerInfo==null){
+            return null;
+        }
+        RecorderResponseDTO record=recordService.getForRecorder(playerInfo.getCckId(), compIdx);
         if(record==null){
             return null;
         }
         Attempt attempt=attemptRepository.findByIdx(record.getAttemptIdx());
-        Account account=accountRepository.findByEmail(email).orElseThrow();
         RecordDTO recordDTO=new RecordDTO(attempt.getRecord());
         if(recordDTO.getRoundGroup()==null){
             return null;
@@ -260,7 +257,8 @@ public class ScramblerService {
             }
         }
         ScramblerResponseDTO scramblerDTO=new ScramblerResponseDTO(scramblerRepository.findByRound_IdxAndRoundGroupAndSeq(recordDTO.getRound().getIdx(), recordDTO.getRoundGroup(), seq));
-        scramblerDTO.setAccount(new MaskedAccountDTO(account));
+        scramblerDTO.setName(playerInfo.getName());
+        scramblerDTO.setCckId(playerInfo.getCckId());
         scramblerDTO.setAttemptIdx(record.getAttemptIdx());
         return scramblerDTO;
     }
@@ -274,12 +272,12 @@ public class ScramblerService {
                 ));
     }
 
-    public int updateScrambler(Integer attemptIdx, String uid){
-        String email=rfidRepository.findEmailByUid(uid);
-        if(email==null){
+    public int updateScrambler(Integer attemptIdx, String uid, String token){
+        JudgeInfo judgeInfo=authService.getRFIDInfo(token, uid).orElse(null);
+        if(judgeInfo==null){
             return -1;
         }
-        if(recordService.updateScrambler(attemptIdx, email)==-1){
+        if(recordService.updateScrambler(attemptIdx, judgeInfo)==-1){
             return -2;
         }
         return 0;

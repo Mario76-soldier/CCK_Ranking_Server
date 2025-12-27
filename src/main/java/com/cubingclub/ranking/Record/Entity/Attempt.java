@@ -1,7 +1,6 @@
 package com.cubingclub.ranking.Record.Entity;
 
 
-import com.cubingclub.ranking.Account.Entity.Account;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -30,20 +29,24 @@ public class Attempt {
     private Integer attemptTry;
     @Column(precision = 10, scale=2)
     private BigDecimal time;
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn
-    private Account scrambler;
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn
-    private Account judge;
+    @Column
+    private String scramblerName;
+    @Column
+    private String scramblerCckId;
+    @Column
+    private String judgeName;
+    @Column
+    private String judgeCckId;
     @Column
     private Integer extra;
     @Column
     private String exReason;
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn
-    private Account delegate;
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn
-    private Account exScrambler;
+    @Column
+    private String delegateName;
+    @Column
+    private String delegateCckId;
+    @Column
+    private String exScramblerName;
+    @Column
+    private String exScramblerCckId;
 }

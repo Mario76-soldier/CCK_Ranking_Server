@@ -6,6 +6,6 @@ import lombok.Setter;
 @Getter
 @Setter
 public class RecorderRequestDTO {
-    String email;
+    String cckId;
     Integer compIdx;
 }

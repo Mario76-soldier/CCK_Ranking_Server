@@ -1,6 +1,5 @@
 package com.cubingclub.ranking.Record.Entity;
 
-import com.cubingclub.ranking.Account.Entity.Account;
 import com.cubingclub.ranking.Round.Entity.Round;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -26,9 +25,12 @@ public class Record {
     private Integer idx;
     @Column
     private Integer pdx;
-    @ManyToOne(fetch=FetchType.LAZY)
-    @JoinColumn
-    private Account account;
+    @Column
+    private String name;
+    @Column
+    private String state;
+    @Column
+    private String cckId;
     @ManyToOne(fetch=FetchType.LAZY)
     @JoinColumn
     private Round round;
