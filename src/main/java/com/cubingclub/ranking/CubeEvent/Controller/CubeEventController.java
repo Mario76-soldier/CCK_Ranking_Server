@@ -23,8 +23,8 @@ public class CubeEventController {
     }
     @PostMapping("/event")
     public ResponseEntity<?> AdjustEvent(
-            @RequestParam("EventName") String eventName,
-            @RequestParam("AvgCalc") String avgCalc,
+            @RequestParam("eventName") String eventName,
+            @RequestParam("avgCalc") String avgCalc,
             @RequestParam("colorType") ColorType colorType,
             @RequestParam(value = "file", required = false) MultipartFile file) throws IOException {
         CubeEvent cubeEvent = cubeEventService.setCubeEvent(eventName, avgCalc, colorType, file);

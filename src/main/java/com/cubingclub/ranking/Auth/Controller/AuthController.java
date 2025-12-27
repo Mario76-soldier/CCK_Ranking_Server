@@ -47,4 +47,23 @@ public class AuthController {
 
         return ResponseEntity.ok(response.getBody());
     }
+
+    @PostMapping("/refresh")
+    public ResponseEntity<?> RefreshTokenForRanking(@RequestParam(name = "refresh")String refresh){
+        HttpHeaders headers=new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+        headers.setBasicAuth(clientId, clientSecret);
+
+        MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
+        body.add("grant_type", "refresh_token");
+        body.add("refresh_token", refresh);
+        body.add("client_id", clientId);
+        body.add("client_secret", clientSecret);
+
+        HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(body, headers);
+
+        ResponseEntity<String> response = restTemplate.postForEntity(tokenUrl+"/oauth2/token", request, String.class);
+
+        return ResponseEntity.ok(response.getBody());
+    }
 }
