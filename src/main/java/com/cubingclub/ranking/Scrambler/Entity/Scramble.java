@@ -2,6 +2,7 @@ package com.cubingclub.ranking.Scrambler.Entity;
 
 import com.cubingclub.ranking.Round.Entity.Round;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -9,18 +10,15 @@ import lombok.NoArgsConstructor;
 @Entity
 @Getter
 @NoArgsConstructor
-@Table
-public class Scrambler {
+@AllArgsConstructor
+@Builder
+public class Scramble {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column
     private Integer idx;
     @ManyToOne(fetch=FetchType.LAZY)
-    @JoinColumn
     private Round round;
-    @Column
     private String roundGroup;
-    @Column
     private String seq;
     @Lob
     @Column(columnDefinition = "TEXT")
@@ -28,13 +26,4 @@ public class Scrambler {
     @Lob
     @Column(columnDefinition = "TEXT")
     private String svg;
-    @Builder
-    public Scrambler(Integer Idx, Round round, String roundGroup, String seq, String scramble, String svg){
-        this.idx=Idx;
-        this.round=round;
-        this.roundGroup=roundGroup;
-        this.seq=seq;
-        this.scramble=scramble;
-        this.svg=svg;
-    }
 }

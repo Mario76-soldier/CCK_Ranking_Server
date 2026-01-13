@@ -12,7 +12,7 @@ import lombok.Setter;
 @NoArgsConstructor
 public class EventFeeDTO {
     private Integer idx;
-    private String eventName;   // CubeEvent의 기본키
+    private String eventName;   // CubeEvent 기본키
     private Integer eventFee;
 
     public EventFee toEntity(Competition comp, CubeEvent cubeEvent) {

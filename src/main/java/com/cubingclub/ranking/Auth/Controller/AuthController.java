@@ -18,7 +18,7 @@ import org.springframework.web.client.RestTemplate;
 @Slf4j
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/auth")
+@RequestMapping("/auth")
 public class AuthController {
     @Value("${spring.oauth.uri}")
     private String tokenUrl;
@@ -31,7 +31,7 @@ public class AuthController {
     private final RestTemplate restTemplate = new RestTemplate();
 
     @PostMapping("/token")
-    public ResponseEntity<?> ExchangeTokenForRanking(@RequestParam(name = "code")String code){
+    public ResponseEntity<?> exchangeTokenForRanking(@RequestParam(name = "code")String code){
         HttpHeaders headers=new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
         headers.setBasicAuth(clientId, clientSecret);
@@ -49,7 +49,7 @@ public class AuthController {
     }
 
     @PostMapping("/refresh")
-    public ResponseEntity<?> RefreshTokenForRanking(@RequestParam(name = "refresh")String refresh){
+    public ResponseEntity<?> refreshTokenForRanking(@RequestParam(name = "refresh")String refresh){
         HttpHeaders headers=new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
         headers.setBasicAuth(clientId, clientSecret);

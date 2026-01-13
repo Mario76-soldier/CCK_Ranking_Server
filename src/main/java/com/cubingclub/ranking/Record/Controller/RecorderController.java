@@ -8,13 +8,11 @@ import com.cubingclub.ranking.Competition.Service.CompetitionService;
 import com.cubingclub.ranking.Record.Service.RecordService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDate;
-import java.util.List;
-
-//CCK Recorder를 사용하기 위한 Controller
 @Slf4j
 @RestController
 @RequiredArgsConstructor
@@ -24,8 +22,8 @@ public class RecorderController {
     private final RecordService recordService;
     private final AuthService authService;
     @GetMapping("/comp")
-    public ResponseEntity<List<CompetitionDTO>> CompIdx(){
-        return ResponseEntity.ok(competitionService.getCompListToday(LocalDate.now()));
+    public ResponseEntity<Page<CompetitionDTO>> CompIdx(Pageable pageable){
+        return ResponseEntity.ok(competitionService.getCompNow(pageable));
     }
     @GetMapping("/info/{uid}")
     public ResponseEntity<JudgeInfo> GetAccountInfo(@PathVariable(name="uid")String uid, @RequestHeader("Authorization")String authHeader){

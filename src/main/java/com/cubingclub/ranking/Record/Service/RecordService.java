@@ -38,6 +38,8 @@ public class RecordService {
 
     public List<RecordDTO> getParticipate(Integer roundIdx) {
         List<Record> list=recordRepository.findByRound_Idx(roundIdx);
+        // OneToMany 컬렉션 초기화
+        list.forEach(record -> record.getAttempts().size());
         List<RecordDTO> recordDTOList=new ArrayList<>();
         for(Record record:list){
             recordDTOList.add(new RecordDTO(record));
@@ -45,11 +47,16 @@ public class RecordService {
         return recordDTOList;
     }
     public RecordDTO getParticipateOne(Integer idx) {
-        return new RecordDTO(recordRepository.findByIdx(idx));
+        Record record = recordRepository.findByIdx(idx);
+        // OneToMany 컬렉션 초기화
+        record.getAttempts().size();
+        return new RecordDTO(record);
     }
 
     public RecorderResponseDTO getForRecorder(String cckId, Integer compIdx) {
             List<Record> list = recordRepository.findByCckIdAndRound_Comp_IdxOrderByRound_EventStart(cckId, compIdx);
+            // OneToMany 컬렉션 초기화
+            list.forEach(record -> record.getAttempts().size());
             for (Record p : list) {
                 String name = p.getName();
                 String roundName = p.getRound().getCubeEvent().getEventName() + " " + p.getRound().getRoundName();
@@ -66,6 +73,8 @@ public class RecordService {
     }
     public void updateRecord(ParticipateRecordDTO p) {
         Record record = recordRepository.findByIdx(p.getIdx());
+        // OneToMany 컬렉션 초기화
+        record.getAttempts().size();
         List<Attempt> attemptList = record.getAttempts();
         int attemptCount = attemptList.size();
         BigDecimal timeLimit = record.getRound().getTimeLimit();
@@ -145,6 +154,8 @@ public class RecordService {
 
     public SingleAverageDTO calculateExpectation(Integer idx) {
         Record record = recordRepository.findByIdx(idx);
+        // OneToMany 컬렉션 초기화
+        record.getAttempts().size();
         String avgCalc = record.getRound().getCubeEvent().getAvgCalc();
 
         // "ao" 로 시작하지 않으면 null 리턴

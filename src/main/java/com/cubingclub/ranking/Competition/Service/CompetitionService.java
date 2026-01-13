@@ -6,95 +6,96 @@ import com.cubingclub.ranking.Competition.Repository.CompetitionRepository;
 import com.cubingclub.ranking.Competition.Entity.Competition;
 import com.cubingclub.ranking.CubeEvent.Entity.CubeEvent;
 import com.cubingclub.ranking.CubeEvent.Repository.CubeEventRepository;
+import com.cubingclub.ranking.Exception.Entity.ErrorCode;
+import com.cubingclub.ranking.Exception.Exceptions.CustomizedException;
 import com.cubingclub.ranking.Round.DTO.RoundScheduleDTO;
-import com.cubingclub.ranking.Round.Entity.Round;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
-@Transactional
 public class CompetitionService {
     private final CompetitionRepository competitionRepository;
     private final CubeEventRepository cubeEventRepository;
-    public Integer create(CompetitionCreateDTO compDTO) {
-        Competition competition;
 
-        if (compDTO.getIdx() != null) {
-            competition = competitionRepository.findByIdx(compDTO.getIdx());
-            competition.update(compDTO);
-            competition.getEventFees().clear();
-        } else {
-            compDTO.setCreatedAt(LocalDateTime.now());
-            compDTO.setUpdatedAt(LocalDateTime.now());
-            competition = compDTO.toEntity();
-        }
+    @Transactional
+    public void create(CompetitionCreateDTO competitionCreateDTO) {
+        Competition competition = competitionCreateDTO.toEntity();
 
-        if (compDTO.getEventFeeList() != null) {
-            for (EventFeeDTO feeDTO : compDTO.getEventFeeList()) {
-                CubeEvent cubeEvent = cubeEventRepository.findByEventName(feeDTO.getEventName());
+        if (competitionCreateDTO.getEventFeeList() != null) {
+            for (EventFeeDTO feeDTO : competitionCreateDTO.getEventFeeList()) {
+                CubeEvent cubeEvent = cubeEventRepository.findById(feeDTO.getEventName()).orElseThrow(() -> new CustomizedException(ErrorCode.CUBE_EVENT_NOT_FOUND));
                 EventFee feeEntity = feeDTO.toEntity(competition, cubeEvent);
                 competition.getEventFees().add(feeEntity);
             }
         }
-
-        return competitionRepository.save(competition).getIdx();
+        competitionRepository.save(competition);
     }
+
+    @Transactional
+    public void update(CompetitionUpdateDTO competitionUpdateDTO){
+        Competition competition=competitionRepository.findById(competitionUpdateDTO.getIdx()).orElseThrow(()->new CustomizedException(ErrorCode.COMPETITION_NOT_FOUND));
+        competition.update(competitionUpdateDTO);
+    }
+
+    @Transactional(readOnly=true)
     public CompetitionDTO getOne(Integer idx){
-        return new CompetitionDTO(competitionRepository.findByIdx(idx));
+        return new CompetitionDTO(competitionRepository.findById(idx).orElseThrow(()->new CustomizedException(ErrorCode.COMPETITION_NOT_FOUND)));
     }
+
+    @Transactional(readOnly=true)
     public CompetitionScheduleDTO getOneSchedule(Integer idx){
-        Competition competition=competitionRepository.findByIdx(idx);
-        CompetitionScheduleDTO competitionScheduleDTO=new CompetitionScheduleDTO(competition);
-        List<RoundScheduleDTO> roundScheduleDTOList=new ArrayList<>();
-        for(Round round:competition.getRounds()){
-            roundScheduleDTOList.add(new RoundScheduleDTO(round));
-        }
-        competitionScheduleDTO.setRoundSchedules(roundScheduleDTOList);
-        return competitionScheduleDTO;
+        Competition competition=competitionRepository.findById(idx).orElseThrow(()->new CustomizedException(ErrorCode.COMPETITION_NOT_FOUND));
+        // OneToMany 컬렉션 초기화
+        competition.getRounds().size();
+        return new CompetitionScheduleDTO(competition, competition.getRounds().stream().map(RoundScheduleDTO::new).toList());
     }
-    public Map<String, List<CompetitionDTO>> getCompList(LocalDate date){
-        List<Competition> list=competitionRepository.findAllByOrderByCompDateStartDesc();
 
-        Map<String, List<CompetitionDTO>> result = new HashMap<>();
-        result.put("past", new ArrayList<>());
-        result.put("now", new ArrayList<>());
-        result.put("future", new ArrayList<>());
-
-        for(Competition c : list){
-            CompetitionDTO competitionDTO=new CompetitionDTO(c);
-            if(c.getCompDateEnd().isBefore(date)){
-                result.get("past").add(competitionDTO);
-            }
-            else if ((c.getCompDateEnd().isEqual(date) || c.getCompDateEnd().isAfter(date)) && (c.getCompDateStart().isEqual(date)||c.getCompDateStart().isBefore(date))){
-                result.get("now").add(competitionDTO);
-            }
-            else{
-                result.get("future").add(competitionDTO);
-            }
-        }
-        return result;
+    @Transactional(readOnly = true)
+    public Page<CompetitionDTO> getCompPast(Pageable pageable){
+        LocalDate currentTime=LocalDate.now();
+        Page<Competition> competitions = competitionRepository
+                .findByCompDateEndBeforeOrderByCompDateStartDesc(pageable, currentTime);
+        // OneToMany 컬렉션 초기화
+        competitions.forEach(comp -> {
+            comp.getEventFees().size();
+        });
+        return competitions.map(CompetitionDTO::new);
     }
-    public List<CompetitionDTO> getCompListToday(LocalDate date){
-        List<Competition> list=competitionRepository.findByCompDateStartLessThanEqualAndCompDateEndGreaterThanEqual(date, date);
-        List<CompetitionDTO> listDTO=new ArrayList<>();
-        for(Competition c : list){
-            listDTO.add(new CompetitionDTO(c));
 
-        }
-        return listDTO;
+    @Transactional(readOnly=true)
+    public Page<CompetitionDTO> getCompNow(Pageable pageable){
+        LocalDate currentTime=LocalDate.now();
+        Page<Competition> competitions = competitionRepository
+                .findByCompDateStartLessThanEqualAndCompDateEndGreaterThanEqualOrderByCompDateStartDesc(pageable, currentTime, currentTime);
+        // OneToMany 컬렉션 초기화
+        competitions.forEach(comp -> {
+            comp.getEventFees().size();
+        });
+        return competitions.map(CompetitionDTO::new);
     }
+
+    @Transactional(readOnly = true)
+    public Page<CompetitionDTO> getCompFuture(Pageable pageable){
+        LocalDate currentTime=LocalDate.now();
+        Page<Competition> competitions = competitionRepository
+                .findByCompDateStartAfterOrderByCompDateStartAsc(pageable, currentTime);
+        // OneToMany 컬렉션 초기화
+        competitions.forEach(comp -> {
+            comp.getEventFees().size();
+        });
+        return competitions.map(CompetitionDTO::new);
+    }
+
+    @Transactional
     public void deleteByIdx(Integer idx){
-        competitionRepository.deleteByIdx(idx);
+        competitionRepository.deleteById(idx);
     }
 }

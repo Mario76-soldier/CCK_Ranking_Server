@@ -18,6 +18,12 @@ import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+
+import java.util.Arrays;
+import java.util.List;
 
 @RequiredArgsConstructor
 @Configuration
@@ -25,17 +31,22 @@ import org.springframework.security.web.SecurityFilterChain;
 @EnableMethodSecurity
 public class SecurityConfig{
     @Value("${spring.oauth.uri}")
-    String OAuthUrl;
+    private String oAuthUrl;
+    @Value("${cors.allowed-origins}")
+    private String allowedOrigins;
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(AbstractHttpConfigurer::disable)
+                .cors(cors->cors.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests(request -> request
-                        .requestMatchers("/api/recorder/**").hasAuthority("SCOPE_limited.read")
-                        .requestMatchers("/api/scramble/**", "/api/scrambler/**").hasAnyRole("ROOT", "SCRAMBLER")
-                        .requestMatchers(HttpMethod.GET,"/api/scrambles/**").hasAnyRole("ROOT","ADMIN")
-                        .requestMatchers(HttpMethod.POST,"/api/comp/**", "/api/event/**","/api/round","/api/advance/**","/api/record/**").hasAnyRole("ROOT","ADMIN")
-                        .requestMatchers(HttpMethod.DELETE,"/api/comp/**","/api/round/**","/api/record/**").hasAnyRole("ROOT","ADMIN")
+                        .requestMatchers("/recorder/**").hasAuthority("SCOPE_limited.read")
+                        .requestMatchers("/scramble/**").hasAnyRole("ROOT", "SCRAMBLER")
+                        .requestMatchers(HttpMethod.POST,"/comp/**", "/event/**","/round","/advance/**","/record/**").hasAnyRole("ROOT","ADMIN")
+                        .requestMatchers(HttpMethod.PUT,"/comp/**", "/event/**","/round","/advance/**","/record/**").hasAnyRole("ROOT","ADMIN")
+                        .requestMatchers(HttpMethod.PATCH,"/comp/**", "/event/**","/round","/advance/**","/record/**").hasAnyRole("ROOT","ADMIN")
+                        .requestMatchers(HttpMethod.DELETE,"/comp/**","/round/**","/record/**").hasAnyRole("ROOT","ADMIN")
                         .requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll()
                         .anyRequest().permitAll()
                 )
@@ -44,10 +55,24 @@ public class SecurityConfig{
                 );
         return http.build();
     }
+
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration config = new CorsConfiguration();
+        config.setAllowedOrigins(Arrays.asList(allowedOrigins.split(",")));
+        config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
+        config.setAllowedHeaders(List.of("*"));
+        config.setAllowCredentials(true);
+
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", config);
+        return source;
+    }
+
     @Bean
     public JwtDecoder jwtDecoder() {
-        NimbusJwtDecoder decoder = NimbusJwtDecoder.withJwkSetUri(OAuthUrl+"/oauth2/jwks").build();
-        OAuth2TokenValidator<Jwt> validator = JwtValidators.createDefaultWithIssuer(OAuthUrl);
+        NimbusJwtDecoder decoder = NimbusJwtDecoder.withJwkSetUri(oAuthUrl+"/oauth2/jwks").build();
+        OAuth2TokenValidator<Jwt> validator = JwtValidators.createDefaultWithIssuer(oAuthUrl);
         decoder.setJwtValidator(validator);
         return decoder;
     }

@@ -17,16 +17,15 @@ import lombok.NoArgsConstructor;
 public class EventFee {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column
     @JsonIgnore
     private Integer idx;
     @ManyToOne
-    @JoinColumn
+    @JoinColumn(nullable = false)
     @JsonIgnore
     private Competition comp;
     @ManyToOne
-    @JoinColumn
+    @JoinColumn(nullable = false)
     private CubeEvent cubeEvent;
-    @Column
+    @Column(nullable = false)
     private Integer eventFee;
 }

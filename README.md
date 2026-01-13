@@ -1,213 +1,254 @@
-# CCK_Ranking_API_SERVER
+# CCK Ranking Backend
 
-## Overview
-이 문서는 **CCK Ranking API** 사용 방법을 설명합니다.  
-해당 API는 JSON 형식으로 요청과 응답을 주고받습니다.
+> 큐빙 대회 순위 관리 및 기록 시스템
 
-- Base URL: `https://ranking.cubingclub.com`
-- Authentication: Cookie (withCredentials)
-- Response Format: JSON
-- Rate Limit: 100 requests/minute
+## 📋 프로젝트 소개
 
-## 🔑 Authentication
-이 API는 OAuth2 SSO 인증 방식을 사용합니다.  
-각 서비스별로 인증을 원하신다면 **CCK Ranking**에서 Client 등록을 해야 합니다.  
+CCK Ranking은 큐브 대회의 참가자 관리, 라운드 스케줄링, 스크램블 생성, 기록 관리 등을 종합적으로 처리하는 백엔드 시스템입니다.
 
-인증 방식은 **세션 쿠키(Session Cookie)** 기반 인증을 사용합니다.  
-인증이 필요한 경우, 브라우저 또는 클라이언트에서 요청 시 `withCredentials: true` 옵션을 반드시 설정해야 합니다.
+### 주요 기능
 
-**Axios 예시**
-```javascript
-import axios from 'axios';
+- 🏆 **대회 관리**: 대회 생성, 수정, 조회 및 일정 관리
+- 🎲 **라운드 관리**: 라운드별 그룹 설정, 컷오프, 어드밴스 인원 관리
+- 🧩 **큐브 이벤트**: 다양한 큐브 종목 관리 (3x3x3, 2x2x2, Pyraminx 등)
+- 🔀 **스크램블 생성**: WCA 공식 TNoodle 라이브러리를 통한 스크램블 생성
+- 📊 **기록 관리**: 참가자별 기록 입력 및 순위 집계
+- 🔐 **인증/인가**: OAuth2 기반 사용자 인증 및 권한 관리
 
-axios.get('https://ranking.cubingclub.com/api/auth/info', {
-    withCredentials: true
-})
-    .then(res => console.log(res.data))
-    .catch(err => console.error(err));
+## 🛠 기술 스택
+
+### Backend
+- **Java 17**
+- **Spring Boot 3.x**
+- **Spring Data JPA**
+- **Spring Security**
+- **MySQL 8.x**
+
+### Testing
+- **JUnit 5**
+- **Mockito**
+- **AssertJ**
+
+### Build & Deploy
+- **Gradle**
+
+## 📁 프로젝트 구조
+
+```
+CompRanking_B/
+├── src/
+│   ├── main/
+│   │   ├── java/com/cubingclub/ranking/
+│   │   │   ├── Auth/              # 인증/인가
+│   │   │   ├── Competition/       # 대회 관리
+│   │   │   ├── Round/             # 라운드 관리
+│   │   │   ├── CubeEvent/         # 큐브 이벤트
+│   │   │   ├── Scrambler/         # 스크램블 생성
+│   │   │   ├── Record/            # 기록 관리
+│   │   │   ├── PersonalRecord/    # 개인 최고 기록
+│   │   │   ├── Config/            # 설정
+│   │   │   └── Exception/         # 예외 처리
+│   │   └── resources/
+│   │       ├── application.yaml
+│   │       └── static/
+│   └── test/
+│       └── java/com/cubingclub/ranking/
+│           ├── Competition/
+│           ├── Round/
+│           ├── CubeEvent/
+│           └── Scrambler/
+├── docs/                          # 프로젝트 문서
+│   ├── API.md                     # API 명세서
+│   ├── CONVENTION.md              # 코딩 컨벤션
+│   ├── ENVIRONMENT.md             # 환경 설정 가이드
+│   └── TESTING.md                 # 테스트 가이드
+├── build.gradle
+└── README.md
 ```
 
-## ER Diagram
+## 🚀 시작하기
 
-## Endpoints Summary
-**굵은 글씨는 개인 혹은 관리자 인증 필요**  
-각 Path마다 상세정보 링크 설정됨
-## Account 
-| Method   | Path                                                                                                | Description                |
-|----------|-----------------------------------------------------------------------------------------------------|----------------------------|
-| GET      | `/oauth2/authorize?response_type=code&client_id={client_id}&scope=openid&redirect_uri={direct_uri}` | 로그인창으로 다이렉트, OAuth2로 코드 반환 |
-| **POST** | [`/oauth2/token`](src/main/java/com/cubingclub/ranking/Account/README.md#1-인증-코드로-로그인-마무리)          | **인증 코드 제공으로 로그인 마무리**     |
-| GET      | `/signup`                                                                                           | 회원가입                       |
-| GET      | `/password-reset`                                                                                   | 비밀번호 재발급                   |
-| **GET**  | [`/api/auth/info`](src/main/java/com/cubingclub/ranking/Account/README.md#2-본인-계정-정보-반환)            | **본인 계정 정보 반환**            |
-| **POST** | [`/api/auth/edit`](src/main/java/com/cubingclub/ranking/Account/README.md#3-개인-정보-수정)               | **개인 정보 수정**               |
+### 사전 요구사항
 
-## Mail
-| Method | Path                                                                                                 | Description       |
-|--------|------------------------------------------------------------------------------------------------------|-------------------|
-| POST   | [`/api/mail/send/signup`](src/main/java/com/cubingclub/ranking/Mail/README.md#1-회원가입-인증-메일-전송)       | 회원가입 인증 메일 전송     |
-| POST   | [`/api/mail/send/password`](src/main/java/com/cubingclub/ranking/Mail/README.md#2-비밀번호-재설정-인증-메일-전송) | 비밀번호 재발급 인증 메일 전송 |
-| POST   | [`/api/mail/password`](src/main/java/com/cubingclub/ranking/Mail/README.md#3-인증번호를-통한-비밀번호-재발급)      | 재발급된 비밀번호 메일 전송   |
+- Java 17 이상
+- MySQL 8.0 이상
+- Gradle 7.x 이상
+- TNoodle 서버 (스크램블 생성용)
+### 설치 및 실행
 
-
-## Competition
-| Method     | Path                                                                                                        | Description                 |
-|------------|-------------------------------------------------------------------------------------------------------------|-----------------------------|
-| GET        | [`/api/comps`](src/main/java/com/cubingclub/ranking/Competition/README.md#1-대회-목록-조회)                       | past, now, future 대회 리스트 반환 |
-| GET        | [`/api/comp/{compIdx}`](src/main/java/com/cubingclub/ranking/Competition/README.md#2-대회-단일-조회)              | 특정 대회 정보 조회                 |
-| **POST**   | [`/api/comp`](src/main/java/com/cubingclub/ranking/Competition/README.md#3-대회-생성수정)                         | **대회 생성 및 수정**              |
-| **DELETE** | [`/api/comp/{compIdx}`](src/main/java/com/cubingclub/ranking/Competition/README.md#4-대회-삭제)                 | **대회 삭제(cascade)**          |
-| **GET**    | [`/api/competitor/{compIdx}`](src/main/java/com/cubingclub/ranking/Competition/README.md#5-참가자-목록-조회)       | **특정 대회의 선수 목록 조회**         |
-| **POST**   | [`/api/competitor/{compIdx}/{uid}`](src/main/java/com/cubingclub/ranking/Competition/README.md#6-참가자-출석-처리) | **카드 태그로 선수 참여 확인**         |
-
-## Round
-| Method     | Path                                                                                                     | Description                         |
-|------------|----------------------------------------------------------------------------------------------------------|-------------------------------------|
-| GET        | [`/api/rounds/{compIdx}`](src/main/java/com/cubingclub/ranking/Round/README.md#1-대회-라운드-목록-조회)           | 특정 대회의 past, now, future 라운드 리스트 반환 |
-| GET        | [`/api/round/{roundIdx}`](src/main/java/com/cubingclub/ranking/Round/README.md#2-특정-라운드-조회)              | 특정 라운드 정보 조회                        |
-| **POST**   | [`/api/round`](src/main/java/com/cubingclub/ranking/Round/README.md#3-라운드-생성수정)                          | **라운드 생성 및 수정**                     |
-| **DELETE** | [`/api/round/{roundIdx}`](src/main/java/com/cubingclub/ranking/Round/README.md#4-라운드-삭제)                 | **라운드 삭제(cascade)**                 |
-| **PUT**    | [`/api/advance/{roundIdx}/{advance}`](src/main/java/com/cubingclub/ranking/Round/README.md#5-어드밴스-인원-수정) | **다음 라운드 진출 인원 조정**                 |
-| GET        | [`/api/group/{roundIdx}`](src/main/java/com/cubingclub/ranking/Round/README.md#6-라운드-그룹-목록-조회)           | 라운드 그룹 리스트 확인                       |
-
-## CubeEvent
-| Method     | Path         | Description |
-|------------|--------------|-------------|
-| GET        | `/api/event` | 종목 리스트 조회   |
-
-## Record
-| Method     | Path                                                                                                  | Description           |
-|------------|-------------------------------------------------------------------------------------------------------|-----------------------|
-| GET        | [`/api/records/{roundIdx}`](src/main/java/com/cubingclub/ranking/Record/README.md#1-라운드-기록-목록-조회)     | 특정 라운드의 전체 기록 리스트 반환  |
-| **POST**   | [`/api/record`](src/main/java/com/cubingclub/ranking/Record/README.md#2-기록-수정)                        | **특정 기록 수정**          |
-| **DELETE** | [`/api/record/{idx}`](src/main/java/com/cubingclub/ranking/Record/README.md#3-기록-삭제)                  | **특정 기록 삭제**          |
-| **DELETE** | [`/api/record/quit`](src/main/java/com/cubingclub/ranking/Record/README.md#4-참가자-기권-처리)               | **선택한 기록 리스트 모두 삭제**  |
-| **POST**   | [`/api/participate`](src/main/java/com/cubingclub/ranking/Record/README.md#5-참가자-추가)                  | **선수(기록) 추가**         |
-| **POST**   | [`/api/extra`](src/main/java/com/cubingclub/ranking/Record/README.md#6-엑스트라-사유-등록)                    | **특정 기록에 대한 엑스트라 추가** |
-| **POST**   | [`/api/extra/{partIdx}/{extraNum}`](src/main/java/com/cubingclub/ranking/Record/README.md#7-추가-기록-삭제) | **특정 엑스트라 삭제**        |
-
-## Recorder(IoT전용)
-### 권한: RECORDER(독자 인증 방식 사용)
-| Method   | Path                                                                                                                       | Description             |
-|----------|----------------------------------------------------------------------------------------------------------------------------|-------------------------|
-| **GET**  | [`/api/recorder/comp`](src/main/java/com/cubingclub/ranking/Record/README_Recorder.md#1-당일-대회-조회)                          | **현재 진행중인 대회 리스트 반환**   |
-| **GET**  | [`/api/recorder/info/{uid}`](src/main/java/com/cubingclub/ranking/Record/README_Recorder.md#2-참가자-정보-조회)                   | **카드 태그 후 해당 선수 정보 반환** |
-| **GET**  | [`/api/recorder/record/{email}/{compIdx}`](src/main/java/com/cubingclub/ranking/Record/README_Recorder.md#3-시도해야-하는-기록-조회) | **특정 선수의 진행상황 반환**      |
-| **POST** | [`/api/recorder/record`](src/main/java/com/cubingclub/ranking/Record/README_Recorder.md#4-기록-업로드)                          | **선수가 시도한 기록 입력**       |
-
-## Scrambler
-### 권한: SCRAMBLER, ROOT
-| Method   | Path                                                                                                        | Description            |
-|----------|-------------------------------------------------------------------------------------------------------------|------------------------|
-| **GET**  | [`/api/scramble/{compIdx}/{uid}`](src/main/java/com/cubingclub/ranking/Scrambler/README.md#1-특정-선수-스크램블-조회) | **특정 선수의 스크램블 정보 반환**  |
-| **GET**  | [`/api/scrambles/{roundIdx}`](src/main/java/com/cubingclub/ranking/Scrambler/README.md#2-스크램블-리스트-조회)       | **특정 라운드 스크램블 리스트 반환** |
-| **POST** | [`/api/scrambler`](src/main/java/com/cubingclub/ranking/Scrambler/README.md#3-스크램블러-사인)                     | **스크램블러 승인 입력**        |
-
-## 기술 스택
-
-- **Spring Boot**
-- **OAuth2**(인증 서버)
-- **Thymeleaf**(로그인, 회원가입, 비밀번호 재발급, 메일 html)
-- **JPA** + **Mysql** (ORM과 데이터베이스)
-
-## 설치 및 실행
-
-### 1. 저장소 클론
-
+1. **저장소 클론**
 ```bash
 git clone https://github.com/cubingclubkorea/CompRanking_B.git
 cd CompRanking_B
 ```
 
-### 2. 환경변수 설정
+2. **환경 설정**
+
+`src/main/resources/application_example.yaml`을 복사하여 `application.yaml` 생성 후 환경변수 설정
 
 ```bash
 cd src/main/resources
-cp application_example.yml application.yml
-#YOUR_DB_URL=localhost:3306
-#YOUR_DB=cck
-#YOUR_DB_USERNAME=root
-#YOUR_DB_PASSWORD=password
-#YOUR_MAIL_APP_EMAIL=example@example.com
-#YOUR_MAIL_APP_PASSWORD=password
-#YOUR_CLIENT_SECRET=password
-#YOUR_REDIRECT_URI=http://localhost:3000/confirm
-cd ../../..
-
+cp application_example.yaml application.yaml
+# application.yaml 파일을 편집하여 DB, 메일 등 설정
 ```
 
-### 3. 빌드 및 실행
+상세한 환경 설정은 [환경 설정 가이드](docs/ENVIRONMENT.md)를 참조하세요.
+
+3. **데이터베이스 생성**
+```sql
+CREATE DATABASE ranking_db CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+```
+
+4. **TNoodle 서버 실행**
 ```bash
-./gradlew clean build
-java -jar build/libs/com.cubingclub.ranking-{version}.jar
+java -jar TNoodle-WCA-*.jar
+# 기본 포트: 2014
 ```
 
-### Docker-compose를 사용한 동시 실행(실행환경 구축 곤란 시 사용)
+5. **애플리케이션 빌드**
 ```bash
-docker network create my_network #첫 실행 시 네트워크 생성 필요, 이후에는 할 필요 없음
-docker-compose up -d #백그라운드로 실행
-```
-## [SSO 인증](README_SSO.md)
-
-## 프로젝트 구조
-
-```
-CompRanking_B/
-├── src/
-│ ├── main/
-│ │ ├── java/com/cubingclub/ranking/
-│ │ │ ├── Account/ # 계정 관련 기능
-│ │ │ ├── Competition/ # 대회 관리 기능
-│ │ │ ├── Config/ # 설정 파일 및 설정 클래스
-│ │ │ ├── CubeEvent/ # 큐브 이벤트 처리
-│ │ │ ├── ExceptionController/ # 예외 처리 컨트롤러
-│ │ │ ├── Mail/ # 이메일 전송 기능
-│ │ │ ├── OAuthClient/ # OAuth 클라이언트 구현
-│ │ │ ├── PersonalRecord/ # 개인 기록 관리
-│ │ │ ├── Record/ # 기록 관련 공통 로직
-│ │ │ ├── RFID/ # RFID 리더기 처리
-│ │ │ ├── Round/ # 라운드 관리
-│ │ │ ├── RsaKeys/ # RSA 키 관리
-│ │ │ ├── Schedule/ # 스케줄 관리
-│ │ │ ├── Scrambler/ # 스크램블 생성
-│ │ │ └── RankingApplication # 스프링 부트 메인 애플리케이션
-│ │ └── resources/ # 설정 파일 및 리소스 (application.yml 등)
-│ └── test/
-│ └── java/com/cubingclub/ranking/
-│ └── RankingApplicationTests # 테스트 코드
-├── build.gradle
-├── gradlew
-├── gradlew.bat
-├── README.md
-└── settings.gradle
+./gradlew build
 ```
 
-## 개발 가이드
+6. **애플리케이션 실행**
+```bash
+./gradlew bootRun
+```
 
-## 기여하기
+애플리케이션은 `http://localhost:8080`에서 실행됩니다.
 
-이 프로젝트에 기여하고 싶으시다면:
+## 📖 문서
 
-1. 이 저장소를 Fork 하세요
-2. Feature 브랜치를 생성하세요 (`git checkout -b feature/amazing-feature`)
-3. 변경사항을 커밋하세요 (`git commit -m 'Add some amazing feature'`)
-4. 브랜치에 Push 하세요 (`git push origin feature/amazing-feature`)
-5. Pull Request를 열어주세요
+- [API 명세서](docs/API.md) - REST API 엔드포인트 및 사용법
+- [코딩 컨벤션](docs/CONVENTION.md) - 프로젝트 코딩 규칙
+- [환경 설정 가이드](docs/ENVIRONMENT.md) - 환경변수 및 설정 방법
+- [테스트 가이드](docs/TESTING.md) - 테스트 코드 작성 방법
 
-### 코드 기여 가이드라인
+## 🧪 테스트
 
-- 커밋 메시지는 [Conventional Commits](https://www.conventionalcommits.org/) 형식을 따라주세요
-- 새로운 기능은 테스트 코드와 함께 제출해주세요
+### 전체 테스트 실행
+```bash
+./gradlew test
+```
 
-## 지원 및 문의
+### 특정 도메인 테스트
+```bash
+./gradlew test --tests com.cubingclub.ranking.Competition.*
+./gradlew test --tests com.cubingclub.ranking.Round.*
+```
 
-- **이슈 신고**: [GitHub Issues](https://github.com/cubingclubkorea/CompRanking_B/issues)
-- **큐빙클럽코리아**: [공식 웹사이트](https://cubingclub.com)
+### 테스트 커버리지 리포트
+```bash
+./gradlew test jacocoTestReport
+```
 
-## 개발팀
+리포트는 `build/reports/jacoco/test/html/index.html`에서 확인할 수 있습니다.
+
+## 📊 주요 API 엔드포인트
+
+### Competition API
+```
+GET    /comp/past          # 지난 대회 목록
+GET    /comp/now           # 진행 중인 대회 목록
+GET    /comp/future        # 예정된 대회 목록
+GET    /comp/{compIdx}     # 단일 대회 조회
+POST   /comp               # 대회 생성
+PUT    /comp               # 대회 수정
+DELETE /comp/comp/{compIdx} # 대회 삭제
+```
+
+### Round API
+```
+GET    /round/past/{compIdx}   # 지난 라운드 목록
+GET    /round/now/{compIdx}    # 진행 중인 라운드 목록
+GET    /round/future/{compIdx} # 예정된 라운드 목록
+GET    /round/{roundIdx}       # 단일 라운드 조회
+POST   /round                  # 라운드 생성
+PUT    /round                  # 라운드 수정
+DELETE /round/{roundIdx}       # 라운드 삭제
+```
+
+### CubeEvent API
+```
+GET    /event               # 이벤트 목록 조회
+POST   /event               # 이벤트 추가
+```
+
+### Scrambler API
+```
+GET    /scramble/check/{uid}     # 사용자 확인
+PATCH  /scramble/scrambler       # 스크램블 조회
+```
+
+더 자세한 API 문서는 [API.md](docs/API.md)를 참조하세요.
+
+## 🏗 아키텍처
+
+### 레이어 구조
+
+```
+Controller Layer
+    ↓ (HTTP Request/Response)
+Service Layer
+    ↓ (Business Logic)
+Repository Layer
+    ↓ (Data Access)
+Database
+```
+
+### 도메인 모델
+
+- **Competition**: 대회 정보 및 일정
+- **Round**: 종목별 라운드 정보
+- **CubeEvent**: 큐브 종목 정보
+- **Scrambler**: 스크램블 생성 및 관리
+- **Record**: 참가자별 기록
+- **PersonalRecord**: 개인 최고 기록
+
+## 🔒 보안
+
+- OAuth2 기반 인증
+- JWT 토큰을 통한 세션 관리
+- RFID UID를 통한 참가자 확인
+- 민감한 정보는 환경변수로 관리
+
+## 🤝 기여하기
+
+1. Fork the Project
+2. Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the Branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
+
+### 코딩 규칙
+
+프로젝트에 기여하기 전에 [코딩 컨벤션](docs/CONVENTION.md)을 확인해주세요.
+
+## 📝 라이선스
+
+이 프로젝트는 MIT 라이선스 하에 배포됩니다.
+
+## 👥 개발팀
 
 이 프로젝트는 **큐빙클럽코리아(CCK) 개발팀**에서 관리하고 있습니다.
 
+## 📞 문의
+
+프로젝트에 대한 문의사항이 있으시면 이슈를 생성해주세요.
+
+## 🔗 관련 프로젝트
+
+- [TNoodle](https://github.com/thewca/tnoodle) - WCA 공식 스크램블 생성기
+- [큐빙클럽코리아 공식 웹사이트](https://cubingclub.com)
+
+## 📈 버전 히스토리
+
+### v1.0.0 (2026-01-13)
+- 초기 릴리즈
+- Competition, Round, CubeEvent, Scrambler 도메인 구현
+- 테스트 코드 작성 완료
+- API 문서화 완료
+
 ---
 
-**큐빙클럽코리아(CCK)** 는 한국의 루빅스 큐브 커뮤니티 발전을 위해 노력하고 있습니다.
+Made with ❤️ by Cubing Club Korea

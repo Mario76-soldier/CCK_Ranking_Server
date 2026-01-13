@@ -1,7 +1,8 @@
 package com.cubingclub.ranking.Competition.DTO;
 
 import com.cubingclub.ranking.Competition.Entity.Competition;
-import com.cubingclub.ranking.Competition.Entity.EventFee;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -14,11 +15,15 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 public class CompetitionCreateDTO {
-    private Integer idx;
+    @NotBlank
     private String compName;
+    @NotNull
     private LocalDate compDateStart;
+    @NotNull
     private LocalDate compDateEnd;
+    @NotNull
     private LocalDateTime joinDateStart;
+    @NotNull
     private LocalDateTime joinDateEnd;
     private Integer baseFee;
     private String location;
