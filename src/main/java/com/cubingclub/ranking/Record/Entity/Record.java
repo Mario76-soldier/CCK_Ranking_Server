@@ -32,7 +32,7 @@ public class Record {
     private Round round;
     @Column(length = 20)
     private String roundGroup;
-    @OneToMany(mappedBy = "record", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "record", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     @BatchSize(size = 100)
     @OrderBy("attemptTry ASC")
     private List<Attempt> attempts;
@@ -45,4 +45,19 @@ public class Record {
     private BestType singleBestType;
     private BestType averageBestType;
     private String note;
+
+    public void updateRecord(BigDecimal single, BigDecimal average){
+        this.single=single;
+        this.average=average;
+    }
+
+    public void updateRanking(Integer ranking, Integer stateRanking){
+        this.ranking=ranking;
+        this.stateRanking=stateRanking;
+    }
+
+    public void updateBestType(BestType singleBestType, BestType averageBestType){
+        this.singleBestType=singleBestType;
+        this.averageBestType=averageBestType;
+    }
 }

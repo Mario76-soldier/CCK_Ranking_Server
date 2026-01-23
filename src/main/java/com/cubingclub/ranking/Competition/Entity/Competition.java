@@ -52,6 +52,7 @@ public class Competition {
     @BatchSize(size = 100)
     @JsonIgnore
     private final List<Round> rounds = new ArrayList<>();
+
     @Builder
     public Competition(Integer Idx, String CompName, LocalDate CompDateStart, LocalDate CompDateEnd, LocalDateTime JoinDateStart, LocalDateTime JoinDateEnd, Integer baseFee, String location, Integer MaxParticipate, LocalDateTime createdAt, LocalDateTime updatedAt){
         this.idx=Idx;

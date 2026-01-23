@@ -33,6 +33,7 @@ public class RoundCreateDTO {
     private BigDecimal cutoff;
     private BigDecimal timeLimit;
     private Integer advance;
+
     public Round toEntity(Competition competition, CubeEvent cubeEvent){
         return Round.builder()
                 .comp(competition)

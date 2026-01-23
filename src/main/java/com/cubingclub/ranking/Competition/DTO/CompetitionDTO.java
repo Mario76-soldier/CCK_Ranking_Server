@@ -24,7 +24,8 @@ public class CompetitionDTO {
     private Integer maxParticipate;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
-    private List<EventFee> eventFeeList;
+    private List<EventFeeDTO> eventFeeList;
+
     public CompetitionDTO(Competition entity){
         this.idx=entity.getIdx();
         this.compName=entity.getCompName();
@@ -37,6 +38,6 @@ public class CompetitionDTO {
         this.maxParticipate=entity.getMaxParticipate();
         this.createdAt=entity.getCreatedAt();
         this.updatedAt=entity.getUpdatedAt();
-        this.eventFeeList=entity.getEventFees();
+        this.eventFeeList=entity.getEventFees().stream().map(EventFeeDTO::new).toList();
     }
 }

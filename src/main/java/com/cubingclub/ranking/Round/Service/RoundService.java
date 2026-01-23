@@ -12,6 +12,7 @@ import com.cubingclub.ranking.Round.Entity.Round;
 import com.cubingclub.ranking.Scrambler.Service.ScramblerService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.hibernate.Hibernate;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -28,6 +29,7 @@ public class RoundService {
     private final CompetitionRepository competitionRepository;
     private final CubeEventRepository cubeEventRepository;
     private final ScramblerService scramblerService;
+
     @Transactional
     public void createRoundList(List<RoundCreateDTO> roundList) {
         roundList.forEach(this::createRound);
@@ -42,10 +44,10 @@ public class RoundService {
 
     @Transactional(readOnly = true)
     public RoundDTO getOne(Integer idx) {
-        Round r = roundRepository.findByIdx(idx);
-        r.getGroupList().size();
+        Round round = roundRepository.findByIdx(idx).orElseThrow(() -> new CustomizedException(ErrorCode.ROUND_NOT_FOUND));
+        Hibernate.initialize(round.getGroupList());
 
-        return new RoundDTO(r);
+        return new RoundDTO(round);
     }
 
     @Transactional(readOnly = true)
@@ -53,7 +55,7 @@ public class RoundService {
         LocalDateTime currentTime=LocalDateTime.now();
         Page<Round> rounds=roundRepository.findPastRoundsByCompIdx(pageable, compIdx, currentTime);
 
-        rounds.getContent().forEach(round -> round.getGroupList().size());
+        rounds.getContent().forEach(round -> Hibernate.initialize(round.getGroupList()));
 
         return rounds.map(RoundDTO::new);
     }
@@ -63,7 +65,7 @@ public class RoundService {
         LocalDateTime currentTime=LocalDateTime.now();
         Page<Round> rounds=roundRepository.findPresentRoundsByCompIdx(pageable, compIdx, currentTime);
 
-        rounds.getContent().forEach(round -> round.getGroupList().size());
+        rounds.getContent().forEach(round -> Hibernate.initialize(round.getGroupList()));
 
         return rounds.map(RoundDTO::new);
     }
@@ -73,7 +75,7 @@ public class RoundService {
         LocalDateTime currentTime=LocalDateTime.now();
         Page<Round> rounds=roundRepository.findFutureRoundsByCompIdx(pageable, compIdx, currentTime);
 
-        rounds.getContent().forEach(round -> round.getGroupList().size());
+        rounds.getContent().forEach(round -> Hibernate.initialize(round.getGroupList()));
 
         return rounds.map(RoundDTO::new);
     }

@@ -1,12 +1,16 @@
 package com.cubingclub.ranking.Scrambler.Service;
 
+import com.cubingclub.ranking.Exception.Entity.ErrorCode;
+import com.cubingclub.ranking.Exception.Exceptions.CustomizedException;
 import com.cubingclub.ranking.Round.Repository.RoundRepository;
 import com.cubingclub.ranking.Round.Entity.Round;
 import com.cubingclub.ranking.Scrambler.Component.PuzzleConfigResolver;
 import com.cubingclub.ranking.Scrambler.DTO.ScrambleResponseDTO;
+import com.cubingclub.ranking.Scrambler.DTO.ScramblerUpdateDTO;
 import com.cubingclub.ranking.Scrambler.Repository.ScramblerRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.hibernate.Hibernate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,10 +31,10 @@ public class ScramblerService {
     public void saveScramble(Integer roundIdx, List<String> groups) {
         scramblerRepository.deleteByRound_Idx(roundIdx);
 
-        Round round = roundRepository.findByIdx(roundIdx);
+        Round round = roundRepository.findByIdx(roundIdx).orElseThrow(() -> new CustomizedException(ErrorCode.ROUND_NOT_FOUND));
         // OneToMany 컬렉션 초기화
-        round.getRecords().size();
-        round.getScrambles().size();
+        Hibernate.initialize(round.getRecords());
+        Hibernate.initialize(round.getScrambles());
         
         String puzzleId = puzzleConfigResolver.resolvePuzzleId(round);
         int count = puzzleConfigResolver.resolveScrambleCount(round);
@@ -47,7 +51,10 @@ public class ScramblerService {
     }
 
     @Transactional
-    public ScrambleResponseDTO getScramble(Integer compIdx, String uid, String token) {
-        return scrambleQueryService.getScrambleForPlayer(compIdx, uid, token);
+    public ScrambleResponseDTO getScramble(ScramblerUpdateDTO scramblerUpdateDTO, String token) {
+        return scrambleQueryService.getScrambleForPlayer(scramblerUpdateDTO.getCompIdx()
+                , scramblerUpdateDTO.getPlayerUid()
+                , scramblerUpdateDTO.getScramblerUid()
+                , token);
     }
 }

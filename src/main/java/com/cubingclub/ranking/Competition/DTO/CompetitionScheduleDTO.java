@@ -19,6 +19,7 @@ public class CompetitionScheduleDTO {
     private LocalDate compDateStart;
     private LocalDate compDateEnd;
     private List<RoundScheduleDTO> roundSchedules;
+
     public CompetitionScheduleDTO(Competition entity, List<RoundScheduleDTO> roundSchedules){
         this.idx=entity.getIdx();
         this.compName=entity.getCompName();

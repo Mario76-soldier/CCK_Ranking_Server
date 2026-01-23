@@ -14,7 +14,7 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 public class CompetitionUpdateDTO {
-    @NotBlank
+    @NotNull
     private Integer idx;
     @NotBlank
     private String compName;
@@ -29,7 +29,5 @@ public class CompetitionUpdateDTO {
     private Integer baseFee;
     private String location;
     private Integer maxParticipate;
-    private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
     private List<EventFeeDTO> eventFeeList;
 }

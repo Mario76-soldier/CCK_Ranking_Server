@@ -15,6 +15,12 @@ public class EventFeeDTO {
     private String eventName;   // CubeEvent 기본키
     private Integer eventFee;
 
+    public EventFeeDTO(EventFee entity){
+        this.idx=entity.getIdx();
+        this.eventName=entity.getCubeEvent().getEventName();
+        this.eventFee=entity.getEventFee();
+    }
+
     public EventFee toEntity(Competition comp, CubeEvent cubeEvent) {
         return EventFee.builder()
                 .idx(idx)

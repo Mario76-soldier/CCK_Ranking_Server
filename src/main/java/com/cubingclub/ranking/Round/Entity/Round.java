@@ -51,6 +51,7 @@ public class Round {
     @BatchSize(size = 100)
     @JsonIgnore
     private final List<Scramble> scrambles = new ArrayList<>();
+
     @Builder
     public Round(Integer idx, Competition comp, CubeEvent cubeEvent, String roundName,
                  LocalDateTime eventStart, LocalDateTime eventEnd,

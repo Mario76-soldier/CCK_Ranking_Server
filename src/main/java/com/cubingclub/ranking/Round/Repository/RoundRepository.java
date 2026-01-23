@@ -8,10 +8,11 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 public interface RoundRepository extends JpaRepository<Round, Integer> {
     @Query("select r from Round r join fetch r.comp join fetch r.cubeEvent where r.idx = :idx")
-    Round findByIdx(@Param("idx") Integer idx);
+    Optional<Round> findByIdx(@Param("idx") Integer idx);
 
     @Query("select r from Round r join fetch r.comp c join fetch r.cubeEvent e where c.idx = :compIdx and r.eventEnd < :now order by r.eventStart desc")
     Page<Round> findPastRoundsByCompIdx(Pageable pageable, @Param("compIdx") Integer compIdx, @Param("now") LocalDateTime now);

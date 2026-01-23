@@ -8,7 +8,7 @@ import java.util.List;
 
 @Getter
 @Setter
-public class ParticipateRecordDTO {
+public class RecordUpdateDTO {
     Integer idx;
     List<BigDecimal> times;
 }

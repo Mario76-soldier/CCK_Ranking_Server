@@ -28,9 +28,8 @@ public class CompetitionCreateDTO {
     private Integer baseFee;
     private String location;
     private Integer maxParticipate;
-    private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
     private List<EventFeeDTO> eventFeeList;
+
     public Competition toEntity(){
         return Competition.builder()
                 .CompName(compName)
@@ -41,8 +40,6 @@ public class CompetitionCreateDTO {
                 .baseFee(baseFee)
                 .location(location)
                 .MaxParticipate(maxParticipate)
-                .createdAt(createdAt)
-                .updatedAt(updatedAt)
                 .build();
     }
 }

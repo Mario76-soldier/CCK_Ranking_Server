@@ -7,6 +7,10 @@ import org.springframework.http.HttpStatus;
 @Getter
 @AllArgsConstructor
 public enum ErrorCode {
+    AUTH_REFRESH_TOKEN_NOT_FOUND(HttpStatus.BAD_REQUEST, "AUTH-001", "리프레쉬 토큰이 존재하지 않습니다."),
+    AUTH_ACCESS_TOKEN_NOT_FOUND(HttpStatus.BAD_REQUEST, "AUTH-002", "액세스 토큰이 존재하지 않습니다."),
+    AUTH_SERVER_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "AUTH-003", "인증 서버로부터 정보를 가져오는데 실패했습니다."),
+
     USER_NOT_FOUND(HttpStatus.BAD_REQUEST, "USER-001", "유저가 존재하지 않습니다."),
 
     COMPETITION_NOT_FOUND(HttpStatus.BAD_REQUEST, "COMPETITION-001", "해당 대회가 존재하지 않습니다."),
@@ -20,17 +24,10 @@ public enum ErrorCode {
     SCRAMBLE_SCRAMBLER_NOT_FOUND(HttpStatus.BAD_REQUEST, "SCRAMBLE-001", "스크램블러 정보가 없습니다."),
 
     RECORD_NOT_FOUND(HttpStatus.BAD_REQUEST, "RECORD-001", "기록 정보가 없습니다."),
+    RECORD_ATTEMPT_NOT_FOUND(HttpStatus.BAD_REQUEST, "RECORD-002", "시도 정보가 없습니다."),
 
-    PASSWORD_INCORRECT(HttpStatus.UNAUTHORIZED, "ACCOUNT-002", "비밀번호가 일치하지 않습니다."),
-    ID_DUPLICATE(HttpStatus.CONFLICT, "ACCOUNT-003", "이미 존재하는 아이디입니다."),
-    EMAIL_DUPLICATE(HttpStatus.CONFLICT, "ACCOUNT-004", "이미 존재하는 이메일입니다."),
-    DISABLED_ACCOUNT(HttpStatus.UNAUTHORIZED, "ACCOUNT-005", "비활성화된 계정입니다."),
-    INVALID_ACCESS_TOKEN(HttpStatus.UNAUTHORIZED, "ACCOUNT-006", "유효하지 않은 액세스 토큰입니다."),
-    INVALID_REFRESH_TOKEN(HttpStatus.UNAUTHORIZED, "ACCOUNT-007", "유효하지 않은 리프레시 토큰입니다."),
-    USERADD_FAIL(HttpStatus.INTERNAL_SERVER_ERROR, "ACCOUNT-008", "사용자 추가에 실패했습니다."),
-    NEW_PASSWORD_NOT_MATCH(HttpStatus.BAD_REQUEST, "ACCOUNT-009", "비밀번호 확인이 틀립니다."),
 
-    CONFLICT_ACCOUNT_DELETE(HttpStatus.CONFLICT, "ACCOUNT-010", "본인 계정을 삭제하고 있습니다.");
+    RECORDER_RECORD_NOT_REMAIN(HttpStatus.BAD_REQUEST, "RECORDER-001", "측정해야 하는 기록이 남아있지 않습니다.");
 
     private final HttpStatus httpStatus;	// HttpStatus
     private final String code;				// ACCOUNT-001

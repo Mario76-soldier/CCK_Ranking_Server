@@ -25,6 +25,18 @@ public class PuzzleConfigResolver {
             baseEvent = eventName;
         }
 
+        String puzzleId = getPuzzleId(baseEvent);
+        if (puzzleId == null) return null;
+
+        if (option.startsWith("BLD")) puzzleId += "bf";
+        else if (option.startsWith("FMC")) puzzleId += "fm";
+        else if (option.startsWith("OH")) puzzleId += "oh";
+        else if (option.startsWith("MULTBLD")) puzzleId += "mbf";
+
+        return puzzleId;
+    }
+
+    private static String getPuzzleId(String baseEvent) {
         Map<String, String> baseMap = Map.ofEntries(
                 Map.entry("2x2x2", "222"),
                 Map.entry("3x3x3", "333"),
@@ -39,15 +51,7 @@ public class PuzzleConfigResolver {
                 Map.entry("Square-1", "sq1")
         );
 
-        String puzzleId = baseMap.get(baseEvent);
-        if (puzzleId == null) return null;
-
-        if (option.startsWith("BLD")) puzzleId += "bf";
-        else if (option.startsWith("FMC")) puzzleId += "fm";
-        else if (option.startsWith("OH")) puzzleId += "oh";
-        else if (option.startsWith("MULTBLD")) puzzleId += "mbf";
-
-        return puzzleId;
+        return baseMap.get(baseEvent);
     }
 
     public int resolveScrambleCount(Round round) {

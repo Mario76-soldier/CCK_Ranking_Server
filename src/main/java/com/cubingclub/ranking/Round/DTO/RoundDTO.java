@@ -23,6 +23,7 @@ public class RoundDTO {
     private Integer advance;
     private List<String> roundGroupList;
 
+
     public RoundDTO(Round entity){
         this.idx=entity.getIdx();
         this.compIdx=entity.getComp().getIdx();

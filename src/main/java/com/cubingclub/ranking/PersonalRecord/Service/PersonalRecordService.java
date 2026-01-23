@@ -43,7 +43,7 @@ public class PersonalRecordService {
 
     private Map<String, List<RecordDTO>> groupByEvent(List<RecordDTO> records) {
         return records.stream()
-                .collect(Collectors.groupingBy(r -> r.getRound().getCubeEvent().getEventName()));
+                .collect(Collectors.groupingBy(RecordDTO::getEventName));
     }
 
     private Map<String, RecordDTO> extractBestSingle(Map<String, List<RecordDTO>> groupedRecords) {

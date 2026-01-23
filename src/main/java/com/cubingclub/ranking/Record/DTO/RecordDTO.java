@@ -1,6 +1,5 @@
 package com.cubingclub.ranking.Record.DTO;
 
-import com.cubingclub.ranking.Record.Entity.Attempt;
 import com.cubingclub.ranking.Record.Entity.BestType;
 import com.cubingclub.ranking.Record.Entity.Record;
 import com.cubingclub.ranking.Round.Entity.Round;
@@ -9,7 +8,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.List;
 
 
@@ -22,8 +20,14 @@ public class RecordDTO {
     private String name;
     private String state;
     private String cckId;
-    private Round round;
+    private Integer roundIdx;
+    private String roundName;
     private String roundGroup;
+    private Integer roundAdvance;
+    private Integer compIdx;
+    private String compName;
+    private String eventName;
+    private String avgCalc;
     private List<AttemptDTO> attempts;
     private BigDecimal single;
     private BigDecimal average;
@@ -32,18 +36,22 @@ public class RecordDTO {
     private BestType singleBestType;
     private BestType averageBestType;
     private String note;
+
     public RecordDTO(Record entity){
         this.idx=entity.getIdx();
         this.pdx=entity.getPdx();
         this.name=entity.getName();
         this.state=entity.getState();
         this.cckId=entity.getCckId();
-        this.round=entity.getRound();
+        this.roundIdx=entity.getRound().getIdx();
+        this.roundName=entity.getRound().getRoundName();
         this.roundGroup=entity.getRoundGroup();
-        this.attempts=new ArrayList<>();
-        for(Attempt attempt:entity.getAttempts()){
-            this.attempts.add(new AttemptDTO(attempt));
-        }
+        this.roundAdvance=entity.getRound().getAdvance();
+        this.compIdx=entity.getRound().getComp().getIdx();
+        this.compName=entity.getRound().getComp().getCompName();
+        this.eventName=entity.getRound().getCubeEvent().getEventName();
+        this.avgCalc=entity.getRound().getCubeEvent().getAvgCalc();
+        this.attempts=entity.getAttempts().stream().map(AttemptDTO::new).toList();
         this.single=entity.getSingle();
         this.average=entity.getAverage();
         this.ranking=entity.getRanking();
@@ -52,44 +60,16 @@ public class RecordDTO {
         this.averageBestType=entity.getAverageBestType();
         this.note=entity.getNote();
     }
-    public RecordDTO(String name, String state, String cckId, Integer pdx, Round round, String roundGroup, String note) {
-        this.name=name;
-        this.state=state;
-        this.cckId=cckId;
-        this.pdx=pdx;
-        this.round=round;
-        this.roundGroup=roundGroup;
-        this.note=note;
-    }
-    public Record toEntity(){
-        return Record.builder()
-                .pdx(pdx)
-                .name(name)
-                .state(state)
-                .cckId(cckId)
-                .round(round)
-                .roundGroup(roundGroup)
-                .note(note)
-                .build();
-    }
-    public Record toEntityFull(List<Attempt> attempts) {
-        return Record.builder()
-                .idx(idx)
-                .pdx(pdx)
-                .name(name)
-                .state(state)
-                .cckId(cckId)
-                .round(round)
-                .roundGroup(roundGroup)
-                .attempts(attempts)
-                .single(single != null ? single : BigDecimal.ZERO)
-                .average(average != null ? average : BigDecimal.ZERO)
-                .ranking(ranking)
-                .stateRanking(stateRanking)
-                .singleBestType(singleBestType)
-                .averageBestType(averageBestType)
-                .note(note)
-                .build();
-    }
 
+    public Record toEntity(Round round){
+        return Record.builder()
+                .pdx(pdx)
+                .name(name)
+                .state(state)
+                .cckId(cckId)
+                .round(round)
+                .roundGroup(roundGroup)
+                .note(note)
+                .build();
+    }
 }

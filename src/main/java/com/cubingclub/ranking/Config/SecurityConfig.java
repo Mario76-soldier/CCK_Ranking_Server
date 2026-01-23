@@ -1,15 +1,18 @@
 package com.cubingclub.ranking.Config;
 
 import lombok.RequiredArgsConstructor;
+import org.jspecify.annotations.NonNull;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.convert.converter.Converter;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.oauth2.core.OAuth2TokenValidator;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
@@ -18,11 +21,15 @@ import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
+import org.springframework.security.web.csrf.CsrfTokenRequestAttributeHandler;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 
 @RequiredArgsConstructor
@@ -37,8 +44,24 @@ public class SecurityConfig{
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        CsrfTokenRequestAttributeHandler requestHandler = new CsrfTokenRequestAttributeHandler();
+        requestHandler.setCsrfRequestAttributeName("_csrf");
+
         http
-                .csrf(AbstractHttpConfigurer::disable)
+                .csrf(csrf -> csrf
+                        .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
+                        .csrfTokenRequestHandler(requestHandler)
+                        .ignoringRequestMatchers(
+                                "/auth/token",           // 인가 코드로 토큰 발급 (GET 파라미터)
+                                "/recorder/**",          // JWT 인증 사용
+                                "/scramble/**",          // JWT 인증 사용
+                                "/comp/**",              // JWT 인증 사용
+                                "/event/**",             // JWT 인증 사용
+                                "/round/**",             // JWT 인증 사용
+                                "/advance/**",           // JWT 인증 사용
+                                "/record/**"             // JWT 인증 사용
+                        )
+                )
                 .cors(cors->cors.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests(request -> request
                         .requestMatchers("/recorder/**").hasAuthority("SCOPE_limited.read")
@@ -79,12 +102,29 @@ public class SecurityConfig{
 
     @Bean
     public JwtAuthenticationConverter jwtAuthenticationConverter() {
-        JwtGrantedAuthoritiesConverter grantedAuthoritiesConverter = new JwtGrantedAuthoritiesConverter();
-        grantedAuthoritiesConverter.setAuthorityPrefix("");  // roles는 ROLE_ 접두사 붙이기
-        grantedAuthoritiesConverter.setAuthoritiesClaimName("roles"); // JWT claim 이름
+
+        JwtGrantedAuthoritiesConverter scopeConverter = new JwtGrantedAuthoritiesConverter();
+        scopeConverter.setAuthorityPrefix("SCOPE_");
+        scopeConverter.setAuthoritiesClaimName("scope");
+
+        Converter<Jwt, Collection<GrantedAuthority>> combinedConverter = getJwtCollectionConverter(scopeConverter);
 
         JwtAuthenticationConverter converter = new JwtAuthenticationConverter();
-        converter.setJwtGrantedAuthoritiesConverter(grantedAuthoritiesConverter);
+        converter.setJwtGrantedAuthoritiesConverter(combinedConverter);
+
         return converter;
+    }
+
+    private static @NonNull Converter<Jwt, Collection<GrantedAuthority>> getJwtCollectionConverter(JwtGrantedAuthoritiesConverter scopeConverter) {
+        JwtGrantedAuthoritiesConverter roleConverter = new JwtGrantedAuthoritiesConverter();
+        roleConverter.setAuthorityPrefix("");
+        roleConverter.setAuthoritiesClaimName("roles");
+
+        return jwt -> {
+            Collection<GrantedAuthority> authorities = new ArrayList<>();
+            authorities.addAll(scopeConverter.convert(jwt));
+            authorities.addAll(roleConverter.convert(jwt));
+            return authorities;
+        };
     }
 }

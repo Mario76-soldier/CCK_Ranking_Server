@@ -8,7 +8,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 public class ExtraDTO {
-    Integer partIdx;
+    Integer recordIdx;
     Integer extraNum;
     Integer extraTry;
     String extraReason;

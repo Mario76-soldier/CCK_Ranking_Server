@@ -5,7 +5,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class RecorderRequestDTO {
-    String cckId;
-    Integer compIdx;
+public class AdvanceRequestDTO {
+    Integer pastRoundIdx;
+    Integer advanceRoundIdx;
 }

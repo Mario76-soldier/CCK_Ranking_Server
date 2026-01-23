@@ -11,6 +11,7 @@ import com.cubingclub.ranking.Exception.Exceptions.CustomizedException;
 import com.cubingclub.ranking.Round.DTO.RoundScheduleDTO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.hibernate.Hibernate;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -43,6 +44,20 @@ public class CompetitionService {
     public void update(CompetitionUpdateDTO competitionUpdateDTO){
         Competition competition=competitionRepository.findById(competitionUpdateDTO.getIdx()).orElseThrow(()->new CustomizedException(ErrorCode.COMPETITION_NOT_FOUND));
         competition.update(competitionUpdateDTO);
+        
+        // EventFee 업데이트 처리
+        if (competitionUpdateDTO.getEventFeeList() != null) {
+            // 기존 EventFee 모두 삭제
+            competition.getEventFees().clear();
+            
+            // 새로운 EventFee 추가
+            for (EventFeeDTO feeDTO : competitionUpdateDTO.getEventFeeList()) {
+                CubeEvent cubeEvent = cubeEventRepository.findById(feeDTO.getEventName())
+                        .orElseThrow(() -> new CustomizedException(ErrorCode.CUBE_EVENT_NOT_FOUND));
+                EventFee feeEntity = feeDTO.toEntity(competition, cubeEvent);
+                competition.getEventFees().add(feeEntity);
+            }
+        }
     }
 
     @Transactional(readOnly=true)
@@ -54,7 +69,7 @@ public class CompetitionService {
     public CompetitionScheduleDTO getOneSchedule(Integer idx){
         Competition competition=competitionRepository.findById(idx).orElseThrow(()->new CustomizedException(ErrorCode.COMPETITION_NOT_FOUND));
         // OneToMany 컬렉션 초기화
-        competition.getRounds().size();
+        Hibernate.initialize(competition.getRounds());
         return new CompetitionScheduleDTO(competition, competition.getRounds().stream().map(RoundScheduleDTO::new).toList());
     }
 
@@ -64,9 +79,7 @@ public class CompetitionService {
         Page<Competition> competitions = competitionRepository
                 .findByCompDateEndBeforeOrderByCompDateStartDesc(pageable, currentTime);
         // OneToMany 컬렉션 초기화
-        competitions.forEach(comp -> {
-            comp.getEventFees().size();
-        });
+        competitions.forEach(comp -> Hibernate.initialize(comp.getEventFees()));
         return competitions.map(CompetitionDTO::new);
     }
 
@@ -76,9 +89,7 @@ public class CompetitionService {
         Page<Competition> competitions = competitionRepository
                 .findByCompDateStartLessThanEqualAndCompDateEndGreaterThanEqualOrderByCompDateStartDesc(pageable, currentTime, currentTime);
         // OneToMany 컬렉션 초기화
-        competitions.forEach(comp -> {
-            comp.getEventFees().size();
-        });
+        competitions.forEach(comp -> Hibernate.initialize(comp.getEventFees()));
         return competitions.map(CompetitionDTO::new);
     }
 
@@ -88,9 +99,7 @@ public class CompetitionService {
         Page<Competition> competitions = competitionRepository
                 .findByCompDateStartAfterOrderByCompDateStartAsc(pageable, currentTime);
         // OneToMany 컬렉션 초기화
-        competitions.forEach(comp -> {
-            comp.getEventFees().size();
-        });
+        competitions.forEach(comp -> Hibernate.initialize(comp.getEventFees()));
         return competitions.map(CompetitionDTO::new);
     }
 
