@@ -1,103 +1,129 @@
 package com.cubingclub.ranking.Round.Service;
 
-import com.cubingclub.ranking.Record.Repository.RecordRepository;
-import com.cubingclub.ranking.Round.DTO.CreateRoundDTO;
-import com.cubingclub.ranking.Round.DTO.RoundDTO;
+import com.cubingclub.ranking.Competition.Entity.Competition;
+import com.cubingclub.ranking.CubeEvent.Entity.CubeEvent;
+import com.cubingclub.ranking.Exception.Entity.ErrorCode;
+import com.cubingclub.ranking.Exception.Exceptions.CustomizedException;
+import com.cubingclub.ranking.Round.DTO.*;
 import com.cubingclub.ranking.Competition.Repository.CompetitionRepository;
 import com.cubingclub.ranking.CubeEvent.Repository.CubeEventRepository;
-import com.cubingclub.ranking.Round.DTO.RoundGroupDTO;
-import com.cubingclub.ranking.Round.Repository.RoundGroupRepository;
 import com.cubingclub.ranking.Round.Repository.RoundRepository;
 import com.cubingclub.ranking.Round.Entity.Round;
-import com.cubingclub.ranking.Scrambler.Repository.ScramblerRepository;
 import com.cubingclub.ranking.Scrambler.Service.ScramblerService;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.hibernate.Hibernate;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
-@Transactional
 public class RoundService {
     private final RoundRepository roundRepository;
-    private final RoundGroupRepository roundGroupRepository;
     private final CompetitionRepository competitionRepository;
     private final CubeEventRepository cubeEventRepository;
     private final ScramblerService scramblerService;
-    public List<Integer> create(List<CreateRoundDTO> roundList){
-        List<Integer> list=new ArrayList<>();
-        for (CreateRoundDTO createRoundDTO : roundList) {
-            Integer roundIdx;
-            Round round;
-            if (createRoundDTO.getIdx() != null) { // Update
-                round = roundRepository.findByIdx(createRoundDTO.getIdx());
-                round.update(createRoundDTO, cubeEventRepository);
-                list.add(round.getIdx());
-                scramblerService.saveScramble(round.getIdx(), createRoundDTO.getGroupList());
-            } else { // Create
-                round = createRoundDTO.toEntity(competitionRepository, cubeEventRepository);
-                roundIdx = roundRepository.save(round).getIdx();
 
-                // 새로 생성된 그룹
-                List<String> roundGroup=createRoundDTO.getGroupList();
-                list.add(roundIdx);
-                for (String s : roundGroup){
-                    RoundGroupDTO roundGroupDTO = new RoundGroupDTO(roundIdx, s);
-                    roundGroupRepository.save(roundGroupDTO.toEntity(roundRepository));
-                }
-                scramblerService.saveScramble(roundIdx, roundGroup);
-            }
-        }
-        return list;
+    @Transactional
+    public void createRoundList(List<RoundCreateDTO> roundList) {
+        roundList.forEach(this::createRound);
     }
-    public RoundDTO getOne(Integer idx){
-        Round round=roundRepository.findByIdx(idx);
-        if(round==null){
-            return null;
+
+    @Transactional
+    public void updateRoundList(List<RoundUpdateDTO> dtoList) {
+        for (RoundUpdateDTO roundUpdateDTO : dtoList) {
+            updateSingleRound(roundUpdateDTO);
         }
+    }
+
+    @Transactional(readOnly = true)
+    public RoundDTO getOne(Integer idx) {
+        Round round = roundRepository.findByIdx(idx).orElseThrow(() -> new CustomizedException(ErrorCode.ROUND_NOT_FOUND));
+        Hibernate.initialize(round.getGroupList());
+
         return new RoundDTO(round);
     }
-    public Map<String, List<RoundDTO>> getRoundList(Integer compIdx, LocalDateTime date){
-        List<Round> list=roundRepository.findRoundList(compIdx);
 
-        Map<String, List<RoundDTO>> result = new HashMap<>();
-        result.put("past", new ArrayList<>());
-        result.put("now", new ArrayList<>());
-        result.put("future", new ArrayList<>());
+    @Transactional(readOnly = true)
+    public Page<RoundDTO> getRoundPast(Pageable pageable, Integer compIdx){
+        LocalDateTime currentTime=LocalDateTime.now();
+        Page<Round> rounds=roundRepository.findPastRoundsByCompIdx(pageable, compIdx, currentTime);
 
-        for(Round r : list){
-            RoundDTO roundDTO=new RoundDTO(r);
-            if(r.getEventEnd().isBefore(date)){
-                result.get("past").add(roundDTO);
-            }
-            else if ((r.getEventEnd().isEqual(date) || r.getEventEnd().isAfter(date)) && (r.getEventStart().isEqual(date)||r.getEventStart().isBefore(date))){
-                result.get("now").add(roundDTO);
-            }
-            else{
-                result.get("future").add(roundDTO);
-            }
-        }
-        return result;
+        rounds.getContent().forEach(round -> Hibernate.initialize(round.getGroupList()));
+
+        return rounds.map(RoundDTO::new);
     }
+
+    @Transactional(readOnly = true)
+    public Page<RoundDTO> getRoundNow(Pageable pageable, Integer compIdx){
+        LocalDateTime currentTime=LocalDateTime.now();
+        Page<Round> rounds=roundRepository.findPresentRoundsByCompIdx(pageable, compIdx, currentTime);
+
+        rounds.getContent().forEach(round -> Hibernate.initialize(round.getGroupList()));
+
+        return rounds.map(RoundDTO::new);
+    }
+
+    @Transactional(readOnly = true)
+    public Page<RoundDTO> getRoundFuture(Pageable pageable, Integer compIdx){
+        LocalDateTime currentTime=LocalDateTime.now();
+        Page<Round> rounds=roundRepository.findFutureRoundsByCompIdx(pageable, compIdx, currentTime);
+
+        rounds.getContent().forEach(round -> Hibernate.initialize(round.getGroupList()));
+
+        return rounds.map(RoundDTO::new);
+    }
+
+    @Transactional
     public void deleteByRoundIdx(Integer roundIdx){
-        roundRepository.deleteByIdx(roundIdx);
-    }
-    public void updateAdvance(Integer roundIdx, Integer advance){
-        Round round=roundRepository.findByIdx(roundIdx);
-        RoundDTO roundDTO=new RoundDTO(round);
-        roundDTO.setAdvance(advance);
-        roundRepository.save(roundDTO.toEntity(round.getRoundGroup()));
+        roundRepository.deleteById(roundIdx);
     }
 
-    public List<String> getGroupList(Integer roundIdx){
-        return roundGroupRepository.findGroupByRound_Idx(roundIdx);
+    @Transactional
+    public void updateAdvance(Integer roundIdx, Integer advance){
+        Round round=roundRepository.findById(roundIdx).orElseThrow(()->new CustomizedException(ErrorCode.ROUND_NOT_FOUND));
+        round.updateAdvance(advance);
+    }
+
+    private void updateSingleRound(RoundUpdateDTO roundUpdateDTO) {
+
+        Round round = roundRepository.findById(roundUpdateDTO.getIdx())
+                .orElseThrow(() -> new CustomizedException(ErrorCode.ROUND_NOT_FOUND));
+
+        CubeEvent cubeEvent = cubeEventRepository.findById(roundUpdateDTO.getCubeEvent())
+                .orElseThrow(() -> new CustomizedException(ErrorCode.CUBE_EVENT_NOT_FOUND));
+
+        round.update(roundUpdateDTO, cubeEvent);
+
+        round.updateRoundGroups(roundUpdateDTO.getGroupList());
+    }
+
+    private void createRound(RoundCreateDTO roundCreateDTO) {
+        Round round = roundCreateDTO.toEntity(
+                findCompetition(roundCreateDTO.getComp()),
+                findCubeEvent(roundCreateDTO.getCubeEvent())
+        );
+
+        round.updateRoundGroups(roundCreateDTO.getGroupList());
+
+        Round saved = roundRepository.save(round);
+
+        scramblerService.saveScramble(saved.getIdx(), roundCreateDTO.getGroupList());
+    }
+
+    private Competition findCompetition(Integer idx) {
+        return competitionRepository.findById(idx)
+                .orElseThrow(() -> new CustomizedException(ErrorCode.COMPETITION_NOT_FOUND));
+    }
+
+    private CubeEvent findCubeEvent(String eventName) {
+        return cubeEventRepository.findById(eventName)
+                .orElseThrow(() -> new CustomizedException(ErrorCode.CUBE_EVENT_NOT_FOUND));
     }
 }

@@ -2,7 +2,6 @@ package com.cubingclub.ranking.Competition.DTO;
 
 import com.cubingclub.ranking.Competition.Entity.Competition;
 import com.cubingclub.ranking.Competition.Entity.EventFee;
-import jakarta.persistence.Column;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -25,7 +24,8 @@ public class CompetitionDTO {
     private Integer maxParticipate;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
-    private List<EventFee> eventFeeList;
+    private List<EventFeeDTO> eventFeeList;
+
     public CompetitionDTO(Competition entity){
         this.idx=entity.getIdx();
         this.compName=entity.getCompName();
@@ -38,20 +38,6 @@ public class CompetitionDTO {
         this.maxParticipate=entity.getMaxParticipate();
         this.createdAt=entity.getCreatedAt();
         this.updatedAt=entity.getUpdatedAt();
-        this.eventFeeList=entity.getEventFees();
-    }
-    public Competition toEntity(){
-        return Competition.builder()
-                .CompName(compName)
-                .CompDateStart(compDateStart)
-                .CompDateEnd(compDateEnd)
-                .JoinDateStart(joinDateStart)
-                .JoinDateEnd(joinDateEnd)
-                .baseFee(baseFee)
-                .location(location)
-                .MaxParticipate(maxParticipate)
-                .createdAt(createdAt)
-                .updatedAt(updatedAt)
-                .build();
+        this.eventFeeList=entity.getEventFees().stream().map(EventFeeDTO::new).toList();
     }
 }

@@ -1,7 +1,6 @@
 package com.cubingclub.ranking.Round.DTO;
 
 import com.cubingclub.ranking.Round.Entity.Round;
-import com.cubingclub.ranking.Round.Entity.RoundGroup;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -19,7 +18,7 @@ public class RoundScheduleDTO {
     private String roundName;
     private LocalDateTime eventStart;
     private LocalDateTime eventEnd;
-    private List<RoundGroup> roundGroup;
+    private List<String> groupList;
     private BigDecimal cutoff;
     private BigDecimal timeLimit;
     private Integer advance;
@@ -30,7 +29,7 @@ public class RoundScheduleDTO {
         this.roundName=entity.getRoundName();
         this.eventStart=entity.getEventStart();
         this.eventEnd=entity.getEventEnd();
-        this.roundGroup=entity.getRoundGroup();
+        this.groupList=entity.getGroupList();
         this.cutoff=entity.getCutoff();
         this.timeLimit=entity.getTimeLimit();
         this.advance=entity.getAdvance();

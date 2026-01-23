@@ -11,19 +11,12 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 public class CubeEventDTO {
-    private String EventName;
-    private String AvgCalc;
+    private String eventName;
+    private String avgCalc;
     private ColorType colorType;
     public CubeEventDTO(CubeEvent entity){
-        this.EventName=entity.getEventName();
-        this.AvgCalc=entity.getAvgCalc();
+        this.eventName=entity.getEventName();
+        this.avgCalc=entity.getAvgCalc();
         this.colorType=entity.getColorType();
-    }
-    public CubeEvent toEntity(){
-        return CubeEvent.builder()
-                .EventName(EventName)
-                .AvgCalc(AvgCalc)
-                .colorType(colorType)
-                .build();
     }
 }
