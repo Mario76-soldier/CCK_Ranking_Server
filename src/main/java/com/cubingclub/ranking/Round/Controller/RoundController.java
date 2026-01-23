@@ -1,53 +1,66 @@
 package com.cubingclub.ranking.Round.Controller;
 
-import com.cubingclub.ranking.Round.DTO.CreateRoundDTO;
+import com.cubingclub.ranking.Round.DTO.RoundCreateDTO;
 import com.cubingclub.ranking.Round.DTO.RoundDTO;
+import com.cubingclub.ranking.Round.DTO.RoundUpdateDTO;
 import com.cubingclub.ranking.Round.Service.RoundService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Map;
 
 @Slf4j
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api")
+@RequestMapping("/round")
 public class RoundController {
     private final RoundService roundService;
-    @GetMapping("/rounds/{compIdx}")
-    public ResponseEntity<Map<String, List<RoundDTO>>> RoundList(@PathVariable(value="compIdx") Integer compIdx){
-        LocalDateTime now=LocalDateTime.now();
-        return ResponseEntity.ok(roundService.getRoundList(compIdx, now));
+
+    @GetMapping("/past/{compIdx}")
+    public ResponseEntity<Page<RoundDTO>> getRoundPast(Pageable pageable, @PathVariable Integer compIdx){
+        return ResponseEntity.ok(roundService.getRoundPast(pageable, compIdx));
     }
-    @GetMapping("/round/{roundIdx}")
-    public ResponseEntity<RoundDTO> RoundInfo(@PathVariable(value="roundIdx")Integer roundIdx){
-        RoundDTO roundDTO=roundService.getOne(roundIdx);
-        if(roundDTO==null){
-            return ResponseEntity.noContent().build();
-        }
-        return ResponseEntity.ok(roundDTO);
+
+    @GetMapping("/now/{compIdx}")
+    public ResponseEntity<Page<RoundDTO>> getRoundNow(Pageable pageable, @PathVariable Integer compIdx){
+        return ResponseEntity.ok(roundService.getRoundNow(pageable, compIdx));
     }
-    @PostMapping("/round")
-    public ResponseEntity<List<Integer>> CreateRound(@RequestBody List<CreateRoundDTO> roundList){
-        return ResponseEntity.ok(roundService.create(roundList));
+
+    @GetMapping("/future/{compIdx}")
+    public ResponseEntity<Page<RoundDTO>> getRoundFuture(Pageable pageable, @PathVariable Integer compIdx){
+        return ResponseEntity.ok(roundService.getRoundFuture(pageable, compIdx));
     }
-    @DeleteMapping("/round/{roundIdx}")
-    public ResponseEntity<?> DeleteRound(@PathVariable(value="roundIdx")Integer roundIdx){
+
+    @GetMapping("/{roundIdx}")
+    public ResponseEntity<RoundDTO> getRound(@PathVariable Integer roundIdx){
+        return ResponseEntity.ok(roundService.getOne(roundIdx));
+    }
+
+    @PostMapping("")
+    public ResponseEntity<Void> createRound(@RequestBody List<RoundCreateDTO> roundList){
+        roundService.createRoundList(roundList);
+        return ResponseEntity.ok().build();
+    }
+
+    @PutMapping("")
+    public ResponseEntity<Void> updateRound(@RequestBody List<RoundUpdateDTO> roundList){
+        roundService.updateRoundList(roundList);
+        return ResponseEntity.ok().build();
+    }
+
+    @DeleteMapping("/{roundIdx}")
+    public ResponseEntity<Void> deleteRound(@PathVariable Integer roundIdx){
         roundService.deleteByRoundIdx(roundIdx);
         return ResponseEntity.ok().build();
     }
-    @PutMapping("/advance/{roundIdx}/{advance}")//어드밴스 인원 조정 콜
-    public ResponseEntity<Integer> UpdateAdvance(@PathVariable(value="roundIdx")Integer roundIdx, @PathVariable(value="advance")Integer advance) {
-        roundService.updateAdvance(roundIdx, advance);
-        return ResponseEntity.ok(roundService.getOne(roundIdx).getAdvance());
-    }
 
-    @GetMapping("/group/{roundIdx}")
-    public ResponseEntity<List<String>> GroupList(@PathVariable(value="roundIdx")Integer roundIdx){
-        return ResponseEntity.ok(roundService.getGroupList(roundIdx));
+    @PatchMapping("/{roundIdx}/advance/{advance}")//어드밴스 인원 조정 콜
+    public ResponseEntity<Void> updateAdvance(@PathVariable Integer roundIdx, @PathVariable Integer advance) {
+        roundService.updateAdvance(roundIdx, advance);
+        return ResponseEntity.ok().build();
     }
 }

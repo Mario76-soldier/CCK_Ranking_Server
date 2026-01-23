@@ -1,12 +1,9 @@
 package com.cubingclub.ranking.Record.Entity;
 
 
-import com.cubingclub.ranking.Account.Entity.Account;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.hibernate.annotations.DynamicInsert;
 
 import java.math.BigDecimal;
@@ -20,30 +17,50 @@ import java.math.BigDecimal;
 @Builder
 public class Attempt {
     @Id
-    @Column
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer idx;
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn
+    @JsonIgnore
+    @Setter
+    @JoinColumn(nullable = false)
     private Record record;
-    @Column
     private Integer attemptTry;
     @Column(precision = 10, scale=2)
     private BigDecimal time;
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn
-    private Account scrambler;
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn
-    private Account judge;
-    @Column
+    private String scramblerName;
+    private String scramblerCckId;
+    private String judgeName;
+    private String judgeCckId;
     private Integer extra;
-    @Column
     private String exReason;
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn
-    private Account delegate;
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn
-    private Account exScrambler;
+    private String delegateName;
+    private String delegateCckId;
+    private String exScramblerName;
+    private String exScramblerCckId;
+
+    public void updateTime(BigDecimal time){
+        this.time=time;
+    }
+
+    public void updateScrambler(String scramblerName, String scramblerCckId){
+        this.scramblerName=scramblerName;
+        this.scramblerCckId=scramblerCckId;
+    }
+
+    public void updateJudge(String judgeName, String judgeCckId){
+        this.judgeName=judgeName;
+        this.judgeCckId=judgeCckId;
+    }
+
+    public void updateExtra(Integer extra, String exReason, String delegateName, String delegateCckId){
+        this.extra=extra;
+        this.exReason=exReason;
+        this.delegateName=delegateName;
+        this.delegateCckId=delegateCckId;
+    }
+
+    public void updateExScrambler(String exScramblerName, String exScramblerCckId){
+        this.exScramblerName=exScramblerName;
+        this.exScramblerCckId=exScramblerCckId;
+    }
 }

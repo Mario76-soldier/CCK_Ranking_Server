@@ -1,12 +1,12 @@
 package com.cubingclub.ranking.Record.Entity;
 
-import com.cubingclub.ranking.Account.Entity.Account;
 import com.cubingclub.ranking.Round.Entity.Round;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.BatchSize;
 import org.hibernate.annotations.DynamicInsert;
 
 import java.math.BigDecimal;
@@ -17,38 +17,47 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @DynamicInsert
-@Table
 @Builder
 public class Record {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column
     private Integer idx;
-    @Column
     private Integer pdx;
+    @Column(nullable = false)
+    private String name;
+    private String state;
+    private String cckId;
     @ManyToOne(fetch=FetchType.LAZY)
-    @JoinColumn
-    private Account account;
-    @ManyToOne(fetch=FetchType.LAZY)
-    @JoinColumn
+    @JoinColumn(nullable = false)
     private Round round;
-    @Column
+    @Column(length = 20)
     private String roundGroup;
-    @OneToMany(mappedBy = "record", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "record", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    @BatchSize(size = 100)
     @OrderBy("attemptTry ASC")
     private List<Attempt> attempts;
     @Column(precision = 10, scale=2)
     private BigDecimal single;
     @Column(precision = 10, scale=2)
     private BigDecimal average;
-    @Column
     private Integer ranking;
-    @Column
     private Integer stateRanking;
-    @Column
     private BestType singleBestType;
-    @Column
     private BestType averageBestType;
-    @Column
     private String note;
+
+    public void updateRecord(BigDecimal single, BigDecimal average){
+        this.single=single;
+        this.average=average;
+    }
+
+    public void updateRanking(Integer ranking, Integer stateRanking){
+        this.ranking=ranking;
+        this.stateRanking=stateRanking;
+    }
+
+    public void updateBestType(BestType singleBestType, BestType averageBestType){
+        this.singleBestType=singleBestType;
+        this.averageBestType=averageBestType;
+    }
 }

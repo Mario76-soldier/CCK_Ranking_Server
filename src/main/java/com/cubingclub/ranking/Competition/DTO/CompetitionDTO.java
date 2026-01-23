@@ -1,11 +1,13 @@
 package com.cubingclub.ranking.Competition.DTO;
 
 import com.cubingclub.ranking.Competition.Entity.Competition;
+import com.cubingclub.ranking.Competition.Entity.EventFee;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Getter
 @Setter
@@ -17,7 +19,13 @@ public class CompetitionDTO {
     private LocalDate compDateEnd;
     private LocalDateTime joinDateStart;
     private LocalDateTime joinDateEnd;
+    private Integer baseFee;
+    private String location;
     private Integer maxParticipate;
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
+    private List<EventFeeDTO> eventFeeList;
+
     public CompetitionDTO(Competition entity){
         this.idx=entity.getIdx();
         this.compName=entity.getCompName();
@@ -25,16 +33,11 @@ public class CompetitionDTO {
         this.compDateEnd=entity.getCompDateEnd();
         this.joinDateStart=entity.getJoinDateStart();
         this.joinDateEnd=entity.getJoinDateEnd();
+        this.baseFee=entity.getBaseFee();
+        this.location=entity.getLocation();
         this.maxParticipate=entity.getMaxParticipate();
-    }
-    public Competition toEntity(){
-        return Competition.builder()
-                .CompName(compName)
-                .CompDateStart(compDateStart)
-                .CompDateEnd(compDateEnd)
-                .JoinDateStart(joinDateStart)
-                .JoinDateEnd(joinDateEnd)
-                .MaxParticipate(maxParticipate)
-                .build();
+        this.createdAt=entity.getCreatedAt();
+        this.updatedAt=entity.getUpdatedAt();
+        this.eventFeeList=entity.getEventFees().stream().map(EventFeeDTO::new).toList();
     }
 }
