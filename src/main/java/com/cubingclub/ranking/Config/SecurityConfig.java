@@ -41,6 +41,8 @@ public class SecurityConfig{
     private String oAuthUrl;
     @Value("${cors.allowed-origins}")
     private String allowedOrigins;
+    @Value("${cors.allowed-methods}")
+    private String allowedMethods;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -83,7 +85,7 @@ public class SecurityConfig{
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
         config.setAllowedOrigins(Arrays.asList(allowedOrigins.split(",")));
-        config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
+        config.setAllowedMethods(Arrays.asList(allowedMethods.split(",")));
         config.setAllowedHeaders(List.of("*"));
         config.setAllowCredentials(true);
 
