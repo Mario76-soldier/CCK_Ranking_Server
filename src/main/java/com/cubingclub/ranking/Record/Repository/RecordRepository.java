@@ -29,13 +29,13 @@ public interface RecordRepository extends JpaRepository<Record, Integer> {
     List<Record> findByRound_IdxForBestType(@Param(value="roundIdx")Integer roundIdx);
 
     @Modifying
-    @Query(value = "UPDATE Record r JOIN (" +
+    @Query(value = "UPDATE record r JOIN (" +
             "SELECT idx, RANK() OVER (" +
             "ORDER BY " +
             "(CASE WHEN average = -2 THEN 2 WHEN average = -1 THEN 1 ELSE 0 END), average, " +
             "(CASE WHEN single = -2 THEN 2 WHEN single = -1 THEN 1 ELSE 0 END), single" +
             ") AS new_rank " +
-            "FROM Record " +
+            "FROM record " +
             "WHERE round_idx = :roundIdx AND average IS NOT NULL AND average != 0" +
             ") ranked ON r.idx = ranked.idx " +
             "SET r.ranking = ranked.new_rank " +
