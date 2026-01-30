@@ -32,6 +32,21 @@ public class CompetitionController {
         return ResponseEntity.ok(competitionService.getCompFuture(pageable));
     }
 
+    @GetMapping("/join/past")
+    public ResponseEntity<Page<CompetitionDTO>> getJoinPast(Pageable pageable){
+        return ResponseEntity.ok(competitionService.getJoinPast(pageable));
+    }
+
+    @GetMapping("/join/now")
+    public ResponseEntity<Page<CompetitionDTO>> getJoinNow(Pageable pageable){
+        return ResponseEntity.ok(competitionService.getJoinNow(pageable));
+    }
+
+    @GetMapping("/join/future")
+    public ResponseEntity<Page<CompetitionDTO>> getJoinFuture(Pageable pageable){
+        return ResponseEntity.ok(competitionService.getJoinFuture(pageable));
+    }
+
     @GetMapping("/{compIdx}")
     public ResponseEntity<CompetitionDTO> getComp(@PathVariable Integer compIdx){
         return ResponseEntity.ok(competitionService.getOne(compIdx));
