@@ -33,4 +33,20 @@ public class CubeEventController {
         cubeEventService.createCubeEvent(eventName, avgCalc, colorType, file);
         return ResponseEntity.ok().build();
     }
+
+    @PutMapping("")
+    public ResponseEntity<Void> updateEvent(
+            @RequestParam("eventName") String eventName,
+            @RequestParam("avgCalc") String avgCalc,
+            @RequestParam("colorType") ColorType colorType,
+            @RequestParam(value = "file", required = false) MultipartFile file) {
+        cubeEventService.updateCubeEvent(eventName, avgCalc, colorType, file);
+        return ResponseEntity.ok().build();
+    }
+
+    @DeleteMapping("/{eventName}")
+    public ResponseEntity<Void> deleteEvent(@PathVariable String eventName){
+        cubeEventService.deleteCubeEvent(eventName);
+        return ResponseEntity.ok().build();
+    }
 }

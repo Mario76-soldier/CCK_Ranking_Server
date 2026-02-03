@@ -50,7 +50,7 @@ public class CubeEventService {
                 Path folder = Paths.get(path);
                 if (!Files.exists(folder)) Files.createDirectories(folder);
 
-                Path filePath = folder.resolve(eventName + ".svg");
+                Path filePath = resolvePath(eventName);
                 Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
             }
             cubeEventRepository.save(cubeEvent);
@@ -59,5 +59,45 @@ public class CubeEventService {
         catch (IOException e) {
             throw new CustomizedException(ErrorCode.CUBE_EVENT_SAVE_FAILED, e.getMessage());
         }
+    }
+
+    @Transactional
+    public void updateCubeEvent(String eventName, String avgCalc, ColorType colorType, MultipartFile file) {
+        CubeEvent cubeEvent = cubeEventRepository.findById(eventName)
+                .orElseThrow(() -> new CustomizedException(ErrorCode.CUBE_EVENT_NOT_FOUND));
+
+        Path filePath = resolvePath(eventName);
+
+        try {
+            if (file != null && !file.isEmpty()) {
+                Files.createDirectories(filePath.getParent());
+                Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
+            }
+
+            cubeEvent.update(avgCalc, colorType);
+
+        } catch (IOException e) {
+            throw new CustomizedException(ErrorCode.CUBE_EVENT_UPDATE_FAILED, e.getMessage());
+        }
+    }
+
+    @Transactional
+    public void deleteCubeEvent(String eventName) {
+        CubeEvent cubeEvent = cubeEventRepository.findById(eventName)
+                .orElseThrow(() -> new CustomizedException(ErrorCode.CUBE_EVENT_NOT_FOUND));
+
+        Path filePath = resolvePath(eventName);
+
+        cubeEventRepository.delete(cubeEvent);
+
+        try {
+            Files.deleteIfExists(filePath);
+        } catch (IOException e) {
+            throw new CustomizedException(ErrorCode.CUBE_EVENT_DELETE_FAILED, e.getMessage());
+        }
+    }
+
+    private Path resolvePath(String eventName) {
+        return Paths.get(path).resolve(eventName + ".svg");
     }
 }
