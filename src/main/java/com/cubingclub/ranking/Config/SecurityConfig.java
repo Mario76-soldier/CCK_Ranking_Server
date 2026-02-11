@@ -67,11 +67,12 @@ public class SecurityConfig{
                 .cors(cors->cors.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests(request -> request
                         .requestMatchers("/recorder/**").hasAuthority("SCOPE_limited.read")
-                        .requestMatchers("/scramble/**").hasAnyRole("ROOT", "SCRAMBLER")
+                        .requestMatchers("/scramble", "/scramble/check/**").hasAnyRole("ROOT", "SCRAMBLER")
                         .requestMatchers(HttpMethod.POST,"/comp/**", "/event/**","/round","/advance/**","/record/**").hasAnyRole("ROOT","ADMIN")
                         .requestMatchers(HttpMethod.PUT,"/comp/**", "/event/**","/round","/advance/**","/record/**").hasAnyRole("ROOT","ADMIN")
                         .requestMatchers(HttpMethod.PATCH,"/comp/**", "/event/**","/round","/advance/**","/record/**").hasAnyRole("ROOT","ADMIN")
                         .requestMatchers(HttpMethod.DELETE,"/comp/**","/round/**","/record/**").hasAnyRole("ROOT","ADMIN")
+
                         .requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll()
                         .anyRequest().permitAll()
                 )

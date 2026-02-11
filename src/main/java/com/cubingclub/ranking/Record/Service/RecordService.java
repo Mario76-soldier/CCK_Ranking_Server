@@ -20,6 +20,7 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.Hibernate;
+import org.springframework.cache.CacheManager;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -34,6 +35,7 @@ public class RecordService {
     private final RecordRepository recordRepository;
     private final AttemptRepository attemptRepository;
     private final EntityManager em;
+    private final CacheManager cacheManager;
 
     private final AuthService authService;
     private final RecordCalculator recordCalculator;
@@ -48,17 +50,20 @@ public class RecordService {
                 .toList();
     }
 
+    public List<RecordDTO> getBreakRecordList(Integer compIdx) {
+        List<Record> list=recordRepository.findRecordsWithBestTypeByCompIdx(compIdx);
+        list.forEach(record -> Hibernate.initialize(record.getAttempts()));
+        return list.stream()
+                .map(RecordDTO::new)
+                .toList();
+    }
+
     public void updateRecord(RecordUpdateDTO p) {
         Record record = recordRepository.findByIdx(p.getIdx());
         Hibernate.initialize(record.getAttempts());
         
         // Cutoff와 TimeLimit 처리를 CutoffProcessor에 위임
-        cutoffProcessor.applyRules(
-            record.getAttempts(),
-            p.getTimes(),
-            record.getRound().getCutoff(),
-            record.getRound().getTimeLimit()
-        );
+
         
         // 기록 계산 및 업데이트
         applyRecordUpdate(record);
@@ -105,6 +110,14 @@ public class RecordService {
         List<BigDecimal> times = attemptList.stream()
                 .map(Attempt::getTime)
                 .toList();
+
+        cutoffProcessor.applyRules(
+                attemptList,
+                times,
+                record.getRound().getCutoff(),
+                record.getRound().getTimeLimit(),
+                calcInfo
+        );
         
         // 계산 가능한 상태인지 확인
         if (calcInfo.canCalculate(times)) {
@@ -120,6 +133,9 @@ public class RecordService {
         // BestType 업데이트
         updateBestTypesForRound(record);
         recordRepository.flush();
+        
+        // 글로벌 통계 캐시 삭제
+        evictGlobalStatsCache(record.getRound().getCubeEvent().getEventName());
     }
     
     /**
@@ -129,7 +145,7 @@ public class RecordService {
         BigDecimal single;
         BigDecimal average;
         
-        switch (calcInfo.getType()) {
+        switch (calcInfo.type()) {
             case AO -> {
                 single = recordCalculator.calculateSingle(times);
                 average = recordCalculator.calculateAoXAverage(times);
@@ -150,7 +166,7 @@ public class RecordService {
                 single = times.get(0);
                 average = times.get(0);
             }
-            default -> throw new IllegalStateException("Unknown calc type: " + calcInfo.getType());
+            default -> throw new IllegalStateException("Unknown calc type: " + calcInfo.type());
         }
         
         record.updateRecord(single, average);
@@ -207,9 +223,40 @@ public class RecordService {
 
 
     public void deleteRecord(Integer idx) {
-        Integer roundIdx=recordRepository.findByIdx(idx).getRound().getIdx();
+        Record record = recordRepository.findByIdx(idx);
+        Integer roundIdx = record.getRound().getIdx();
+        String eventName = record.getRound().getCubeEvent().getEventName();
+        
         recordRepository.deleteById(idx);
         recordRepository.setRankOnRound(roundIdx);
+        
+        // 글로벌 통계 캐시 삭제
+        evictGlobalStatsCache(eventName);
+    }
+    
+    /**
+     * 글로벌 통계 캐시 삭제
+     */
+    private void evictGlobalStatsCache(String eventName) {
+        log.debug("Evicting stats cache for event: {}", eventName);
+        
+        var globalSingleCache = cacheManager.getCache("globalStatsSingle");
+        var globalAverageCache = cacheManager.getCache("globalStatsAverage");
+        var stateSingleCache = cacheManager.getCache("stateStatsSingle");
+        var stateAverageCache = cacheManager.getCache("stateStatsAverage");
+        
+        if (globalSingleCache != null) {
+            globalSingleCache.evict(eventName);
+        }
+        if (globalAverageCache != null) {
+            globalAverageCache.evict(eventName);
+        }
+        if (stateSingleCache != null) {
+            stateSingleCache.evict(eventName);
+        }
+        if (stateAverageCache != null) {
+            stateAverageCache.evict(eventName);
+        }
     }
 
     public void quitRecord(List<Integer> partList) {

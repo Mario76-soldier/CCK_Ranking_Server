@@ -3,6 +3,7 @@ package com.cubingclub.ranking.Record.DTO;
 import com.cubingclub.ranking.Record.Entity.Attempt;
 import com.cubingclub.ranking.Record.Entity.Record;
 import com.cubingclub.ranking.Record.Repository.RecordRepository;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -12,6 +13,7 @@ import java.math.BigDecimal;
 @Getter
 @Setter
 @NoArgsConstructor
+@AllArgsConstructor
 public class AttemptDTO {
     private Integer idx;
     private Integer recordIdx;
@@ -27,6 +29,7 @@ public class AttemptDTO {
     private String delegateCckId;
     private String exScramblerName;
     private String exScramblerCckId;
+
     public AttemptDTO(Attempt entity) {
         this.idx = entity.getIdx();
         this.recordIdx=entity.getRecord().getIdx();

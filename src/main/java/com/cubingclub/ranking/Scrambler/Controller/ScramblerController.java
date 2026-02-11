@@ -5,6 +5,7 @@ import com.cubingclub.ranking.Auth.DTO.PlayerInfo;
 import com.cubingclub.ranking.Auth.Service.AuthService;
 import com.cubingclub.ranking.Exception.Entity.ErrorCode;
 import com.cubingclub.ranking.Exception.Exceptions.CustomizedException;
+import com.cubingclub.ranking.Scrambler.DTO.ScrambleDTO;
 import com.cubingclub.ranking.Scrambler.DTO.ScrambleResponseDTO;
 import com.cubingclub.ranking.Scrambler.DTO.ScramblerUpdateDTO;
 import com.cubingclub.ranking.Scrambler.Service.ScramblerService;
@@ -24,6 +25,11 @@ public class ScramblerController {
     @GetMapping("/check/{uid}")
     public ResponseEntity<PlayerInfo> getAccountInfo(@PathVariable String uid, @JwtToken String token) {
         return ResponseEntity.ok(authService.getRFIDInfo(token, uid).orElseThrow(() -> new CustomizedException(ErrorCode.USER_NOT_FOUND)));
+    }
+
+    @GetMapping("/record/{recordIdx}")
+    public ResponseEntity<ScrambleDTO> getScramble(@PathVariable Integer recordIdx, @RequestParam Integer attemptTry, @RequestParam(required = false) String extra) {
+        return ResponseEntity.ok(scramblerService.getScrambleByRecord(recordIdx, attemptTry, extra));
     }
 
     @PatchMapping("")

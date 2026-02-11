@@ -24,6 +24,7 @@ public enum ErrorCode {
     CUBE_EVENT_DELETE_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "CUBEEVENT-004", "큐브 종목 삭제가 실패했습니다."),
 
     SCRAMBLE_SCRAMBLER_NOT_FOUND(HttpStatus.BAD_REQUEST, "SCRAMBLE-001", "스크램블러 정보가 없습니다."),
+    SCRAMBLE_NOT_FOUND(HttpStatus.BAD_REQUEST, "SCRAMBLE-002", "스크램블 정보가 없습니다."),
 
     RECORD_NOT_FOUND(HttpStatus.BAD_REQUEST, "RECORD-001", "기록 정보가 없습니다."),
     RECORD_ATTEMPT_NOT_FOUND(HttpStatus.BAD_REQUEST, "RECORD-002", "시도 정보가 없습니다."),

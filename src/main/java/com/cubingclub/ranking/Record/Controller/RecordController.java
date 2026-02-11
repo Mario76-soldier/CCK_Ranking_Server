@@ -21,6 +21,11 @@ public class RecordController {
         return ResponseEntity.ok(recordService.getRecordList(roundIdx));
     }
 
+    @GetMapping("/break/{compIdx}")
+    public ResponseEntity<List<RecordDTO>> getBreakRecordList(@PathVariable Integer compIdx){
+        return ResponseEntity.ok(recordService.getBreakRecordList(compIdx));
+    }
+
     @PostMapping("")
     public ResponseEntity<Integer> addPlayer(@RequestBody List<PlayerAddDTO> playerAddDTOList){
         recordService.addPlayer(playerAddDTOList);
