@@ -18,4 +18,9 @@ public class CubeEvent {
     @Column(length=15, nullable = false)
     private String avgCalc;
     private ColorType colorType;
+
+    public void update(String avgCalc, ColorType colorType){
+        this.avgCalc=avgCalc;
+        this.colorType=colorType;
+    }
 }

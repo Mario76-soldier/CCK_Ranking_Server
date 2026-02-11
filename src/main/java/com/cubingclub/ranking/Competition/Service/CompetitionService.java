@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Slf4j
 @Service
@@ -98,6 +99,36 @@ public class CompetitionService {
         LocalDate currentTime=LocalDate.now();
         Page<Competition> competitions = competitionRepository
                 .findByCompDateStartAfterOrderByCompDateStartAsc(pageable, currentTime);
+        // OneToMany 컬렉션 초기화
+        competitions.forEach(comp -> Hibernate.initialize(comp.getEventFees()));
+        return competitions.map(CompetitionDTO::new);
+    }
+
+    @Transactional(readOnly = true)
+    public Page<CompetitionDTO> getJoinPast(Pageable pageable){
+        LocalDateTime currentTime=LocalDateTime.now();
+        Page<Competition> competitions = competitionRepository
+                .findByJoinDateEndBeforeOrderByJoinDateStartDesc(pageable, currentTime);
+        // OneToMany 컬렉션 초기화
+        competitions.forEach(comp -> Hibernate.initialize(comp.getEventFees()));
+        return competitions.map(CompetitionDTO::new);
+    }
+
+    @Transactional(readOnly=true)
+    public Page<CompetitionDTO> getJoinNow(Pageable pageable){
+        LocalDateTime currentTime=LocalDateTime.now();
+        Page<Competition> competitions = competitionRepository
+                .findByJoinDateStartLessThanEqualAndJoinDateEndGreaterThanEqualOrderByJoinDateStartDesc(pageable, currentTime, currentTime);
+        // OneToMany 컬렉션 초기화
+        competitions.forEach(comp -> Hibernate.initialize(comp.getEventFees()));
+        return competitions.map(CompetitionDTO::new);
+    }
+
+    @Transactional(readOnly = true)
+    public Page<CompetitionDTO> getJoinFuture(Pageable pageable){
+        LocalDateTime currentTime=LocalDateTime.now();
+        Page<Competition> competitions = competitionRepository
+                .findByJoinDateStartAfterOrderByJoinDateStartAsc(pageable, currentTime);
         // OneToMany 컬렉션 초기화
         competitions.forEach(comp -> Hibernate.initialize(comp.getEventFees()));
         return competitions.map(CompetitionDTO::new);

@@ -67,38 +67,30 @@ public enum CalcType {
     }
 
     /**
-     * CalcType 정보를 담는 VO
-     */
-    @Getter
-    public static class CalcTypeInfo {
-        private final CalcType type;
-        private final int attemptCount;
-
-        public CalcTypeInfo(CalcType type, int attemptCount) {
-            this.type = type;
-            this.attemptCount = attemptCount;
-        }
+         * CalcType 정보를 담는 VO
+         */
+        public record CalcTypeInfo(CalcType type, int attemptCount) {
 
         /**
-         * 실제 시도 횟수가 예상과 일치하는지 확인
-         */
-        public boolean isValidAttemptCount(int actualCount) {
-            return actualCount == attemptCount;
-        }
+             * 실제 시도 횟수가 예상과 일치하는지 확인
+             */
+            public boolean isValidAttemptCount(int actualCount) {
+                return actualCount == attemptCount;
+            }
 
-        /**
-         * 시도 리스트에 비어있는 값이 있는지 확인
-         */
-        public boolean hasEmptyAttempt(List<BigDecimal> times) {
-            return times.stream()
-                    .anyMatch(t -> t == null || t.compareTo(BigDecimal.ZERO) == 0);
-        }
+            /**
+             * 시도 리스트에 비어있는 값이 있는지 확인
+             */
+            public boolean hasEmptyAttempt(List<BigDecimal> times) {
+                return times.stream()
+                        .anyMatch(t -> t == null || t.compareTo(BigDecimal.ZERO) == 0);
+            }
 
-        /**
-         * 기록 계산이 가능한 상태인지 확인
-         */
-        public boolean canCalculate(List<BigDecimal> times) {
-            return isValidAttemptCount(times.size()) && !hasEmptyAttempt(times);
+            /**
+             * 기록 계산이 가능한 상태인지 확인
+             */
+            public boolean canCalculate(List<BigDecimal> times) {
+                return isValidAttemptCount(times.size()) && !hasEmptyAttempt(times);
+            }
         }
-    }
 }

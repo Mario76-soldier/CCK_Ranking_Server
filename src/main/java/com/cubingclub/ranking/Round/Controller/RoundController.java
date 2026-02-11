@@ -2,12 +2,11 @@ package com.cubingclub.ranking.Round.Controller;
 
 import com.cubingclub.ranking.Round.DTO.RoundCreateDTO;
 import com.cubingclub.ranking.Round.DTO.RoundDTO;
+import com.cubingclub.ranking.Round.DTO.RoundListDTO;
 import com.cubingclub.ranking.Round.DTO.RoundUpdateDTO;
 import com.cubingclub.ranking.Round.Service.RoundService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -20,19 +19,9 @@ import java.util.List;
 public class RoundController {
     private final RoundService roundService;
 
-    @GetMapping("/past/{compIdx}")
-    public ResponseEntity<Page<RoundDTO>> getRoundPast(Pageable pageable, @PathVariable Integer compIdx){
-        return ResponseEntity.ok(roundService.getRoundPast(pageable, compIdx));
-    }
-
-    @GetMapping("/now/{compIdx}")
-    public ResponseEntity<Page<RoundDTO>> getRoundNow(Pageable pageable, @PathVariable Integer compIdx){
-        return ResponseEntity.ok(roundService.getRoundNow(pageable, compIdx));
-    }
-
-    @GetMapping("/future/{compIdx}")
-    public ResponseEntity<Page<RoundDTO>> getRoundFuture(Pageable pageable, @PathVariable Integer compIdx){
-        return ResponseEntity.ok(roundService.getRoundFuture(pageable, compIdx));
+    @GetMapping("/{compIdx}/day-count/{dayCount}")
+    public ResponseEntity<RoundListDTO> getRoundPast(@PathVariable Integer compIdx, @PathVariable Integer dayCount){
+        return ResponseEntity.ok(roundService.getRoundList(compIdx, dayCount));
     }
 
     @GetMapping("/{roundIdx}")

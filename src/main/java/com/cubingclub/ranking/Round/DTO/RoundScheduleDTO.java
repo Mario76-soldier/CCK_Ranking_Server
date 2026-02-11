@@ -7,6 +7,7 @@ import lombok.Setter;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Getter
@@ -29,7 +30,7 @@ public class RoundScheduleDTO {
         this.roundName=entity.getRoundName();
         this.eventStart=entity.getEventStart();
         this.eventEnd=entity.getEventEnd();
-        this.groupList=entity.getGroupList();
+        this.groupList=new ArrayList<>(entity.getGroupList());
         this.cutoff=entity.getCutoff();
         this.timeLimit=entity.getTimeLimit();
         this.advance=entity.getAdvance();

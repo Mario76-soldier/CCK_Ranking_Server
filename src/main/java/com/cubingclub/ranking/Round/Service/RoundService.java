@@ -13,8 +13,6 @@ import com.cubingclub.ranking.Scrambler.Service.ScramblerService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.Hibernate;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -51,33 +49,22 @@ public class RoundService {
     }
 
     @Transactional(readOnly = true)
-    public Page<RoundDTO> getRoundPast(Pageable pageable, Integer compIdx){
-        LocalDateTime currentTime=LocalDateTime.now();
-        Page<Round> rounds=roundRepository.findPastRoundsByCompIdx(pageable, compIdx, currentTime);
-
-        rounds.getContent().forEach(round -> Hibernate.initialize(round.getGroupList()));
-
-        return rounds.map(RoundDTO::new);
+    public RoundListDTO getRoundList(Integer compIdx, Integer dayCount) {
+        return new RoundListDTO(getRoundPast(compIdx, dayCount), getRoundNow(compIdx, dayCount), getRoundFuture(compIdx, dayCount));
     }
 
-    @Transactional(readOnly = true)
-    public Page<RoundDTO> getRoundNow(Pageable pageable, Integer compIdx){
-        LocalDateTime currentTime=LocalDateTime.now();
-        Page<Round> rounds=roundRepository.findPresentRoundsByCompIdx(pageable, compIdx, currentTime);
-
-        rounds.getContent().forEach(round -> Hibernate.initialize(round.getGroupList()));
-
-        return rounds.map(RoundDTO::new);
+    private List<RoundDTO> getRoundPast(Integer compIdx, Integer dayCount){
+        return roundRepository.findPastRoundsByCompIdx(compIdx, dayCount, LocalDateTime.now()).stream().map(RoundDTO::new).toList();
     }
 
-    @Transactional(readOnly = true)
-    public Page<RoundDTO> getRoundFuture(Pageable pageable, Integer compIdx){
-        LocalDateTime currentTime=LocalDateTime.now();
-        Page<Round> rounds=roundRepository.findFutureRoundsByCompIdx(pageable, compIdx, currentTime);
 
-        rounds.getContent().forEach(round -> Hibernate.initialize(round.getGroupList()));
+    private List<RoundDTO> getRoundNow(Integer compIdx, Integer dayCount){
+        return roundRepository.findPresentRoundsByCompIdx(compIdx, dayCount, LocalDateTime.now()).stream().map(RoundDTO::new).toList();
+    }
 
-        return rounds.map(RoundDTO::new);
+
+    private List<RoundDTO> getRoundFuture(Integer compIdx, Integer dayCount){
+        return roundRepository.findFutureRoundsByCompIdx(compIdx, dayCount, LocalDateTime.now()).stream().map(RoundDTO::new).toList();
     }
 
     @Transactional

@@ -20,8 +20,12 @@ public enum ErrorCode {
 
     CUBE_EVENT_NOT_FOUND(HttpStatus.BAD_REQUEST, "CUBEEVENT-001", "해당 종목이 존재하지 않습니다."),
     CUBE_EVENT_SAVE_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "CUBEEVENT-002", "큐브 종목 저장이 실패했습니다."),
+    CUBE_EVENT_UPDATE_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "CUBEEVENT-003", "큐브 종목 업데이트가 실패했습니다."),
+    CUBE_EVENT_DELETE_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "CUBEEVENT-004", "큐브 종목 삭제가 실패했습니다."),
 
     SCRAMBLE_SCRAMBLER_NOT_FOUND(HttpStatus.BAD_REQUEST, "SCRAMBLE-001", "스크램블러 정보가 없습니다."),
+    SCRAMBLE_NOT_FOUND(HttpStatus.BAD_REQUEST, "SCRAMBLE-002", "스크램블 정보가 없습니다."),
+    SCRAMBLE_COMPETITION_NOT_ENDED(HttpStatus.BAD_REQUEST, "SCRAMBLE-003", "대회가 아직 종료되지 않았습니다."),
 
     RECORD_NOT_FOUND(HttpStatus.BAD_REQUEST, "RECORD-001", "기록 정보가 없습니다."),
     RECORD_ATTEMPT_NOT_FOUND(HttpStatus.BAD_REQUEST, "RECORD-002", "시도 정보가 없습니다."),

@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Getter
@@ -35,7 +36,7 @@ public class RoundDTO {
         this.cutoff=entity.getCutoff();
         this.timeLimit=entity.getTimeLimit();
         this.advance=entity.getAdvance();
-        this.roundGroupList=entity.getGroupList();
+        this.roundGroupList=new ArrayList<>(entity.getGroupList());
     }
 }
 

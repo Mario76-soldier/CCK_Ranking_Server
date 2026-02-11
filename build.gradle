@@ -4,6 +4,10 @@ plugins {
 	id 'io.spring.dependency-management' version '1.1.4'
 }
 
+jar {
+    enabled = false
+}
+
 group = 'CubingClubKorea'
 version = '4.0.0'
 
@@ -36,7 +40,6 @@ dependencies {
 	testImplementation("org.junit.vintage:junit-vintage-engine"){
 		exclude group: "org.hamcrest", module: "hamcrest-core"
 	}
-	implementation "org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.15"
 }
 
 tasks.named('test') {

@@ -1,6 +1,7 @@
 package com.cubingclub.ranking.Record.Service;
 
 import com.cubingclub.ranking.Record.Entity.Attempt;
+import com.cubingclub.ranking.Record.Entity.CalcType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -27,14 +28,14 @@ public class CutoffProcessor {
             List<Attempt> attempts,
             List<BigDecimal> times,
             BigDecimal cutoff,
-            BigDecimal timeLimit
+            BigDecimal timeLimit,
+            CalcType.CalcTypeInfo avgCalc
     ) {
-        int attemptCount = attempts.size();
         boolean isCutoffTriggered = false;
         int cutoffFailCount = 0;
-        int cutoffCheckIndex = calculateCutoffCheckIndex(attemptCount, cutoff);
+        int cutoffCheckIndex = calculateCutoffCheckIndex(avgCalc, cutoff);
 
-        for (int i = 0; i < attemptCount; i++) {
+        for (int i = 0; i < attempts.size(); i++) {
             Attempt attempt = attempts.get(i);
             BigDecimal time = times.get(i);
 
@@ -56,7 +57,7 @@ public class CutoffProcessor {
             // 컷오프 체크
             if (shouldCheckCutoff(cutoff, i, cutoffCheckIndex, time)) {
                 cutoffFailCount++;
-                if (shouldTriggerCutoff(attemptCount, cutoffFailCount)) {
+                if (shouldTriggerCutoff(avgCalc, cutoffFailCount)) {
                     isCutoffTriggered = true;
                 }
             }
@@ -65,18 +66,23 @@ public class CutoffProcessor {
 
     /**
      * 컷오프 체크 인덱스 계산
-     * - 3시도: 1번째 시도 (index 0)
-     * - 5시도 이상: 2번째 시도까지 (index 1)
+     * - mo시도: 1번째 시도 (index 0)
+     * - ao시도: 2번째 시도까지 (index 1)
+     * - ba시도: 3번째 시도까지 (index 2)
+     * - 이외: 컷오프 미적용
      */
-    private int calculateCutoffCheckIndex(int attemptCount, BigDecimal cutoff) {
+    private int calculateCutoffCheckIndex(CalcType.CalcTypeInfo avgCalc, BigDecimal cutoff) {
         if (cutoff == null) {
             return -1;
         }
-        if (attemptCount == 3) {
+        if (avgCalc.type()==CalcType.MO) {
             return 0;
         }
-        if (attemptCount >= 5) {
+        if (avgCalc.type()==CalcType.AO) {
             return 1;
+        }
+        if (avgCalc.type()==CalcType.BA) {
+            return 2;
         }
         return -1;
     }
@@ -104,13 +110,21 @@ public class CutoffProcessor {
 
     /**
      * 컷오프 발동 여부 결정
-     * - 3시도: 1회 실패 시 발동
-     * - 5시도: 2회 실패 시 발동
+     * - mo시도: 1회 실패 시 발동
+     * - ao시도: 2회 실패 시 발동
+     * - ba시도: 3회 실패 시 발동
+     * - 이외: 컷오프 미적용
      */
-    private boolean shouldTriggerCutoff(int attemptCount, int failCount) {
-        if (attemptCount == 3) {
+    private boolean shouldTriggerCutoff(CalcType.CalcTypeInfo avgCalc, int failCount) {
+        if (avgCalc.type()==CalcType.MO) {
             return failCount >= 1;
         }
-        return failCount >= 2;
+        if (avgCalc.type()==CalcType.AO) {
+            return failCount >= 2;
+        }
+        if (avgCalc.type()==CalcType.BA) {
+            return failCount >= 3;
+        }
+        return false;
     }
 }

@@ -2,6 +2,8 @@ package com.cubingclub.ranking.Competition.Controller;
 
 import com.cubingclub.ranking.Competition.DTO.*;
 import com.cubingclub.ranking.Competition.Service.CompetitionService;
+import com.cubingclub.ranking.Record.DTO.RecordDTO;
+import com.cubingclub.ranking.Record.Service.RecordService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -10,12 +12,15 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @Slf4j
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/comp")
 public class CompetitionController {
     private final CompetitionService competitionService;
+    private final RecordService recordService;
 
     @GetMapping("/past")
     public ResponseEntity<Page<CompetitionDTO>> getCompPast(Pageable pageable){
@@ -30,6 +35,26 @@ public class CompetitionController {
     @GetMapping("/future")
     public ResponseEntity<Page<CompetitionDTO>> getCompFuture(Pageable pageable){
         return ResponseEntity.ok(competitionService.getCompFuture(pageable));
+    }
+
+    @GetMapping("/{compIdx}/break")
+    public ResponseEntity<List<RecordDTO>> getBreakRecordList(@PathVariable Integer compIdx){
+        return ResponseEntity.ok(recordService.getBreakRecordList(compIdx));
+    }
+
+    @GetMapping("/join/past")
+    public ResponseEntity<Page<CompetitionDTO>> getJoinPast(Pageable pageable){
+        return ResponseEntity.ok(competitionService.getJoinPast(pageable));
+    }
+
+    @GetMapping("/join/now")
+    public ResponseEntity<Page<CompetitionDTO>> getJoinNow(Pageable pageable){
+        return ResponseEntity.ok(competitionService.getJoinNow(pageable));
+    }
+
+    @GetMapping("/join/future")
+    public ResponseEntity<Page<CompetitionDTO>> getJoinFuture(Pageable pageable){
+        return ResponseEntity.ok(competitionService.getJoinFuture(pageable));
     }
 
     @GetMapping("/{compIdx}")
