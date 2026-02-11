@@ -135,7 +135,7 @@ public class RecordService {
         recordRepository.flush();
         
         // 글로벌 통계 캐시 삭제
-        evictGlobalStatsCache(record.getRound().getCubeEvent().getEventName());
+        evictStatsCache(record.getRound().getCubeEvent().getEventName());
     }
     
     /**
@@ -231,19 +231,15 @@ public class RecordService {
         recordRepository.setRankOnRound(roundIdx);
         
         // 글로벌 통계 캐시 삭제
-        evictGlobalStatsCache(eventName);
+        evictStatsCache(eventName);
     }
-    
-    /**
-     * 글로벌 통계 캐시 삭제
-     */
-    private void evictGlobalStatsCache(String eventName) {
-        log.debug("Evicting stats cache for event: {}", eventName);
-        
+
+    private void evictStatsCache(String eventName) {
         var globalSingleCache = cacheManager.getCache("globalStatsSingle");
         var globalAverageCache = cacheManager.getCache("globalStatsAverage");
         var stateSingleCache = cacheManager.getCache("stateStatsSingle");
         var stateAverageCache = cacheManager.getCache("stateStatsAverage");
+        var stateCache = cacheManager.getCache("stateStat");
         
         if (globalSingleCache != null) {
             globalSingleCache.evict(eventName);
@@ -256,6 +252,9 @@ public class RecordService {
         }
         if (stateAverageCache != null) {
             stateAverageCache.evict(eventName);
+        }
+        if (stateCache != null) {
+            stateCache.evict(eventName);
         }
     }
 

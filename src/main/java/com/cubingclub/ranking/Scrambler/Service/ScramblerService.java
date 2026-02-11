@@ -18,6 +18,8 @@ import org.hibernate.Hibernate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
@@ -66,6 +68,9 @@ public class ScramblerService {
     @Transactional(readOnly = true)
     public ScrambleDTO getScrambleByRecord(Integer recordIdx, Integer attemptTry, String extra) {
         Record record=recordRepository.findById(recordIdx).orElseThrow(()->new CustomizedException(ErrorCode.RECORD_NOT_FOUND));
+        if(record.getRound().getComp().getCompDateEnd().isAfter(LocalDate.now())){
+            throw new CustomizedException(ErrorCode.SCRAMBLE_COMPETITION_NOT_ENDED);
+        }
         String seq=attemptTry.toString();
         if(extra!=null){
             seq="ex"+extra;
