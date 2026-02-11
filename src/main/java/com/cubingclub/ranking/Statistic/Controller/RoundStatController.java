@@ -1,6 +1,7 @@
 package com.cubingclub.ranking.Statistic.Controller;
 
 import com.cubingclub.ranking.Record.DTO.*;
+import com.cubingclub.ranking.Statistic.DTO.DNFStatDTO;
 import com.cubingclub.ranking.Statistic.Service.RoundStatService;
 import com.cubingclub.ranking.Statistic.DTO.RoundGlobalStatDTO;
 import com.cubingclub.ranking.Statistic.DTO.RoundStateStatDTO;
@@ -34,5 +35,10 @@ public class RoundStatController {
     @GetMapping("/{roundIdx}/extra")
     public ResponseEntity<List<AttemptDTO>> getStateStat(@PathVariable Integer roundIdx){
         return ResponseEntity.ok(roundStatService.getExtraByRoundIdx(roundIdx));
+    }
+
+    @GetMapping("/{roundIdx}/dnf")
+    public ResponseEntity<DNFStatDTO> getRoundDNFStat(@PathVariable Integer roundIdx){
+        return ResponseEntity.ok(roundStatService.getDNFStatByRoundIdx(roundIdx));
     }
 }

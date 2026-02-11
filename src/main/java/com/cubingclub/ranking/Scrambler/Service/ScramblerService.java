@@ -57,7 +57,7 @@ public class ScramblerService {
         }
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     public ScrambleResponseDTO getScramble(ScramblerUpdateDTO scramblerUpdateDTO, String token) {
         return scrambleQueryService.getScrambleForPlayer(scramblerUpdateDTO.getCompIdx()
                 , scramblerUpdateDTO.getPlayerUid()
@@ -77,5 +77,11 @@ public class ScramblerService {
         }
         Scramble scramble = scramblerRepository.findByRoundIdxAndRoundGroupAndSeq(record.getRound().getIdx(), record.getRoundGroup(), seq).orElseThrow(()->new CustomizedException(ErrorCode.SCRAMBLE_NOT_FOUND));
         return new ScrambleDTO(scramble);
+    }
+
+    @Transactional(readOnly = true)
+    public List<ScrambleDTO> getScramblesByRoundAndGroup(Integer roundIdx, String groupName) {
+        List<Scramble> scrambles=scramblerRepository.findByRoundIdxAndRoundGroup(roundIdx, groupName);
+        return scrambles.stream().map(ScrambleDTO::new).toList();
     }
 }

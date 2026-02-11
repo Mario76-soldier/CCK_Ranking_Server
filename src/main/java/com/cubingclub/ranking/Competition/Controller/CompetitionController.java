@@ -37,7 +37,7 @@ public class CompetitionController {
         return ResponseEntity.ok(competitionService.getCompFuture(pageable));
     }
 
-    @GetMapping("/break/{compIdx}")
+    @GetMapping("/{compIdx}/break")
     public ResponseEntity<List<RecordDTO>> getBreakRecordList(@PathVariable Integer compIdx){
         return ResponseEntity.ok(recordService.getBreakRecordList(compIdx));
     }

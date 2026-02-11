@@ -1,6 +1,7 @@
 package com.cubingclub.ranking.Statistic.Service;
 
 import com.cubingclub.ranking.Record.DTO.AttemptDTO;
+import com.cubingclub.ranking.Statistic.DTO.DNFStatDTO;
 import com.cubingclub.ranking.Statistic.DTO.RoundGlobalStatDTO;
 import com.cubingclub.ranking.Statistic.DTO.RoundStateStatDTO;
 import com.cubingclub.ranking.Statistic.Repository.RoundStatRepository;
@@ -28,7 +29,12 @@ public class RoundStatService {
     public List<RoundStateStatDTO> getSingleAndAverageState(Integer roundIdx) {
         return roundStatRepository.findSingleAndAverageState(roundIdx);
     }
+
     public RoundGlobalStatDTO getSingleAndAverageGlobal(Integer roundIdx) {
         return roundStatRepository.findSingleAndAverageGlobal(roundIdx);
+    }
+
+    public DNFStatDTO getDNFStatByRoundIdx(Integer roundIdx) {
+        return roundStatRepository.findDNFStatByRoundIdx(roundIdx);
     }
 }

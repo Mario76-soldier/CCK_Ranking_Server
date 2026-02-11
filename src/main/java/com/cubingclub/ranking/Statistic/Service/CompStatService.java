@@ -1,6 +1,7 @@
 package com.cubingclub.ranking.Statistic.Service;
 
 import com.cubingclub.ranking.Record.DTO.AttemptDTO;
+import com.cubingclub.ranking.Statistic.DTO.DNFStatDTO;
 import com.cubingclub.ranking.Statistic.DTO.StaffStatDTO;
 import com.cubingclub.ranking.Statistic.Repository.CompStatRepository;
 import lombok.RequiredArgsConstructor;
@@ -30,5 +31,9 @@ public class CompStatService {
 
     public List<StaffStatDTO> getScramblerStatByCompIdx(Integer compIdx) {
         return compStatRepository.findScramblerStatByCompIdx(compIdx);
+    }
+
+    public DNFStatDTO getDNFStatByCompIdx(Integer compIdx) {
+        return compStatRepository.findDNFStatByCompIdx(compIdx);
     }
 }

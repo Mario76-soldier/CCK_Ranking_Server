@@ -42,6 +42,8 @@ public class SecurityConfig{
     private String allowedOrigins;
     @Value("${cors.allowed-methods}")
     private String allowedMethods;
+    @Value("${api.prefix}")
+    private String apiPrefix;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -53,14 +55,15 @@ public class SecurityConfig{
                         .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
                         .csrfTokenRequestHandler(requestHandler)
                         .ignoringRequestMatchers(
-                                "/auth/token",           // 인가 코드로 토큰 발급 (GET 파라미터)
-                                "/recorder/**",          // JWT 인증 사용
-                                "/scramble/**",          // JWT 인증 사용
-                                "/comp/**",              // JWT 인증 사용
-                                "/event/**",             // JWT 인증 사용
-                                "/round/**",             // JWT 인증 사용
-                                "/advance/**",           // JWT 인증 사용
-                                "/record/**"             // JWT 인증 사용
+                                apiPrefix+"/auth/token/**",           // 인가 코드로 토큰 발급 (GET 파라미터)
+                                apiPrefix+"/recorder/**",          // JWT 인증 사용
+                                apiPrefix+"/scramble/**",          // JWT 인증 사용
+                                apiPrefix+"/comp/**",              // JWT 인증 사용
+                                apiPrefix+"/event/**",             // JWT 인증 사용
+                                apiPrefix+"/round/**",             // JWT 인증 사용
+                                apiPrefix+"/advance/**",           // JWT 인증 사용
+                                apiPrefix+"/record/**",             // JWT 인증 사용
+                                apiPrefix+"/statistics/**"
                         )
                 )
                 .cors(cors->cors.configurationSource(corsConfigurationSource()))
@@ -76,7 +79,7 @@ public class SecurityConfig{
                         .anyRequest().permitAll()
                 )
                 .oauth2ResourceServer(oauth2 -> oauth2
-                        .jwt(jwt -> jwt.decoder(jwtDecoder())) // JWT 검증 필터링
+                        .jwt(jwt -> jwt.decoder(jwtDecoder()).jwtAuthenticationConverter(jwtAuthenticationConverter())) // JWT 검증 필터링
                 );
         return http.build();
     }

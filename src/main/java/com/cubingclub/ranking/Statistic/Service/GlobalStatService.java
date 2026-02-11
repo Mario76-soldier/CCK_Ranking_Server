@@ -1,6 +1,7 @@
 package com.cubingclub.ranking.Statistic.Service;
 
 import com.cubingclub.ranking.Record.DTO.RecordDTO;
+import com.cubingclub.ranking.Statistic.DTO.CompRecordStatDTO;
 import com.cubingclub.ranking.Statistic.Repository.GlobalStatRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -27,6 +28,11 @@ public class GlobalStatService {
     public List<RecordDTO> getGlobalTop10ByAverageByEvent(String eventName) {
         log.debug("Fetching global top 10 average records for event: {}", eventName);
         return globalStatRepository.findGlobalAverageTop10(eventName).stream().map(RecordDTO::new).toList();
+    }
+
+    public List<CompRecordStatDTO> getGlobalRecordStatByCompetition(String eventName) {
+        log.debug("Fetching global record stats by competition");
+        return globalStatRepository.findGlobalRecordStatByCompetition(eventName);
     }
 }
 

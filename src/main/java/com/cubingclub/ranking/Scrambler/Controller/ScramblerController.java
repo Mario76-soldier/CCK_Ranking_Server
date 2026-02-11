@@ -14,6 +14,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @Slf4j
 @RestController
 @RequiredArgsConstructor
@@ -35,5 +37,10 @@ public class ScramblerController {
     @PatchMapping("")
     public ResponseEntity<ScrambleResponseDTO> updateScrambler(@RequestBody ScramblerUpdateDTO scramblerUpdateDTO, @JwtToken String token) {
         return ResponseEntity.ok(scramblerService.getScramble(scramblerUpdateDTO, token));
+    }
+
+    @GetMapping("/list/round/{roundIdx}/group/{groupName}")
+    public ResponseEntity<List<ScrambleDTO>> getScramblesByRoundAndGroup(@PathVariable Integer roundIdx, @PathVariable String groupName) {
+        return ResponseEntity.ok(scramblerService.getScramblesByRoundAndGroup(roundIdx, groupName));
     }
 }

@@ -18,5 +18,8 @@ public interface ScramblerRepository extends JpaRepository<Scramble, Integer> {
     @Query("select s from Scramble s join fetch s.round r where s.round.idx=:roundIdx and s.roundGroup=:roundGroup and s.seq=:seq")
     Optional<Scramble> findByRoundIdxAndRoundGroupAndSeq(@Param("roundIdx") Integer roundIdx, @Param("roundGroup") String roundGroup, @Param("seq") String seq);
 
+    @Query("select s from Scramble s join fetch s.round r where s.round.idx=:roundIdx and s.roundGroup=:roundGroup")
+    List<Scramble> findByRoundIdxAndRoundGroup(@Param("roundIdx") Integer roundIdx, @Param("roundGroup") String roundGroup);
+
     void deleteByRound_Idx(Integer roundIdx);
 }

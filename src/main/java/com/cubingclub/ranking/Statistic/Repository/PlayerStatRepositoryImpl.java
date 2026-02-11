@@ -39,7 +39,7 @@ public class PlayerStatRepositoryImpl implements PlayerStatRepository{
     @Override
     public PlayerCountStatDTO findPlayerCountByCckId(String cckId) {
         return entityManager
-                .createQuery("select new com.cubingclub.ranking.Record.DTO.PlayerCountStatDTO(count(distinct r.round.comp.idx), count(case when a.time > 0 then a.idx end)) from Record r " +
+                .createQuery("select new com.cubingclub.ranking.Statistic.DTO.PlayerCountStatDTO(count(distinct r.round.comp.idx), count(case when a.time > 0 then a.idx end)) from Record r " +
                         "left join r.attempts a where r.cckId=:cckId group by r.cckId", PlayerCountStatDTO.class)
                 .setParameter("cckId", cckId)
                 .getSingleResult();
@@ -48,7 +48,7 @@ public class PlayerStatRepositoryImpl implements PlayerStatRepository{
     @Override
     public StaffCountStatDTO findStaffCountByCckId(String cckId) {
         return entityManager
-                .createQuery("select new com.cubingclub.ranking.Record.DTO.StaffCountStatDTO(" +
+                .createQuery("select new com.cubingclub.ranking.Statistic.DTO.StaffCountStatDTO(" +
                         "count(case when a.judgeCckId=:cckId then a.idx end), " +
                         "count(case when a.scramblerCckId=:cckId then a.idx end)) from Attempt a", StaffCountStatDTO.class)
                 .setParameter("cckId", cckId)

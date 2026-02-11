@@ -1,6 +1,7 @@
 package com.cubingclub.ranking.Statistic.Repository;
 
 import com.cubingclub.ranking.Record.Entity.Record;
+import com.cubingclub.ranking.Statistic.DTO.CompRecordStatDTO;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -63,4 +64,9 @@ public interface GlobalStatRepository extends JpaRepository<Record, Integer> {
     limit 10
     """)
     List<Record> findGlobalAverageTop10(@Param("eventName") String eventName);
+
+    @Query("select c.compName compName, min(r.single) bestSingle, min(r.average) bestAverage, avg(r.single) avgSingle, avg(r.average) avgAverage, count(r.idx) count " +
+            "from Record r join r.round ro join ro.comp c where r.single>0 and r.average>0 and ro.cubeEvent.eventName=:eventName " +
+            "group by c.compName, c.compDateStart order by c.compDateStart")
+    List<CompRecordStatDTO> findGlobalRecordStatByCompetition(String eventName);
 }

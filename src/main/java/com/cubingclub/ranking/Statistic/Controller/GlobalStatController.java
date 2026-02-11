@@ -1,6 +1,7 @@
 package com.cubingclub.ranking.Statistic.Controller;
 
 import com.cubingclub.ranking.Record.DTO.RecordDTO;
+import com.cubingclub.ranking.Statistic.DTO.CompRecordStatDTO;
 import com.cubingclub.ranking.Statistic.Service.GlobalStatService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -27,5 +28,10 @@ public class GlobalStatController {
     @GetMapping("/average/{eventName}")
     public ResponseEntity<List<RecordDTO>> getAverageGlobalTop10(@PathVariable String eventName){
         return ResponseEntity.ok(globalStatService.getGlobalTop10ByAverageByEvent(eventName));
+    }
+
+    @GetMapping("/comp/{eventName}")
+    public ResponseEntity<List<CompRecordStatDTO>> getGlobalRecordStatByCompetition(@PathVariable String eventName){
+        return ResponseEntity.ok(globalStatService.getGlobalRecordStatByCompetition(eventName));
     }
 }

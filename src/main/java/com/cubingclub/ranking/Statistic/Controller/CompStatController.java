@@ -1,6 +1,7 @@
 package com.cubingclub.ranking.Statistic.Controller;
 
 import com.cubingclub.ranking.Record.DTO.AttemptDTO;
+import com.cubingclub.ranking.Statistic.DTO.DNFStatDTO;
 import com.cubingclub.ranking.Statistic.DTO.StaffStatDTO;
 import com.cubingclub.ranking.Statistic.Service.CompStatService;
 import lombok.RequiredArgsConstructor;
@@ -33,5 +34,10 @@ public class CompStatController {
     @GetMapping("/{compIdx}/extra")
     public ResponseEntity<List<AttemptDTO>> getCompExtraStat(@PathVariable Integer compIdx){
         return ResponseEntity.ok(compStatService.getExtraByCompIdx(compIdx));
+    }
+
+    @GetMapping("/{compIdx}/dnf")
+    public ResponseEntity<DNFStatDTO> getCompDNFStat(@PathVariable Integer compIdx){
+        return ResponseEntity.ok(compStatService.getDNFStatByCompIdx(compIdx));
     }
 }
