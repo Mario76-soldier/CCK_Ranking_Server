@@ -1,7 +1,7 @@
-package com.cubingclub.ranking.Record.Service;
+package com.cubingclub.ranking.Statistic.Service;
 
 import com.cubingclub.ranking.Record.DTO.RecordDTO;
-import com.cubingclub.ranking.Record.Repository.GlobalStatRepository;
+import com.cubingclub.ranking.Statistic.Repository.GlobalStatRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.Cacheable;

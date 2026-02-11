@@ -1,5 +1,6 @@
-package com.cubingclub.ranking.Record.DTO;
+package com.cubingclub.ranking.Statistic.DTO;
 
+import com.cubingclub.ranking.Record.DTO.AttemptDTO;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

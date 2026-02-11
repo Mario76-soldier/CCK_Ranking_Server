@@ -1,7 +1,7 @@
-package com.cubingclub.ranking.Record.Repository;
+package com.cubingclub.ranking.Statistic.Repository;
 
-import com.cubingclub.ranking.Record.DTO.StateRecordFlatDTO;
-import com.cubingclub.ranking.Record.DTO.StateStatDTO;
+import com.cubingclub.ranking.Statistic.DTO.StateRecordFlatDTO;
+import com.cubingclub.ranking.Statistic.DTO.StateStatDTO;
 import com.cubingclub.ranking.Record.Entity.Record;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;

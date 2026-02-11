@@ -1,4 +1,4 @@
-package com.cubingclub.ranking.Record.DTO;
+package com.cubingclub.ranking.Statistic.DTO;
 
 public interface StaffStatDTO {
     String getStaffName();

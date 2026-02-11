@@ -1,8 +1,8 @@
-package com.cubingclub.ranking.Record.Service;
+package com.cubingclub.ranking.Statistic.Service;
 
 import com.cubingclub.ranking.Record.DTO.AttemptDTO;
-import com.cubingclub.ranking.Record.DTO.StaffStatDTO;
-import com.cubingclub.ranking.Record.Repository.CompStatRepository;
+import com.cubingclub.ranking.Statistic.DTO.StaffStatDTO;
+import com.cubingclub.ranking.Statistic.Repository.CompStatRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;

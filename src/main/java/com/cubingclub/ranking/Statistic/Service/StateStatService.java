@@ -1,11 +1,11 @@
-package com.cubingclub.ranking.Record.Service;
+package com.cubingclub.ranking.Statistic.Service;
 
 import com.cubingclub.ranking.Record.DTO.AttemptDTO;
-import com.cubingclub.ranking.Record.DTO.StateRecordDTO;
-import com.cubingclub.ranking.Record.DTO.StateRecordFlatDTO;
-import com.cubingclub.ranking.Record.DTO.StateStatDTO;
+import com.cubingclub.ranking.Statistic.DTO.StateRecordDTO;
+import com.cubingclub.ranking.Statistic.DTO.StateRecordFlatDTO;
+import com.cubingclub.ranking.Statistic.DTO.StateStatDTO;
 import com.cubingclub.ranking.Record.Repository.AttemptRepository;
-import com.cubingclub.ranking.Record.Repository.StateStatRepository;
+import com.cubingclub.ranking.Statistic.Repository.StateStatRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.Cacheable;

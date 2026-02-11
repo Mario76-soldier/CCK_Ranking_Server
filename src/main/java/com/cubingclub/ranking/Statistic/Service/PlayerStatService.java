@@ -1,11 +1,11 @@
-package com.cubingclub.ranking.Record.Service;
+package com.cubingclub.ranking.Statistic.Service;
 
-import com.cubingclub.ranking.Record.DTO.PlayerCountStatDTO;
+import com.cubingclub.ranking.Statistic.DTO.PlayerCountStatDTO;
 import com.cubingclub.ranking.Record.DTO.RecordDTO;
-import com.cubingclub.ranking.Record.DTO.StaffCountStatDTO;
-import com.cubingclub.ranking.Record.DTO.PlayerRankingDTO;
-import com.cubingclub.ranking.Record.Repository.PlayerRankingRepository;
-import com.cubingclub.ranking.Record.Repository.PlayerStatRepository;
+import com.cubingclub.ranking.Statistic.DTO.StaffCountStatDTO;
+import com.cubingclub.ranking.Statistic.DTO.PlayerRankingDTO;
+import com.cubingclub.ranking.Statistic.Repository.PlayerRankingRepository;
+import com.cubingclub.ranking.Statistic.Repository.PlayerStatRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;

@@ -1,7 +1,7 @@
-package com.cubingclub.ranking.Record.Repository;
+package com.cubingclub.ranking.Statistic.Repository;
 
-import com.cubingclub.ranking.Record.DTO.RoundGlobalStatDTO;
-import com.cubingclub.ranking.Record.DTO.RoundStateStatDTO;
+import com.cubingclub.ranking.Statistic.DTO.RoundGlobalStatDTO;
+import com.cubingclub.ranking.Statistic.DTO.RoundStateStatDTO;
 import com.cubingclub.ranking.Record.Entity.Attempt;
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;

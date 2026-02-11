@@ -1,4 +1,4 @@
-package com.cubingclub.ranking.Record.Repository;
+package com.cubingclub.ranking.Statistic.Repository;
 
 import com.cubingclub.ranking.Record.Entity.Record;
 import org.springframework.data.jpa.repository.JpaRepository;

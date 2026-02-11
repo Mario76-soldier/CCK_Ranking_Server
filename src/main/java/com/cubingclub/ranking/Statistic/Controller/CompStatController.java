@@ -1,9 +1,8 @@
-package com.cubingclub.ranking.Record.Controller;
+package com.cubingclub.ranking.Statistic.Controller;
 
 import com.cubingclub.ranking.Record.DTO.AttemptDTO;
-import com.cubingclub.ranking.Record.DTO.StaffStatDTO;
-import com.cubingclub.ranking.Record.DTO.RoundStateStatDTO;
-import com.cubingclub.ranking.Record.Service.CompStatService;
+import com.cubingclub.ranking.Statistic.DTO.StaffStatDTO;
+import com.cubingclub.ranking.Statistic.Service.CompStatService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;

@@ -1,9 +1,9 @@
-package com.cubingclub.ranking.Record.Service;
+package com.cubingclub.ranking.Statistic.Service;
 
 import com.cubingclub.ranking.Record.DTO.AttemptDTO;
-import com.cubingclub.ranking.Record.DTO.RoundGlobalStatDTO;
-import com.cubingclub.ranking.Record.DTO.RoundStateStatDTO;
-import com.cubingclub.ranking.Record.Repository.RoundStatRepository;
+import com.cubingclub.ranking.Statistic.DTO.RoundGlobalStatDTO;
+import com.cubingclub.ranking.Statistic.DTO.RoundStateStatDTO;
+import com.cubingclub.ranking.Statistic.Repository.RoundStatRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
