@@ -6,7 +6,7 @@ spring:
     driver-class-name: com.mysql.cj.jdbc.Driver
   jpa:
     generate-ddl: true
-    show-sql: false
+    show-sql: true
     open-in-view: false
   tnoodle:
     url: ${TNOODLE_URL}
@@ -20,6 +20,5 @@ spring:
 cors:
   allowed-origins: ${CORS_ALLOWED_ORIGINS}
   allowed-methods: GET,POST,PUT,PATCH,DELETE,OPTIONS
-server:
-  servlet:
-    context-path: ${SERVER_SERVLET_CONTEXT_PATH}
+api:
+  prefix: ${API_PREFIX}

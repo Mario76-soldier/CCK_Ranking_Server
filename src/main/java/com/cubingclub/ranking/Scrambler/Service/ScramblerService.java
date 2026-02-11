@@ -2,21 +2,24 @@ package com.cubingclub.ranking.Scrambler.Service;
 
 import com.cubingclub.ranking.Exception.Entity.ErrorCode;
 import com.cubingclub.ranking.Exception.Exceptions.CustomizedException;
+import com.cubingclub.ranking.Record.Entity.Record;
+import com.cubingclub.ranking.Record.Repository.RecordRepository;
 import com.cubingclub.ranking.Round.Repository.RoundRepository;
 import com.cubingclub.ranking.Round.Entity.Round;
 import com.cubingclub.ranking.Scrambler.Component.PuzzleConfigResolver;
+import com.cubingclub.ranking.Scrambler.DTO.ScrambleDTO;
 import com.cubingclub.ranking.Scrambler.DTO.ScrambleResponseDTO;
 import com.cubingclub.ranking.Scrambler.DTO.ScramblerUpdateDTO;
+import com.cubingclub.ranking.Scrambler.Entity.Scramble;
 import com.cubingclub.ranking.Scrambler.Repository.ScramblerRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.Hibernate;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.transaction.event.TransactionPhase;
-import org.springframework.transaction.event.TransactionalEventListener;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
@@ -25,6 +28,7 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class ScramblerService {
     private final RoundRepository roundRepository;
+    private final RecordRepository recordRepository;
     private final ScramblerRepository scramblerRepository;
     private final PuzzleConfigResolver puzzleConfigResolver;
     private final ScrambleCreationService scrambleCreationService;
@@ -53,11 +57,31 @@ public class ScramblerService {
         }
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     public ScrambleResponseDTO getScramble(ScramblerUpdateDTO scramblerUpdateDTO, String token) {
         return scrambleQueryService.getScrambleForPlayer(scramblerUpdateDTO.getCompIdx()
                 , scramblerUpdateDTO.getPlayerUid()
                 , scramblerUpdateDTO.getScramblerUid()
                 , token);
+    }
+
+    @Transactional(readOnly = true)
+    public ScrambleDTO getScrambleByRecord(Integer recordIdx, Integer attemptTry, String extra) {
+        Record record=recordRepository.findById(recordIdx).orElseThrow(()->new CustomizedException(ErrorCode.RECORD_NOT_FOUND));
+        if(record.getRound().getComp().getCompDateEnd().isAfter(LocalDate.now())){
+            throw new CustomizedException(ErrorCode.SCRAMBLE_COMPETITION_NOT_ENDED);
+        }
+        String seq=attemptTry.toString();
+        if(extra!=null){
+            seq="ex"+extra;
+        }
+        Scramble scramble = scramblerRepository.findByRoundIdxAndRoundGroupAndSeq(record.getRound().getIdx(), record.getRoundGroup(), seq).orElseThrow(()->new CustomizedException(ErrorCode.SCRAMBLE_NOT_FOUND));
+        return new ScrambleDTO(scramble);
+    }
+
+    @Transactional(readOnly = true)
+    public List<ScrambleDTO> getScramblesByRoundAndGroup(Integer roundIdx, String groupName) {
+        List<Scramble> scrambles=scramblerRepository.findByRoundIdxAndRoundGroup(roundIdx, groupName);
+        return scrambles.stream().map(ScrambleDTO::new).toList();
     }
 }

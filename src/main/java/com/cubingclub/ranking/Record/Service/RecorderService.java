@@ -50,7 +50,7 @@ public class RecorderService {
     }
 
     public SingleAverageDTO updateAttempt(RecorderDTO recorderDTO){
-        PlayerInfo playerInfo =authService.getPlayerInfo(recorderDTO.getJudgeCckId());
+        PlayerInfo playerInfo=authService.getPlayerInfo(recorderDTO.getJudgeCckId());
         updateRecordOne(recorderDTO.getAttemptIdx(), recorderDTO.getRecord(), playerInfo);
         Attempt attempt=attemptRepository.findById(recorderDTO.getAttemptIdx()).orElseThrow(()->new CustomizedException(ErrorCode.RECORD_ATTEMPT_NOT_FOUND));
         Record record=attempt.getRecord();

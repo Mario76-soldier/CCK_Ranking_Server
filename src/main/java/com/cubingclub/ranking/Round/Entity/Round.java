@@ -37,6 +37,7 @@ public class Round {
     @Column(nullable = false)
     private LocalDateTime eventEnd;
     @ElementCollection
+    @BatchSize(size = 100)
     private final List<String> groupList = new ArrayList<>();
     @Column(precision = 10, scale=2)
     private BigDecimal cutoff;
