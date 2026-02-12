@@ -60,11 +60,12 @@ public class RecordService {
 
     public void updateRecord(RecordUpdateDTO p) {
         Record record = recordRepository.findByIdx(p.getIdx());
-        Hibernate.initialize(record.getAttempts());
-        
-        // Cutoff와 TimeLimit 처리를 CutoffProcessor에 위임
+        List<Attempt> attemptList=record.getAttempts();
 
-        
+        for(int i=0; i<p.getTimes().size(); i++){
+            Attempt attempt=attemptList.get(i);
+            attempt.updateTime(p.getTimes().get(i));
+        }
         // 기록 계산 및 업데이트
         applyRecordUpdate(record);
     }
