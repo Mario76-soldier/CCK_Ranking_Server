@@ -16,12 +16,12 @@ import com.cubingclub.ranking.Record.Repository.RecordRepository;
 import com.cubingclub.ranking.Round.Entity.Round;
 import com.cubingclub.ranking.Round.Repository.RoundRepository;
 import jakarta.persistence.EntityManager;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.Hibernate;
 import org.springframework.cache.CacheManager;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.*;
@@ -82,7 +82,7 @@ public class RecordService {
     public void deleteExtra(Integer partIdx, Integer extraNum){
         Attempt attempt=attemptRepository.findByRecord_IdxAndExtra(partIdx, extraNum);
         if(attempt==null){
-            return;
+            throw new CustomizedException(ErrorCode.RECORD_ATTEMPT_NOT_FOUND);
         }
         attempt.updateExtra(null, null, null, null);
         attempt.updateScrambler(null, null);
@@ -91,14 +91,14 @@ public class RecordService {
 
     public void updateScrambler(Integer idx, PlayerInfo scramblerInfo){
         Attempt attempt=attemptRepository.findByIdx(idx);
-        log.info(scramblerInfo.getCckId());
         if(attempt.getRecord().getCckId().equals(scramblerInfo.getCckId())){
-            return;
+            throw new CustomizedException(ErrorCode.SCRAMBLER_CONFLICT);
         }
         if(attempt.getExtra()==null || attempt.getExtra().equals(0)){
             attempt.updateScrambler(scramblerInfo.getName(), scramblerInfo.getCckId());
         }
         else {
+            log.info("Extra: {}", attempt.getExtra());
             attempt.updateExScrambler(scramblerInfo.getName(), scramblerInfo.getCckId());
         }
     }

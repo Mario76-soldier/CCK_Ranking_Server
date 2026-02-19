@@ -2,7 +2,6 @@ package com.cubingclub.ranking.Competition;
 
 import com.cubingclub.ranking.Competition.DTO.*;
 import com.cubingclub.ranking.Competition.Entity.Competition;
-import com.cubingclub.ranking.Competition.Entity.EventFee;
 import com.cubingclub.ranking.Competition.Repository.CompetitionRepository;
 import com.cubingclub.ranking.Competition.Service.CompetitionService;
 import com.cubingclub.ranking.CubeEvent.Entity.ColorType;
@@ -23,7 +22,6 @@ import org.springframework.data.domain.Pageable;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
