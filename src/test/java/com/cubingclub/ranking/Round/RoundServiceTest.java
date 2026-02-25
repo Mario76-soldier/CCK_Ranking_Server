@@ -20,10 +20,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -182,7 +178,7 @@ class RoundServiceTest {
     @DisplayName("단일 라운드 조회 성공")
     void getOneRoundSuccess() {
         // Given
-        when(roundRepository.findByIdx(1)).thenReturn(testRound);
+        when(roundRepository.findByIdx(1)).thenReturn(Optional.of(testRound));
 
         // When
         RoundDTO result = roundService.getOne(1);
@@ -194,64 +190,14 @@ class RoundServiceTest {
     }
 
     @Test
-    @DisplayName("지난 라운드 목록 조회")
-    void getRoundPastSuccess() {
+    @DisplayName("단일 라운드 조회 - 존재하지 않는 라운드")
+    void getOneRoundNotFound() {
         // Given
-        Pageable pageable = PageRequest.of(0, 10);
-        Round pastRound = Round.builder()
-                .idx(2)
-                .comp(testCompetition)
-                .cubeEvent(testCubeEvent)
-                .roundName("Past Round")
-                .eventStart(LocalDateTime.now().minusDays(2))
-                .eventEnd(LocalDateTime.now().minusDays(2).plusHours(2))
-                .build();
+        when(roundRepository.findByIdx(999)).thenReturn(Optional.empty());
 
-        Page<Round> page = new PageImpl<>(List.of(pastRound));
-        when(roundRepository.findPastRoundsByCompIdx(any(Pageable.class), eq(1), any(LocalDateTime.class)))
-                .thenReturn(page);
-
-        // When
-        Page<RoundDTO> result = roundService.getRoundPast(pageable, 1);
-
-        // Then
-        assertThat(result).isNotNull();
-        assertThat(result.getContent()).hasSize(1);
-        assertThat(result.getContent().get(0).getRoundName()).isEqualTo("Past Round");
-    }
-
-    @Test
-    @DisplayName("진행 중인 라운드 목록 조회")
-    void getRoundNowSuccess() {
-        // Given
-        Pageable pageable = PageRequest.of(0, 10);
-        Page<Round> page = new PageImpl<>(List.of(testRound));
-        when(roundRepository.findPresentRoundsByCompIdx(any(Pageable.class), eq(1), any(LocalDateTime.class)))
-                .thenReturn(page);
-
-        // When
-        Page<RoundDTO> result = roundService.getRoundNow(pageable, 1);
-
-        // Then
-        assertThat(result).isNotNull();
-        assertThat(result.getContent()).hasSize(1);
-    }
-
-    @Test
-    @DisplayName("예정된 라운드 목록 조회")
-    void getRoundFutureSuccess() {
-        // Given
-        Pageable pageable = PageRequest.of(0, 10);
-        Page<Round> page = new PageImpl<>(List.of(testRound));
-        when(roundRepository.findFutureRoundsByCompIdx(any(Pageable.class), eq(1), any(LocalDateTime.class)))
-                .thenReturn(page);
-
-        // When
-        Page<RoundDTO> result = roundService.getRoundFuture(pageable, 1);
-
-        // Then
-        assertThat(result).isNotNull();
-        assertThat(result.getContent()).hasSize(1);
+        // When & Then
+        assertThatThrownBy(() -> roundService.getOne(999))
+                .isInstanceOf(CustomizedException.class);
     }
 
     @Test
