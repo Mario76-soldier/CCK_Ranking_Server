@@ -25,6 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Slf4j
 @Service
@@ -236,26 +237,37 @@ public class RecordService {
     }
 
     private void evictStatsCache(String eventName) {
-        var globalSingleCache = cacheManager.getCache("globalStatsSingle");
-        var globalAverageCache = cacheManager.getCache("globalStatsAverage");
-        var stateSingleCache = cacheManager.getCache("stateStatsSingle");
-        var stateAverageCache = cacheManager.getCache("stateStatsAverage");
-        var stateCache = cacheManager.getCache("stateStat");
+        evictCacheByPattern("globalStatsSingle", eventName);
+        evictCacheByPattern("globalStatsAverage", eventName);
+        evictCacheByPattern("stateStatsSingle", eventName);
+        evictCacheByPattern("stateStatsAverage", eventName);
         
-        if (globalSingleCache != null) {
-            globalSingleCache.evict(eventName);
-        }
-        if (globalAverageCache != null) {
-            globalAverageCache.evict(eventName);
-        }
-        if (stateSingleCache != null) {
-            stateSingleCache.evict(eventName);
-        }
-        if (stateAverageCache != null) {
-            stateAverageCache.evict(eventName);
-        }
+        // stateStat은 패턴이 다를 수 있으므로 기존 방식 유지 또는 전체 삭제
+        var stateCache = cacheManager.getCache("stateStat");
         if (stateCache != null) {
             stateCache.evict(eventName);
+        }
+    }
+
+    /**
+     * 특정 이벤트의 모든 페이지 캐시를 패턴으로 삭제
+     */
+    private void evictCacheByPattern(String cacheName, String eventName) {
+        var cache = cacheManager.getCache(cacheName);
+        if (cache != null) {
+            // ConcurrentMapCache인 경우 특정 키만 삭제 가능
+            if (cache.getNativeCache() instanceof ConcurrentHashMap) {
+                @SuppressWarnings("unchecked")
+                ConcurrentHashMap<Object, Object> nativeCache =
+                    (ConcurrentHashMap<Object, Object>) cache.getNativeCache();
+                
+                nativeCache.keySet().stream()
+                    .filter(key -> key.toString().startsWith(eventName + "-"))
+                    .forEach(cache::evict);
+            } else {
+                // Redis 등 다른 캐시는 전체 삭제
+                cache.clear();
+            }
         }
     }
 

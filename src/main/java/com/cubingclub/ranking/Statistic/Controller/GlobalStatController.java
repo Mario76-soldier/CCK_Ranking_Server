@@ -5,6 +5,8 @@ import com.cubingclub.ranking.Statistic.DTO.CompRecordStatDTO;
 import com.cubingclub.ranking.Statistic.Service.GlobalStatService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -21,13 +23,13 @@ public class GlobalStatController {
     private final GlobalStatService globalStatService;
 
     @GetMapping("/single/{eventName}")
-    public ResponseEntity<List<RecordDTO>> getSingleGlobalTop10(@PathVariable String eventName){
-        return ResponseEntity.ok(globalStatService.getGlobalTop10BySingleByEvent(eventName));
+    public ResponseEntity<Page<RecordDTO>> getSingleGlobalTop10(@PathVariable String eventName, Pageable pageable){
+        return ResponseEntity.ok(globalStatService.getGlobalSingleByEvent(eventName, pageable));
     }
 
     @GetMapping("/average/{eventName}")
-    public ResponseEntity<List<RecordDTO>> getAverageGlobalTop10(@PathVariable String eventName){
-        return ResponseEntity.ok(globalStatService.getGlobalTop10ByAverageByEvent(eventName));
+    public ResponseEntity<Page<RecordDTO>> getAverageGlobalTop10(@PathVariable String eventName, Pageable pageable){
+        return ResponseEntity.ok(globalStatService.getGlobalAverageByEvent(eventName, pageable));
     }
 
     @GetMapping("/comp/{eventName}")

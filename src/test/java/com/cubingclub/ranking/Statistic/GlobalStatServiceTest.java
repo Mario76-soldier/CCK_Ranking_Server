@@ -17,6 +17,10 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -103,40 +107,46 @@ class GlobalStatServiceTest {
 
     @Test
     @DisplayName("글로벌 상위 10개 Single 기록 조회 성공")
-    void getGlobalTop10BySingleByEventSuccess() {
+    void getGlobalSingleByEventSuccess() {
         // Given
         String eventName = "3x3x3";
-        when(globalStatRepository.findGlobalSingleTop10(eventName))
-                .thenReturn(List.of(testRecord));
+        Pageable pageable = PageRequest.of(0, 10);
+        Page<Record> recordPage = new PageImpl<>(List.of(testRecord), pageable, 1);
+        when(globalStatRepository.findGlobalSingle(eventName, pageable))
+                .thenReturn(recordPage);
 
         // When
-        List<RecordDTO> result = globalStatService.getGlobalTop10BySingleByEvent(eventName);
+        Page<RecordDTO> result = globalStatService.getGlobalSingleByEvent(eventName, pageable);
 
         // Then
         assertThat(result).isNotEmpty();
         assertThat(result).hasSize(1);
-        assertThat(result.get(0).getCckId()).isEqualTo("TEST001");
-        assertThat(result.get(0).getSingle()).isEqualTo(BigDecimal.valueOf(8.50));
-        verify(globalStatRepository, times(1)).findGlobalSingleTop10(eventName);
+        assertThat(result.getContent().get(0).getCckId()).isEqualTo("TEST001");
+        assertThat(result.getContent().get(0).getSingle()).isEqualTo(BigDecimal.valueOf(8.50));
+        assertThat(result.getTotalElements()).isEqualTo(1);
+        verify(globalStatRepository, times(1)).findGlobalSingle(eventName, pageable);
     }
 
     @Test
     @DisplayName("글로벌 상위 10개 Average 기록 조회 성공")
-    void getGlobalTop10ByAverageByEventSuccess() {
+    void getGlobalAverageByEventSuccess() {
         // Given
         String eventName = "3x3x3";
-        when(globalStatRepository.findGlobalAverageTop10(eventName))
-                .thenReturn(List.of(testRecord));
+        Pageable pageable = PageRequest.of(0, 10);
+        Page<Record> recordPage = new PageImpl<>(List.of(testRecord), pageable, 1);
+        when(globalStatRepository.findGlobalAverage(eventName, pageable))
+                .thenReturn(recordPage);
 
         // When
-        List<RecordDTO> result = globalStatService.getGlobalTop10ByAverageByEvent(eventName);
+        Page<RecordDTO> result = globalStatService.getGlobalAverageByEvent(eventName, pageable);
 
         // Then
         assertThat(result).isNotEmpty();
         assertThat(result).hasSize(1);
-        assertThat(result.get(0).getCckId()).isEqualTo("TEST001");
-        assertThat(result.get(0).getAverage()).isEqualTo(BigDecimal.valueOf(10.20));
-        verify(globalStatRepository, times(1)).findGlobalAverageTop10(eventName);
+        assertThat(result.getContent().get(0).getCckId()).isEqualTo("TEST001");
+        assertThat(result.getContent().get(0).getAverage()).isEqualTo(BigDecimal.valueOf(10.20));
+        assertThat(result.getTotalElements()).isEqualTo(1);
+        verify(globalStatRepository, times(1)).findGlobalAverage(eventName, pageable);
     }
 
     @Test
@@ -169,14 +179,39 @@ class GlobalStatServiceTest {
     void getGlobalTop10EmptyResult() {
         // Given
         String eventName = "Megaminx";
-        when(globalStatRepository.findGlobalSingleTop10(eventName))
-                .thenReturn(List.of());
+        Pageable pageable = PageRequest.of(0, 10);
+        Page<Record> emptyPage = new PageImpl<>(List.of(), pageable, 0);
+        when(globalStatRepository.findGlobalSingle(eventName, pageable))
+                .thenReturn(emptyPage);
 
         // When
-        List<RecordDTO> result = globalStatService.getGlobalTop10BySingleByEvent(eventName);
+        Page<RecordDTO> result = globalStatService.getGlobalSingleByEvent(eventName, pageable);
 
         // Then
         assertThat(result).isEmpty();
-        verify(globalStatRepository, times(1)).findGlobalSingleTop10(eventName);
+        assertThat(result.getTotalElements()).isEqualTo(0);
+        verify(globalStatRepository, times(1)).findGlobalSingle(eventName, pageable);
+    }
+
+    @Test
+    @DisplayName("글로벌 기록 조회 - 페이지네이션 테스트")
+    void getGlobalSingleByEventWithPagination() {
+        // Given
+        String eventName = "3x3x3";
+        Pageable pageable = PageRequest.of(1, 10); // 두 번째 페이지
+        Page<Record> recordPage = new PageImpl<>(List.of(testRecord), pageable, 25);
+        when(globalStatRepository.findGlobalSingle(eventName, pageable))
+                .thenReturn(recordPage);
+
+        // When
+        Page<RecordDTO> result = globalStatService.getGlobalSingleByEvent(eventName, pageable);
+
+        // Then
+        assertThat(result).isNotEmpty();
+        assertThat(result.getNumber()).isEqualTo(1); // 현재 페이지
+        assertThat(result.getSize()).isEqualTo(10); // 페이지 크기
+        assertThat(result.getTotalElements()).isEqualTo(25); // 전체 요소 수
+        assertThat(result.getTotalPages()).isEqualTo(3); // 전체 페이지 수
+        verify(globalStatRepository, times(1)).findGlobalSingle(eventName, pageable);
     }
 }
