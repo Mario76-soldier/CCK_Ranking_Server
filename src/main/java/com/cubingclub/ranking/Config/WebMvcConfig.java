@@ -23,7 +23,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
 
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
-        registry.addResourceHandler("/api/img/event/**")
+        registry.addResourceHandler(apiPrefix+"/img/event/**")
                 .addResourceLocations("file:"+path); // 컨테이너 내부 경로
     }
 
