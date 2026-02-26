@@ -48,7 +48,7 @@ public class StateStatService {
 
     @Cacheable(value = "stateStatsAverage", key = "#eventName + '-' + #state + '-' + #pageable.pageNumber + '-' + #pageable.pageSize")
     public Page<RecordDTO> getStateAverageByEvent(String eventName, String state, Pageable pageable) {
-        return stateStatRepository.findStateSingle(eventName, state, pageable).map(RecordDTO::new);
+        return stateStatRepository.findStateAverage(eventName, state, pageable).map(RecordDTO::new);
     }
 
     // ✅ 공통 로직 분리
