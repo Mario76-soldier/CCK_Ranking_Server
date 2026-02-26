@@ -40,7 +40,7 @@ public class PlayerStatRepositoryImpl implements PlayerStatRepository{
     public PlayerCountStatDTO findPlayerCountByCckId(String cckId) {
         return entityManager
                 .createQuery("select new com.cubingclub.ranking.Statistic.DTO.PlayerCountStatDTO(count(distinct r.round.comp.idx), count(case when a.time > 0 then a.idx end)) from Record r " +
-                        "left join r.attempts a where r.cckId=:cckId group by r.cckId", PlayerCountStatDTO.class)
+                        "left join r.attempts a where r.cckId=:cckId", PlayerCountStatDTO.class)
                 .setParameter("cckId", cckId)
                 .getSingleResult();
     }

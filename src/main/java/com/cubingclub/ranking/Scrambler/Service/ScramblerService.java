@@ -19,7 +19,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
@@ -57,7 +56,7 @@ public class ScramblerService {
         }
     }
 
-    @Transactional(readOnly = true)
+    @Transactional
     public ScrambleResponseDTO getScramble(ScramblerUpdateDTO scramblerUpdateDTO, String token) {
         return scrambleQueryService.getScrambleForPlayer(scramblerUpdateDTO.getCompIdx()
                 , scramblerUpdateDTO.getPlayerUid()

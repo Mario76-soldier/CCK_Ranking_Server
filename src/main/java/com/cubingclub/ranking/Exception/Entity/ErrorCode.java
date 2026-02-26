@@ -26,6 +26,7 @@ public enum ErrorCode {
     SCRAMBLE_SCRAMBLER_NOT_FOUND(HttpStatus.BAD_REQUEST, "SCRAMBLE-001", "스크램블러 정보가 없습니다."),
     SCRAMBLE_NOT_FOUND(HttpStatus.BAD_REQUEST, "SCRAMBLE-002", "스크램블 정보가 없습니다."),
     SCRAMBLE_COMPETITION_NOT_ENDED(HttpStatus.BAD_REQUEST, "SCRAMBLE-003", "대회가 아직 종료되지 않았습니다."),
+    SCRAMBLER_CONFLICT(HttpStatus.BAD_REQUEST, "SCRAMBLE-004", "스크램블러와 선수가 동일합니다."),
 
     RECORD_NOT_FOUND(HttpStatus.BAD_REQUEST, "RECORD-001", "기록 정보가 없습니다."),
     RECORD_ATTEMPT_NOT_FOUND(HttpStatus.BAD_REQUEST, "RECORD-002", "시도 정보가 없습니다."),

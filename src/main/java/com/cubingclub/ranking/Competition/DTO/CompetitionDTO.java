@@ -1,7 +1,6 @@
 package com.cubingclub.ranking.Competition.DTO;
 
 import com.cubingclub.ranking.Competition.Entity.Competition;
-import com.cubingclub.ranking.Competition.Entity.EventFee;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;

@@ -3,10 +3,12 @@ package com.cubingclub.ranking.Scrambler;
 import com.cubingclub.ranking.Competition.Entity.Competition;
 import com.cubingclub.ranking.CubeEvent.Entity.ColorType;
 import com.cubingclub.ranking.CubeEvent.Entity.CubeEvent;
+import com.cubingclub.ranking.Record.Repository.RecordRepository;
 import com.cubingclub.ranking.Round.Entity.Round;
 import com.cubingclub.ranking.Round.Repository.RoundRepository;
 import com.cubingclub.ranking.Scrambler.Component.PuzzleConfigResolver;
 import com.cubingclub.ranking.Scrambler.DTO.ScrambleResponseDTO;
+import com.cubingclub.ranking.Scrambler.DTO.ScramblerUpdateDTO;
 import com.cubingclub.ranking.Scrambler.Repository.ScramblerRepository;
 import com.cubingclub.ranking.Scrambler.Service.ScrambleCreationService;
 import com.cubingclub.ranking.Scrambler.Service.ScrambleQueryService;
@@ -24,6 +26,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.*;
@@ -38,6 +41,9 @@ class ScramblerServiceTest {
 
     @Mock
     private RoundRepository roundRepository;
+
+    @Mock
+    private RecordRepository recordRepository;
 
     @Mock
     private ScramblerRepository scramblerRepository;
@@ -95,7 +101,7 @@ class ScramblerServiceTest {
         int count = 5;
         Map<String, String> colorScheme = Map.of("U", "white", "D", "yellow");
 
-        when(roundRepository.findByIdx(1)).thenReturn(testRound);
+        when(roundRepository.findByIdx(1)).thenReturn(Optional.of(testRound));
         when(puzzleConfigResolver.resolvePuzzleId(testRound)).thenReturn(puzzleId);
         when(puzzleConfigResolver.resolveScrambleCount(testRound)).thenReturn(count);
         when(puzzleConfigResolver.resolveColorScheme(testRound)).thenReturn(colorScheme);
@@ -127,7 +133,7 @@ class ScramblerServiceTest {
         int count = 5;
         Map<String, String> colorScheme = Map.of("U", "white", "D", "yellow");
 
-        when(roundRepository.findByIdx(1)).thenReturn(testRound);
+        when(roundRepository.findByIdx(1)).thenReturn(Optional.of(testRound));
         when(puzzleConfigResolver.resolvePuzzleId(testRound)).thenReturn(puzzleId);
         when(puzzleConfigResolver.resolveScrambleCount(testRound)).thenReturn(count);
         when(puzzleConfigResolver.resolveColorScheme(testRound)).thenReturn(colorScheme);
@@ -149,18 +155,23 @@ class ScramblerServiceTest {
     @DisplayName("플레이어 스크램블 조회 성공")
     void getScrambleSuccess() {
         // Given
-        String uid = "test-uid";
+        ScramblerUpdateDTO updateDTO = new ScramblerUpdateDTO();
+        updateDTO.setCompIdx(1);
+        updateDTO.setPlayerUid("player-uid");
+        updateDTO.setScramblerUid("scrambler-uid");
         String token = "test-token";
+
         ScrambleResponseDTO expectedResponse = new ScrambleResponseDTO();
         expectedResponse.setRoundIdx(1);
         expectedResponse.setRoundName("Round 1");
         expectedResponse.setEventName("3x3x3");
         expectedResponse.setRoundGroup("A");
 
-        when(scrambleQueryService.getScrambleForPlayer(1, uid, token)).thenReturn(expectedResponse);
+        when(scrambleQueryService.getScrambleForPlayer(1, "player-uid", "scrambler-uid", token))
+                .thenReturn(expectedResponse);
 
         // When
-        ScrambleResponseDTO result = scramblerService.getScramble(1, uid, token);
+        ScrambleResponseDTO result = scramblerService.getScramble(updateDTO, token);
 
         // Then
         assertThat(result).isNotNull();
@@ -168,7 +179,7 @@ class ScramblerServiceTest {
         assertThat(result.getRoundName()).isEqualTo("Round 1");
         assertThat(result.getEventName()).isEqualTo("3x3x3");
         assertThat(result.getRoundGroup()).isEqualTo("A");
-        verify(scrambleQueryService, times(1)).getScrambleForPlayer(1, uid, token);
+        verify(scrambleQueryService, times(1)).getScrambleForPlayer(1, "player-uid", "scrambler-uid", token);
     }
 
     @Test
@@ -180,7 +191,7 @@ class ScramblerServiceTest {
         int count = 5;
         Map<String, String> colorScheme = Map.of("U", "white", "D", "yellow");
 
-        when(roundRepository.findByIdx(1)).thenReturn(testRound);
+        when(roundRepository.findByIdx(1)).thenReturn(Optional.of(testRound));
         when(puzzleConfigResolver.resolvePuzzleId(testRound)).thenReturn(puzzleId);
         when(puzzleConfigResolver.resolveScrambleCount(testRound)).thenReturn(count);
         when(puzzleConfigResolver.resolveColorScheme(testRound)).thenReturn(colorScheme);
@@ -205,7 +216,7 @@ class ScramblerServiceTest {
         int count = 5;
         Map<String, String> colorScheme = Map.of("U", "white", "D", "yellow");
 
-        when(roundRepository.findByIdx(1)).thenReturn(testRound);
+        when(roundRepository.findByIdx(1)).thenReturn(Optional.of(testRound));
         when(puzzleConfigResolver.resolvePuzzleId(testRound)).thenReturn(puzzleId);
         when(puzzleConfigResolver.resolveScrambleCount(testRound)).thenReturn(count);
         when(puzzleConfigResolver.resolveColorScheme(testRound)).thenReturn(colorScheme);

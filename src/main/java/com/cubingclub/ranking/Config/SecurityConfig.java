@@ -44,6 +44,9 @@ public class SecurityConfig{
     private String allowedMethods;
     @Value("${api.prefix}")
     private String apiPrefix;
+    
+    private final CustomAuthenticationEntryPoint authenticationEntryPoint;
+    private final CustomAccessDeniedHandler accessDeniedHandler;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -68,18 +71,22 @@ public class SecurityConfig{
                 )
                 .cors(cors->cors.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests(request -> request
-                        .requestMatchers("/recorder/**").hasAuthority("SCOPE_limited.read")
-                        .requestMatchers("/scramble", "/scramble/check/**").hasAnyRole("ROOT", "SCRAMBLER")
-                        .requestMatchers(HttpMethod.POST,"/comp/**", "/event/**","/round","/advance/**","/record/**").hasAnyRole("ROOT","ADMIN")
-                        .requestMatchers(HttpMethod.PUT,"/comp/**", "/event/**","/round","/advance/**","/record/**").hasAnyRole("ROOT","ADMIN")
-                        .requestMatchers(HttpMethod.PATCH,"/comp/**", "/event/**","/round","/advance/**","/record/**").hasAnyRole("ROOT","ADMIN")
-                        .requestMatchers(HttpMethod.DELETE,"/comp/**","/round/**","/record/**").hasAnyRole("ROOT","ADMIN")
+                        .requestMatchers(apiPrefix+"/recorder/**").hasAuthority("SCOPE_limited.read")
+                        .requestMatchers(apiPrefix+"/scramble", apiPrefix+"/scramble/check/**").hasAnyRole("ROOT", "SCRAMBLER")
+                        .requestMatchers(HttpMethod.POST,apiPrefix+"/comp/**", apiPrefix+"/event/**",apiPrefix+"/round",apiPrefix+"/advance/**",apiPrefix+"/record/**").hasAnyRole("ROOT","ADMIN")
+                        .requestMatchers(HttpMethod.PUT,apiPrefix+"/comp/**", apiPrefix+"/event/**",apiPrefix+"/round",apiPrefix+"/advance/**",apiPrefix+"/record/**").hasAnyRole("ROOT","ADMIN")
+                        .requestMatchers(HttpMethod.PATCH,apiPrefix+"/comp/**", apiPrefix+"/event/**",apiPrefix+"/round",apiPrefix+"/advance/**",apiPrefix+"/record/**").hasAnyRole("ROOT","ADMIN")
+                        .requestMatchers(HttpMethod.DELETE,apiPrefix+"/comp/**",apiPrefix+"/round/**",apiPrefix+"/record/**").hasAnyRole("ROOT","ADMIN")
 
                         .requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll()
                         .anyRequest().permitAll()
                 )
                 .oauth2ResourceServer(oauth2 -> oauth2
                         .jwt(jwt -> jwt.decoder(jwtDecoder()).jwtAuthenticationConverter(jwtAuthenticationConverter())) // JWT 검증 필터링
+                        .authenticationEntryPoint(authenticationEntryPoint) // 401 처리
+                )
+                .exceptionHandling(exception -> exception
+                        .accessDeniedHandler(accessDeniedHandler) // 403 처리
                 );
         return http.build();
     }
