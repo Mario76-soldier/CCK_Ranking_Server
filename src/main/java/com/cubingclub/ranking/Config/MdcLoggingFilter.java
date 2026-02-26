@@ -7,7 +7,6 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.MDC;
-import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
@@ -21,7 +20,7 @@ import java.util.stream.Collectors;
 
 @Slf4j
 @Component
-@Order(Ordered.HIGHEST_PRECEDENCE)
+@Order(3)  // 가장 먼저 실행하여 MDC 설정
 public class MdcLoggingFilter extends OncePerRequestFilter {
 
     @Override
@@ -31,17 +30,19 @@ public class MdcLoggingFilter extends OncePerRequestFilter {
             @NonNull FilterChain filterChain
     ) throws ServletException, IOException {
         try {
-            // 클라이언트 IP 추출 및 MDC 설정
+            // 1단계: 요청 정보 MDC에 설정 (인증 전)
             String clientIp = getClientIp(request);
             MDC.put("ip", clientIp);
-
-            // 요청 URI 및 메서드 설정
             MDC.put("method", request.getMethod());
             MDC.put("uri", request.getRequestURI());
+            MDC.put("userId", "anonymous");  // 기본값 설정
 
-            // SecurityContext에서 인증 정보 추출
+            // 2단계: 필터 체인 실행 (여기서 Spring Security의 JWT 인증 실행됨)
+            filterChain.doFilter(request, response);
+            
+            // 3단계: 인증 후 SecurityContext에서 사용자 정보 추출하여 MDC 업데이트
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-
+            
             if (authentication != null && authentication.isAuthenticated() && !authentication.getPrincipal().equals("anonymousUser")) {
                 // OAuth2 JWT 토큰에서 정보 추출
                 if (authentication.getPrincipal() instanceof Jwt jwt) {
@@ -57,22 +58,33 @@ public class MdcLoggingFilter extends OncePerRequestFilter {
                         MDC.put("roles", roles);
                     }
 
-                    log.info("Authenticated user access");
+                    log.info("Authenticated access");
                 } else {
                     // JWT가 아닌 다른 인증 방식
                     MDC.put("userId", authentication.getName());
-                    log.info("Authenticated user access (non-JWT)");
+                    log.info("Authenticated access (non-JWT)");
                 }
             } else {
-                // 익명 사용자
-                MDC.put("userId", "anonymous");
-                log.info("Anonymous user access");
+                log.info("Anonymous access");
             }
-
-            filterChain.doFilter(request, response);
+            
+            // 4단계: 응답 상태 코드 로깅
+            int status = response.getStatus();
+            
+            if (status >= 400) {
+                if (status == 401) {
+                    log.warn("Unauthorized");
+                } else if (status == 403) {
+                    log.warn("Access denied");
+                } else if (status >= 500) {
+                    log.error("Server error: {}", status);
+                } else {
+                    log.warn("Client error: {}", status);
+                }
+            }
         } catch (Exception e) {
-            log.error("Error in MDC logging filter", e);
-            filterChain.doFilter(request, response);
+            log.error("Error in MDC filter", e);
+            throw e;
         } finally {
             // 요청 처리 완료 후 MDC 정리
             MDC.clear();
