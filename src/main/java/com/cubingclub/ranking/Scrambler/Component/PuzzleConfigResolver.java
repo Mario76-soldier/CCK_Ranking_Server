@@ -15,23 +15,16 @@ public class PuzzleConfigResolver {
         String eventName = round.getCubeEvent().getEventName();
 
         String baseEvent;
-        String option = "";
 
         if (eventName.contains(" ")) {
             String[] parts = eventName.split(" ", 2);
             baseEvent = parts[0];
-            option = parts[1];
         } else {
             baseEvent = eventName;
         }
 
         String puzzleId = getPuzzleId(baseEvent);
         if (puzzleId == null) return null;
-
-        if (option.startsWith("BLD")) puzzleId += "bf";
-        else if (option.startsWith("FMC")) puzzleId += "fm";
-        else if (option.startsWith("OH")) puzzleId += "oh";
-        else if (option.startsWith("MULTBLD")) puzzleId += "mbf";
 
         return puzzleId;
     }
