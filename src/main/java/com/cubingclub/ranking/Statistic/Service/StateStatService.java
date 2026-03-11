@@ -1,6 +1,7 @@
 package com.cubingclub.ranking.Statistic.Service;
 
 import com.cubingclub.ranking.Record.DTO.AttemptDTO;
+import com.cubingclub.ranking.Record.DTO.RecordDTO;
 import com.cubingclub.ranking.Statistic.DTO.StateRecordDTO;
 import com.cubingclub.ranking.Statistic.DTO.StateRecordFlatDTO;
 import com.cubingclub.ranking.Statistic.DTO.StateStatDTO;
@@ -9,6 +10,8 @@ import com.cubingclub.ranking.Statistic.Repository.StateStatRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -36,6 +39,16 @@ public class StateStatService {
         return getStateTop3Internal(() ->
                 stateStatRepository.findStateAverageTop3Flat(eventName)
         );
+    }
+
+    @Cacheable(value = "stateStatsSingle", key = "#eventName + '-' + #state + '-' +#pageable.pageNumber + '-' + #pageable.pageSize")
+    public Page<RecordDTO> getStateSingleByEvent(String eventName, String state, Pageable pageable) {
+        return stateStatRepository.findStateSingle(eventName, state, pageable).map(RecordDTO::new);
+    }
+
+    @Cacheable(value = "stateStatsAverage", key = "#eventName + '-' + #state + '-' + #pageable.pageNumber + '-' + #pageable.pageSize")
+    public Page<RecordDTO> getStateAverageByEvent(String eventName, String state, Pageable pageable) {
+        return stateStatRepository.findStateAverage(eventName, state, pageable).map(RecordDTO::new);
     }
 
     // ✅ 공통 로직 분리
