@@ -15,6 +15,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @Slf4j
 @RestController
 @RequiredArgsConstructor
@@ -25,8 +27,8 @@ public class RecorderController {
     private final AuthService authService;
 
     @GetMapping("/comp")
-    public ResponseEntity<Page<CompetitionDTO>> getCompNow(){
-        return ResponseEntity.ok(competitionService.getCompNow(Pageable.ofSize(100)));
+    public ResponseEntity<List<CompetitionDTO>> getCompNow(){
+        return ResponseEntity.ok(competitionService.getCompNowNonPage());
     }
 
     @GetMapping("/info/{uid}")

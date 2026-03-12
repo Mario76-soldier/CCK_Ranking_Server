@@ -19,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Slf4j
 @Service
@@ -28,7 +29,7 @@ public class CompetitionService {
     private final CubeEventRepository cubeEventRepository;
 
     @Transactional
-    public void create(CompetitionCreateDTO competitionCreateDTO) {
+    public CompetitionDTO create(CompetitionCreateDTO competitionCreateDTO) {
         Competition competition = competitionCreateDTO.toEntity();
 
         if (competitionCreateDTO.getEventFeeList() != null) {
@@ -38,7 +39,7 @@ public class CompetitionService {
                 competition.getEventFees().add(feeEntity);
             }
         }
-        competitionRepository.save(competition);
+        return new CompetitionDTO(competitionRepository.save(competition));
     }
 
     @Transactional
@@ -92,6 +93,14 @@ public class CompetitionService {
         // OneToMany 컬렉션 초기화
         competitions.forEach(comp -> Hibernate.initialize(comp.getEventFees()));
         return competitions.map(CompetitionDTO::new);
+    }
+
+    @Transactional(readOnly=true)
+    public List<CompetitionDTO> getCompNowNonPage(){
+        LocalDate currentTime=LocalDate.now();
+        return competitionRepository
+                .findByCompDateStartLessThanEqualAndCompDateEndGreaterThanEqualOrderByCompDateStartDesc(currentTime, currentTime)
+                .stream().map(CompetitionDTO::new).toList();
     }
 
     @Transactional(readOnly = true)

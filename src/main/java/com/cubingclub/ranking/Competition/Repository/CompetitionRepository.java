@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 
 public interface CompetitionRepository extends JpaRepository<Competition, Integer> {
     // Past
@@ -26,4 +27,6 @@ public interface CompetitionRepository extends JpaRepository<Competition, Intege
 
     // Future
     Page<Competition> findByJoinDateStartAfterOrderByJoinDateStartAsc(Pageable pageable, LocalDateTime today);
+
+    List<Competition> findByCompDateStartLessThanEqualAndCompDateEndGreaterThanEqualOrderByCompDateStartDesc(LocalDate today1, LocalDate today2);
 }

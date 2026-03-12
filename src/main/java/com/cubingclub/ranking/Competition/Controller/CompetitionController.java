@@ -68,9 +68,8 @@ public class CompetitionController {
     }
 
     @PostMapping("")
-    public ResponseEntity<Void> createComp(@Valid @RequestBody CompetitionCreateDTO competitionCreateDTO){
-        competitionService.create(competitionCreateDTO);
-        return ResponseEntity.ok().build();
+    public ResponseEntity<CompetitionDTO> createComp(@Valid @RequestBody CompetitionCreateDTO competitionCreateDTO){
+        return ResponseEntity.ok(competitionService.create(competitionCreateDTO));
     }
 
     @PutMapping("")
