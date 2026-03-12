@@ -8,7 +8,11 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 public class PlayerInfo {
-    String name;
-    String state;
-    String cckId;
+    private String name;
+    private String enName;
+    private String state;
+    private String cckId;
+    private String wcaId;
+    private Gender gender;
+    private UserRole position;
 }
