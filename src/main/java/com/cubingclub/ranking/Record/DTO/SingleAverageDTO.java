@@ -10,6 +10,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 public class SingleAverageDTO {
-    String single;
-    String average;
+    private String type;
+    private String single;
+    private String average;
 }

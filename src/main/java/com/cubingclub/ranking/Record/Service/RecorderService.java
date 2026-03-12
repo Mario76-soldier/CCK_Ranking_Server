@@ -55,14 +55,15 @@ public class RecorderService {
         Attempt attempt=attemptRepository.findById(recorderDTO.getAttemptIdx()).orElseThrow(()->new CustomizedException(ErrorCode.RECORD_ATTEMPT_NOT_FOUND));
         Record record=attempt.getRecord();
         String avgCalc=record.getRound().getCubeEvent().getAvgCalc();
-        if(attempt.getAttemptTry().equals(4)){
+        if(attempt.getAttemptTry().equals(1) && avgCalc.equals("single")){
+            return new SingleAverageDTO("result", recordCalculator.formatTime(record.getSingle()), null);
+        }
+        int maxCount = Integer.parseInt(avgCalc.substring(2));
+        if(attempt.getAttemptTry().equals(maxCount-1) && avgCalc.startsWith("ao")){
             return calculateExpectation(record.getIdx());
         }
-        else if (attempt.getAttemptTry().equals(5) || (attempt.getAttemptTry().equals(3) && avgCalc.equals("mo3"))){
-            return new SingleAverageDTO(recordCalculator.formatTime(record.getSingle()), recordCalculator.formatTime(record.getAverage()));
-        }
-        else if(attempt.getAttemptTry().equals(1) && avgCalc.equals("single")){
-            return new SingleAverageDTO(recordCalculator.formatTime(record.getSingle()), null);
+        if (attempt.getAttemptTry().equals(maxCount)){
+            return new SingleAverageDTO("result", recordCalculator.formatTime(record.getSingle()), recordCalculator.formatTime(record.getAverage()));
         }
         return null;
     }
@@ -118,7 +119,7 @@ public class RecorderService {
         SingleAverageDTO expectedDTO = new SingleAverageDTO();
         expectedDTO.setSingle(recordCalculator.formatTime(recordCalculator.calculateAoXAverage(bestList)));
         expectedDTO.setAverage(recordCalculator.formatTime(recordCalculator.calculateAoXAverage(worstList)));
-
+        expectedDTO.setType("bwpa");
         return expectedDTO;
     }
 }
