@@ -65,7 +65,7 @@ public class RecorderService {
         if (attempt.getAttemptTry().equals(maxCount)){
             return new SingleAverageDTO("result", recordCalculator.formatTime(record.getSingle()), recordCalculator.formatTime(record.getAverage()));
         }
-        return null;
+        return new SingleAverageDTO("processing", null, null);
     }
 
     private void updateRecordOne(Integer idx, BigDecimal record, PlayerInfo judgeInfo) {
