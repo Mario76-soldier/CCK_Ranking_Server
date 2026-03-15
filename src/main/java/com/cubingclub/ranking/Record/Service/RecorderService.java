@@ -37,6 +37,7 @@ public class RecorderService {
         for (Record p : list) {
             String roundName = p.getRound().getCubeEvent().getEventName() + " " + p.getRound().getRoundName();
             List<Attempt> attemptList=p.getAttempts();
+            log.info(p.getEnName());
 
             for(Attempt attempt: attemptList){
                 if(attempt.getTime()==null || attempt.getTime().compareTo(BigDecimal.ZERO)==0){

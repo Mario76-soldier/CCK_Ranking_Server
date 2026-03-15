@@ -45,6 +45,10 @@ public class CutoffProcessor {
                 continue;
             }
 
+            if (time==null || time.compareTo(BigDecimal.ZERO) == 0){
+                continue;
+            }
+
             // 타임리밋 초과 시 DNF 처리
             if (isOverTimeLimit(time, timeLimit)) {
                 attempt.updateTime(calculator.getDNF());
