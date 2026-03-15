@@ -136,6 +136,7 @@ public class SecurityConfig{
             Collection<GrantedAuthority> authorities = new ArrayList<>();
             authorities.addAll(scopeConverter.convert(jwt));
             authorities.addAll(roleConverter.convert(jwt));
+            System.out.println("Authorities = " + authorities);
             return authorities;
         };
     }

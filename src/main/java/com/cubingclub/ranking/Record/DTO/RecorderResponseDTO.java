@@ -11,6 +11,7 @@ public class RecorderResponseDTO {
     Integer attemptIdx;
     Integer seq;
     String name;
+    String enName;
     String state;
     String roundName;
     Integer extraNum;

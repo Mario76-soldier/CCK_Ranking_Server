@@ -25,6 +25,7 @@ public class Record {
     private Integer pdx;
     @Column(nullable = false)
     private String name;
+    private String enName;
     private String state;
     private String cckId;
     @ManyToOne(fetch=FetchType.LAZY)

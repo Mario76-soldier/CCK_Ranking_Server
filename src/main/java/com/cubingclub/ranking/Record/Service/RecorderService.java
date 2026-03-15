@@ -35,14 +35,12 @@ public class RecorderService {
         // OneToMany 컬렉션 초기화
         list.forEach(record -> Hibernate.initialize(record.getAttempts()));
         for (Record p : list) {
-            String name = p.getName();
             String roundName = p.getRound().getCubeEvent().getEventName() + " " + p.getRound().getRoundName();
-            String state=p.getState();
             List<Attempt> attemptList=p.getAttempts();
 
             for(Attempt attempt: attemptList){
                 if(attempt.getTime()==null || attempt.getTime().compareTo(BigDecimal.ZERO)==0){
-                    return new RecorderResponseDTO(attempt.getIdx(), attempt.getAttemptTry(), name, state, roundName, attempt.getExtra());
+                    return new RecorderResponseDTO(attempt.getIdx(), attempt.getAttemptTry(), p.getName(), p.getEnName(), p.getState(), roundName, attempt.getExtra());
                 }
             }
         }

@@ -18,6 +18,7 @@ public class RecordDTO {
     private Integer idx;
     private Integer pdx;
     private String name;
+    private String enName;
     private String state;
     private String cckId;
     private Integer roundIdx;
@@ -41,6 +42,7 @@ public class RecordDTO {
         this.idx=entity.getIdx();
         this.pdx=entity.getPdx();
         this.name=entity.getName();
+        this.enName=entity.getEnName();
         this.state=entity.getState();
         this.cckId=entity.getCckId();
         this.roundIdx=entity.getRound().getIdx();
@@ -65,6 +67,7 @@ public class RecordDTO {
         return Record.builder()
                 .pdx(pdx)
                 .name(name)
+                .enName(enName)
                 .state(state)
                 .cckId(cckId)
                 .round(round)

@@ -12,6 +12,7 @@ import lombok.Setter;
 public class PlayerAddDTO {
     private Integer pdx;
     private String name;
+    private String enName;
     private String state;
     private String cckId;
     private Integer roundIdx;
