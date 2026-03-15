@@ -83,6 +83,7 @@ public class RecorderService {
 
         // "ao" 로 시작하지 않으면 null 리턴
         if (!avgCalc.startsWith("ao")) {
+            log.info("not ao");
             return null;
         }
 
@@ -96,7 +97,7 @@ public class RecorderService {
 
         // 아직 시도 중이면 기대값 계산
         // 마지막 시도가 비어 있거나 0보다 크면
-        Attempt lastAttempt = attemptList.get(Math.min(aoCount - 1, attemptList.size() - 1));
+        Attempt lastAttempt = attemptList.get(Math.min(aoCount - 2, attemptList.size() - 2));
         if (lastAttempt.getTime() == null || lastAttempt.getTime().compareTo(BigDecimal.ZERO) == 0) {
             return null;
         }
